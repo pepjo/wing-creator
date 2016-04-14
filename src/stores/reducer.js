@@ -2,8 +2,8 @@
 import { combineReducers } from 'redux'
 
 // Reducers
-import configuration from './configuration.js'
+import geometry from './geometry'
 
 export default combineReducers({
-  configuration,
+  geometry,
 })

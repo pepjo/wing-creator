@@ -1,13 +1,29 @@
 
 import React from 'react'
+import { connect } from 'react-redux'
 import THREE from 'three'
 
 // Components
 import React3 from 'react-THREE-renderer'
 import Container from './container'
+import Ribs from './Ribs'
 
 // Styles
 import * as style from './index.style'
+
+const propTypes = {
+  geometry: React.propTypes.object,
+}
+
+function mapStateToProps (state) {
+  return {
+    geometry: state.geometry,
+  }
+}
+
+function mapDispatchToProps () {
+  return {}
+}
 
 class Viewer extends React.Component {
   constructor (props, context) {
@@ -15,12 +31,11 @@ class Viewer extends React.Component {
 
     // construct the position vector here, because if we use 'new' within render,
     // React will think that things have changed when they have not.
-    this.cameraPosition = new THREE.Vector3(0, 0, 5)
     this.mainLigthPosition = new THREE.Vector3(5, 5, 5)
     this.secondLigthPosition = new THREE.Vector3(-5, -5, 5)
 
     this.state = {
-      cubeRotation: new THREE.Euler(),
+      cameraPosition: new THREE.Vector3(0, 0, 5),
     }
 
     this._onAnimate = () => {
@@ -30,11 +45,6 @@ class Viewer extends React.Component {
       // this helps with updates and pure rendering.
       // React will be sure that the rotation has now updated.
       this.setState({
-        cubeRotation: new THREE.Euler(
-          this.state.cubeRotation.x + 0.01,
-          this.state.cubeRotation.y + 0.01,
-          0
-        ),
       })
     }
   }
@@ -54,48 +64,47 @@ class Viewer extends React.Component {
           alpha
           clearAlpha={0}
         >
-        <scene>
-          <perspectiveCamera
-            name="camera"
-            fov={75}
-            aspect={width / height}
-            near={0.1}
-            far={1000}
+          <scene>
+            <perspectiveCamera
+              name="camera"
+              fov={75}
+              aspect={width / height}
+              near={0.1}
+              far={1000}
 
-            position={this.cameraPosition}
-          />
-
-          <pointLight
-            name="mainLight"
-            position={this.mainLigthPosition}
-            visible
-            castShadow
-          />
-          <pointLight
-            name="secondLight"
-            position={this.secondLigthPosition}
-            intensity={0.3}
-            visible
-            castShadow={false}
-          />
-
-          <mesh
-            rotation={this.state.cubeRotation}
-          >
-            <boxGeometry
-              width={1}
-              height={1}
-              depth={1}
+              position={this.state.cameraPosition}
             />
-            <meshLambertMaterial
-              color={0x00ff00}
+
+            <pointLight
+              name="mainLight"
+              position={this.mainLigthPosition}
+              visible
+              castShadow
             />
-          </mesh>
-        </scene>
+            <pointLight
+              name="secondLight"
+              position={this.secondLigthPosition}
+              intensity={0.3}
+              visible
+              castShadow={false}
+            />
+
+            <mesh>
+              <Ribs
+                airfoil={this.props.geometry.airfoil}
+                settings={this.props.geometry.ribs}
+              />
+              <meshLambertMaterial
+                color={0xff7777}
+              />
+            </mesh>
+          </scene>
         </React3>
       </Container>
     )
   }
 }
 
-export default Viewer
+Viewer.propTypes = propTypes
+
+export default connect(mapStateToProps, mapDispatchToProps)(Viewer)
