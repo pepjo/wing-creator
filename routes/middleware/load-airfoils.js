@@ -67,7 +67,7 @@ module.exports = (req, res, next) => {
   req.airfoils = [] // eslint-disable-line no-param-reassign
 
   readFiles(
-    path.join(__dirname, '../../../airfoils/'),
+    path.join(__dirname, '../../airfoils/'),
     // Handle files
     (filename, content) => {
       const file = parseFile(content)

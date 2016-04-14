@@ -1,5 +1,5 @@
 
-// import { PLAN_UI } from '../actions/admin.js'
+import { REPLACE_AIRFOILS } from '../actions/data'
 
 const defaultState = {
   airfoils: [],
@@ -7,10 +7,10 @@ const defaultState = {
 
 export default (state = defaultState, action) => {
   switch (action.type) {
-    // case GET_ALL_PLANS:
-    //   return Object.assign({}, state, {
-    //     gettingPlans: true
-    //   })
+    case REPLACE_AIRFOILS:
+      return Object.assign({}, state, {
+        airfoils: Object.assign({}, action.airfoils)
+      })
 
     default:
       return state

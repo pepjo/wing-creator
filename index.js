@@ -12,7 +12,8 @@ const logger = require('morgan')
 const path = require('path')
 
 // Routes
-const home = require(path.join(__dirname, 'routes/home/index'))
+const home = require(path.join(__dirname, 'routes/index'))
+const api = require(path.join(__dirname, 'routes/api'))
 
 const app = express()
 
@@ -36,6 +37,9 @@ app.use(bodyParser.urlencoded({ extended: false }))
 
 // Loads the app
 app.use('/', home)
+
+// Loads the app
+app.use('/api', api)
 
 // Loads public folder
 app.use(express.static(path.join(__dirname, 'public')))

@@ -5,7 +5,7 @@ const path = require('path')
 const ReactDOMServer = require('react-dom/server')
 
 const components = {
-  web: require(path.join(__dirname, '../../../views/react/server')).default,
+  web: require(path.join(__dirname, '../../views/react/server')).default,
 }
 
 /** We use this middleware to react render **/
