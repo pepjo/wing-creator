@@ -6,13 +6,13 @@ import THREE from 'three'
 // Components
 import React3 from 'react-THREE-renderer'
 import Container from './container'
-import Ribs from './Ribs'
+import Ribs from './rib/Ribs'
 
 // Styles
 import * as style from './index.style'
 
 const propTypes = {
-  geometry: React.propTypes.object,
+  geometry: React.PropTypes.object,
 }
 
 function mapStateToProps (state) {
@@ -90,9 +90,10 @@ class Viewer extends React.Component {
             />
 
             <mesh>
-              <Ribs
-                airfoil={this.props.geometry.airfoil}
-                settings={this.props.geometry.ribs}
+              <boxGeometry
+                width={1}
+                height={1}
+                depth={1}
               />
               <meshLambertMaterial
                 color={0xff7777}

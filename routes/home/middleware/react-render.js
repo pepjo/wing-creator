@@ -11,13 +11,11 @@ const components = {
 /** We use this middleware to react render **/
 module.exports = (req, res, next) => {
   res.reactRender = (state) => { // eslint-disable-line no-param-reassign
-    let s = state
-
     const component = components.web(req.headers['user-agent'])
 
-    const store = component.configureStore()
+    const store = component.configureStore(state.initial)
 
-    s = Object.assign(
+    const s = Object.assign(
       {
         layout: 'web',
         production: process.env.NODE_ENV === 'production',
