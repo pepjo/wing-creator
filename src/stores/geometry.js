@@ -2,7 +2,7 @@
 // import { PLAN_UI } from '../actions/admin.js'
 
 const defaultState = {
-  airfoil: 'NACA0012',
+  airfoil: 'naca0012.dat',
   ribs: {
     n: 5,
     thickness: 5,

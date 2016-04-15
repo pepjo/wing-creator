@@ -36,7 +36,7 @@ class App extends React.Component {
   }
 
   componentDidMount () {
-    setInterval(() => { this.loadAirfoils() }, 2200)
+    setInterval(() => { this.loadAirfoils() }, 10000)
   }
 
   loadAirfoils () {

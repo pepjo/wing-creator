@@ -49,7 +49,7 @@ function parseFile (content) {
   const name = content.split('\n')[0]
   const data = content
     .split('\n') // separate by lines
-    .slice(2) // Ignore first 2 lines
+    .slice(2, content.split('\n').length - 1) // Ignore first 2 lines
     .map((line) => ( // Parse lines into points
       line
       .split(' ') // Separete numbers

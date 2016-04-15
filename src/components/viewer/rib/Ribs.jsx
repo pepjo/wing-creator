@@ -1,27 +1,39 @@
 
 import React from 'react'
 
+import generator from './generator'
+
 const propTypes = {
-  airfoil: React.PropTypes.string,
-  length: React.PropTypes.number,
+  airfoil: React.PropTypes.object,
   settings: React.PropTypes.object,
 }
 
-function Rib ({ airfoil, settings, length }) {
-  /*
-    1. Load airfoil
-    2. Generate section
-    3. copy section
-    4. Generate vertex matrix
-    5. Generate faces matrix
-  */
-  return (
-    <scene>
+class Ribs extends React.Component {
+  constructor (props) {
+    super(props)
 
-    </scene>
-  )
+    console.log('The msh should be regenerated if the props change')
+    this.msh = generator(
+      props.airfoil, props.settings.ribs, props.settings.length, props.settings.root
+    )
+  }
+
+  render () {
+    const { vertices, faces } = this.msh
+    return (
+      <mesh>
+        <geometry
+          vertices={vertices}
+          faces={faces}
+        />
+        <meshLambertMaterial
+          color={0xff7777}
+        />
+      </mesh>
+    )
+  }
 }
 
-Rib.propTypes = propTypes
+Ribs.propTypes = propTypes
 
-export default Rib
+export default Ribs

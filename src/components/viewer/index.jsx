@@ -1,7 +1,10 @@
 
 import React from 'react'
+import ReactDOM from 'react-dom'
 import { connect } from 'react-redux'
 import THREE from 'three'
+
+import TrackballControls from './trackball'
 
 // Components
 import React3 from 'react-THREE-renderer'
@@ -13,11 +16,13 @@ import * as style from './index.style'
 
 const propTypes = {
   geometry: React.PropTypes.object,
+  airfoil: React.PropTypes.object,
 }
 
 function mapStateToProps (state) {
   return {
     geometry: state.geometry,
+    airfoil: state.data.airfoils.find((item) => (item.filename === state.geometry.airfoil)),
   }
 }
 
@@ -33,10 +38,8 @@ class Viewer extends React.Component {
     // React will think that things have changed when they have not.
     this.mainLigthPosition = new THREE.Vector3(5, 5, 5)
     this.secondLigthPosition = new THREE.Vector3(-5, -5, 5)
-
-    this.state = {
-      cameraPosition: new THREE.Vector3(0, 0, 5),
-    }
+    this.axisPosition = new THREE.Vector3(-0.1, -0.1, -0.1)
+    this.gridPosition = new THREE.Vector3(0, 0, 0)
 
     this._onAnimate = () => {
       // we will get this callback every frame
@@ -44,9 +47,44 @@ class Viewer extends React.Component {
       // pretend cubeRotation is immutable.
       // this helps with updates and pure rendering.
       // React will be sure that the rotation has now updated.
-      this.setState({
-      })
+      // this.setState({
+      // })
+
+      this.controls.update()
     }
+
+    this.state = {
+      mainCameraPosition: new THREE.Vector3(0, 0, 2),
+    }
+  }
+
+  componentDidMount () {
+    const controls = new TrackballControls(this.refs.mainCamera,
+      ReactDOM.findDOMNode(this.refs.react3))
+
+    controls.rotateSpeed = 10
+    controls.zoomSpeed = 1.2
+    controls.panSpeed = 0.8
+
+    controls.noRotate = false
+    controls.noZoom = false
+    controls.noPan = true
+
+    controls.staticMoving = false
+    controls.dynamicDampingFactor = 0.3
+
+    controls.addEventListener('change', () => {
+      this.setState({
+        mainCameraPosition: this.refs.mainCamera.position,
+      })
+    })
+
+    this.controls = controls
+  }
+
+  componentWillUnmount () {
+    this.controls.dispose()
+    delete this.controls
   }
 
   render () {
@@ -57,6 +95,7 @@ class Viewer extends React.Component {
     return (
       <Container>
         <React3
+          ref="react3"
           mainCamera="camera"
           width={width}
           height={height}
@@ -66,13 +105,13 @@ class Viewer extends React.Component {
         >
           <scene>
             <perspectiveCamera
+              ref="mainCamera"
               name="camera"
               fov={75}
               aspect={width / height}
               near={0.1}
-              far={1000}
-
-              position={this.state.cameraPosition}
+              far={10000}
+              position={this.state.mainCameraPosition}
             />
 
             <pointLight
@@ -89,16 +128,15 @@ class Viewer extends React.Component {
               castShadow={false}
             />
 
-            <mesh>
-              <boxGeometry
-                width={1}
-                height={1}
-                depth={1}
-              />
-              <meshLambertMaterial
-                color={0xff7777}
-              />
-            </mesh>
+            <axisHelper
+              position={this.axisPosition}
+              size={0.2}
+            />
+
+            <Ribs
+              airfoil={this.props.airfoil}
+              settings={this.props.geometry}
+            />
           </scene>
         </React3>
       </Container>
