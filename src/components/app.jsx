@@ -6,8 +6,9 @@ import axios from 'axios'
 
 // Components
 import AppBar from './interface/AppBar'
-import Viewer from './viewer/index'
-import Controls from './controls/index'
+import Viewer from './viewer/Viewer'
+import Controls from './controls/Controls'
+import Container from './container'
 
 // Actions
 import { replaceAirfoils } from '../actions/data'
@@ -51,7 +52,7 @@ class App extends React.Component {
 
   render () {
     return (
-      <div>
+      <Container>
         <AppBar />
         <Viewer />
         <Controls />
@@ -59,7 +60,7 @@ class App extends React.Component {
           Built by <em>Pep Rodeja Ferrer</em><br />
           for my <em>UPC BarcelonaTech</em> final degree project
         </footer>
-      </div>
+      </Container>
     )
   }
 }

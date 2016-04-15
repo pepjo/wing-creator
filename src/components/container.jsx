@@ -1,14 +1,27 @@
 
 import React from 'react'
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
 
-// Styles
-import * as style from './index.style.js'
+// Actions
+import { pushWindowSize } from '../actions/display.js'
+
+function mapStateToProps (state) { // eslint-disable-line no-unused-vars
+  return {}
+}
+
+function mapDispatchToProps (dispatch) {
+  return {
+    pushWindowSize: bindActionCreators(pushWindowSize, dispatch),
+  }
+}
 
 const propTypes = {
   children: React.PropTypes.oneOfType([
     React.PropTypes.node,
     React.PropTypes.arrayOf(React.PropTypes.node),
   ]),
+  pushWindowSize: React.PropTypes.func,
 }
 
 class ViewContainer extends React.Component {
@@ -18,6 +31,7 @@ class ViewContainer extends React.Component {
   }
 
   componentDidMount () {
+    this.props.pushWindowSize(window.innerWidth, window.innerHeight)
     if (window.attachEvent) {
       // For IE 9
       window.attachEvent('onresize', this.handleResizeWindowEvent)
@@ -36,12 +50,12 @@ class ViewContainer extends React.Component {
   }
 
   handleResizeWindowEvent () {
-    this.forceUpdate()
+    this.props.pushWindowSize(window.innerWidth, window.innerHeight)
   }
 
   render () {
     return (
-      <main style={style.main()}>
+      <main>
         {this.props.children}
       </main>
     )
@@ -50,4 +64,4 @@ class ViewContainer extends React.Component {
 
 ViewContainer.propTypes = propTypes
 
-export default ViewContainer
+export default connect(mapStateToProps, mapDispatchToProps)(ViewContainer)

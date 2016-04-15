@@ -14,11 +14,13 @@ const propTypes = {
 
 function AppBar () {
   return (
-    <Toolbar>
-      <ToolbarGroup firstChild float="left">
-        <span style={style.title}>Wing creator and mesh utility</span>
-      </ToolbarGroup>
-    </Toolbar>
+    <div style={style.container}>
+      <Toolbar style={style.bar}>
+        <ToolbarGroup firstChild float="left">
+          <span style={style.title}>Wing creator and mesh utility</span>
+        </ToolbarGroup>
+      </Toolbar>
+    </div>
   )
 }
 

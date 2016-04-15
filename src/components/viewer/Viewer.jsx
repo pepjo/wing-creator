@@ -8,21 +8,24 @@ import TrackballControls from './trackball'
 
 // Components
 import React3 from 'react-THREE-renderer'
-import Container from './container'
 import Ribs from './rib/Ribs'
 
 // Styles
-import * as style from './index.style'
+import * as style from './Viewer.style'
 
 const propTypes = {
   geometry: React.PropTypes.object,
   airfoil: React.PropTypes.object,
+  width: React.PropTypes.number,
+  height: React.PropTypes.number,
 }
 
 function mapStateToProps (state) {
   return {
     geometry: state.geometry,
     airfoil: state.data.airfoils.find((item) => (item.filename === state.geometry.airfoil)),
+    width: state.display.width,
+    height: state.display.height,
   }
 }
 
@@ -88,12 +91,12 @@ class Viewer extends React.Component {
   }
 
   render () {
-    const mainStyle = style.main()
-    const width = mainStyle.width
-    const height = mainStyle.height
+    const width = this.props.width - 450
+    const height = this.props.height - 55
+    const mainStyle = style.main(width, height)
 
     return (
-      <Container>
+      <div style={mainStyle}>
         <React3
           ref="react3"
           mainCamera="camera"
@@ -139,7 +142,7 @@ class Viewer extends React.Component {
             />
           </scene>
         </React3>
-      </Container>
+      </div>
     )
   }
 }

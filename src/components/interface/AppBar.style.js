@@ -10,3 +10,12 @@ export const title = {
   whiteSpace: 'nowrap',
   overflow: 'hidden',
 }
+
+export const bar = {
+  position: 'fixed',
+  width: '100%',
+}
+
+export const container = {
+  height: 55,
+}
