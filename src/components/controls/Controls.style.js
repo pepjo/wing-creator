@@ -3,7 +3,7 @@ export const scrollContainer = (height) => (
   {
     display: 'inline-block',
     verticalAlign: 'top',
-    overflowY: 'auto',
+    overflowY: 'scroll',
     overflowX: 'hidden',
     width: 449,
     height: height - 55,
