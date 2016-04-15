@@ -2,6 +2,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
 import THREE from 'three'
 
 import TrackballControls from './trackball'
@@ -10,27 +11,38 @@ import TrackballControls from './trackball'
 import React3 from 'react-THREE-renderer'
 import Ribs from './rib/Ribs'
 
+// Actions
+import { updateInternalMesh } from '../../actions/meshes'
+
 // Styles
 import * as style from './Viewer.style'
 
+// Shapes
+import shape from '../../shapes/geometry'
+
 const propTypes = {
-  geometry: React.PropTypes.object,
-  airfoil: React.PropTypes.object,
+  geometry: shape,
+  airfoils: React.PropTypes.array.isRequired,
   width: React.PropTypes.number,
   height: React.PropTypes.number,
+  updateInternalMesh: React.PropTypes.func.isRequired,
+  internalMesh: React.PropTypes.object,
 }
 
 function mapStateToProps (state) {
   return {
     geometry: state.geometry,
-    airfoil: state.data.airfoils.find((item) => (item.filename === state.geometry.airfoil)),
+    airfoils: state.data.airfoils,
     width: state.display.width,
     height: state.display.height,
+    internalMesh: state.meshes.internalMesh,
   }
 }
 
-function mapDispatchToProps () {
-  return {}
+function mapDispatchToProps (dispatch) {
+  return {
+    updateInternalMesh: bindActionCreators(updateInternalMesh, dispatch),
+  }
 }
 
 class Viewer extends React.Component {
@@ -41,6 +53,7 @@ class Viewer extends React.Component {
     // React will think that things have changed when they have not.
     this.mainLigthPosition = new THREE.Vector3(5, 5, 5)
     this.secondLigthPosition = new THREE.Vector3(-5, -5, 5)
+    this.thirdLightPosition = new THREE.Vector3(-5, 5, -5)
     this.axisPosition = new THREE.Vector3(-0.1, -0.1, -0.1)
     this.gridPosition = new THREE.Vector3(0, 0, 0)
 
@@ -120,13 +133,21 @@ class Viewer extends React.Component {
             <pointLight
               name="mainLight"
               position={this.mainLigthPosition}
+              intensity={1}
               visible
               castShadow
             />
             <pointLight
               name="secondLight"
               position={this.secondLigthPosition}
-              intensity={0.3}
+              intensity={0.5}
+              visible
+              castShadow={false}
+            />
+            <pointLight
+              name="thirdLight"
+              position={this.thirdLightPosition}
+              intensity={0.4}
               visible
               castShadow={false}
             />
@@ -137,8 +158,10 @@ class Viewer extends React.Component {
             />
 
             <Ribs
-              airfoil={this.props.airfoil}
-              settings={this.props.geometry}
+              airfoils={this.props.airfoils}
+              geometry={this.props.geometry}
+              updateInternalMesh={this.props.updateInternalMesh}
+              internalMesh={this.props.internalMesh}
             />
           </scene>
         </React3>

@@ -5,9 +5,11 @@ import { combineReducers } from 'redux'
 import data from './data'
 import display from './display'
 import geometry from './geometry'
+import meshes from './meshes'
 
 export default combineReducers({
   data,
   display,
   geometry,
+  meshes,
 })

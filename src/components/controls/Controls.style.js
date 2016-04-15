@@ -23,3 +23,7 @@ export const input = {
   height: 30,
   marginTop: 34,
 }
+
+export const warning = {
+  position: 'static',
+}

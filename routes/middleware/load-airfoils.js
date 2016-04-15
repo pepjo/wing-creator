@@ -73,7 +73,7 @@ module.exports = (req, res, next) => {
       const file = parseFile(content)
       req.airfoils.push({
         filename,
-        name: file.name,
+        name: file.name.trim(),
         data: file.data,
       })
     },

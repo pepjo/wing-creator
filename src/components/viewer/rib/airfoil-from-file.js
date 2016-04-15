@@ -11,11 +11,6 @@
 import math from 'mathjs'
 import global from 'global'
 
-const distribution = {
-  equal: (x) => (x),
-  sin: () => {throw Error('Sin not yet implemented!')},
-}
-
 const solveSystemForKHelpers = {
   calculateMDiagonal: (airfoil, n) => (
     2 * (
@@ -97,6 +92,7 @@ const sFHelpers = {
 function splineFunction (airfoil, k, x, upSide, interpolation) {
   const i = findPoint(airfoil, x, upSide)
   const t = sFHelpers.calculateTAtPoint(airfoil, i, x)
+  // TODO: FIX: spline behaviour
   if (interpolation === 'spline') {
     const a = sFHelpers.calculateAAtPoint(airfoil, i, k)
     const b = sFHelpers.calculateBAtPoint(airfoil, i, k)
@@ -108,7 +104,7 @@ function splineFunction (airfoil, k, x, upSide, interpolation) {
   throw new Error('airfoil interpolation type not recognized')
 }
 
-export default function airfoilPointsGnrtr (airfoil, n, type = 'equal', interpolation = 'spline') {
+export default function airfoilPointsGnrtr (airfoil, interpolation = 'spline') {
   let k
 
   if (interpolation === 'spline') {
@@ -117,30 +113,16 @@ export default function airfoilPointsGnrtr (airfoil, n, type = 'equal', interpol
       k = global.airfoils[airfoil.filename]
     } else {
       k = solveSystemForK(airfoil.data)
-    }
-  }
 
-  const x = (math.range(0, 1, 1 / (n - 1))).toArray()
-  const data = [[1, 0]]
-
-  for (let i = x.length - 1; i >= 0; i--) {
-    const xx = distribution[type](x[i])
-    data.push([xx, splineFunction(airfoil.data, k, xx, true, interpolation)])
-  }
-  for (let i = 0; i < x.length; i++) {
-    const xx = distribution[type](x[i])
-    data.push([xx, splineFunction(airfoil.data, k, xx, false, interpolation)])
-  }
-
-  // Save the solved system for later use
-  if (interpolation === 'spline') {
-    if (!global.airfoils || !global.airfoils[airfoil.filename]) {
-      if (!global.airfoils) {
-        global.airfoils = {}
+      // Save the solution
+      if (!global.airfoils || !global.airfoils[airfoil.filename]) {
+        if (!global.airfoils) {
+          global.airfoils = {}
+        }
+        global.airfoils[airfoil.filename] = k
       }
-      global.airfoils[airfoil.filename] = k
     }
   }
 
-  return data
+  return splineFunction.bind(undefined, airfoil.data, k)
 }

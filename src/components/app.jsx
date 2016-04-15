@@ -43,7 +43,11 @@ class App extends React.Component {
   loadAirfoils () {
     axios.get('/api/airfoils')
     .then((response) => {
-      this.props.replaceAirfoils(response.data)
+      try {
+        this.props.replaceAirfoils(response.data)
+      } catch (err) {
+        console.log(err.stack)
+      }
     })
     .catch(() => {
       console.error('ERROR LOADING AIRFOILS')

@@ -1,27 +1,57 @@
 
-// import { PLAN_UI } from '../actions/admin.js'
+import { UPDATE_GEOMETRY_PARAM, UPDATE_AIRFOIL } from '../actions/geometry'
 
 const defaultState = {
-  airfoil: 'naca0012.dat',
-  ribs: {
-    n: 5,
-    thickness: 5,
-    type: 'solid',
+  wingParameters: {
+    ribs: 5,
+    length: 10,
+    root: 1.5,
+    tip: 1.5,
+    sweep: 0,
   },
-  length: 5,
-  root: 2,
-  skin: {
-    thickness: 0,
+  internal: {
     type: 'shell',
+    thickness: 5,
   },
+  external: {
+    type: 'shell',
+    thickness: 5,
+  },
+  airfoil: {
+    type: 'fromFile',
+    filename: undefined,
+    uid: undefined,
+    data: undefined,
+    name: undefined,
+    nPoints: 50,
+    distribution: 'equal',
+    interpolation: 'linear',
+  },
+}
+
+function newState (param, value, state) {
+  const route = param.split('.')
+  const newstate = {}
+  newstate[route[0]] = Object.assign({}, state[route[0]])
+  newstate[route[0]][route[1]] = value
+  return newstate
 }
 
 export default (state = defaultState, action) => {
   switch (action.type) {
-    // case GET_ALL_PLANS:
-    //   return Object.assign({}, state, {
-    //     gettingPlans: true
-    //   })
+    case UPDATE_GEOMETRY_PARAM:
+      return Object.assign({}, state, newState(action.param, action.value, state))
+
+    case UPDATE_AIRFOIL:
+      console.log('action', action)
+      return Object.assign({}, state, {
+        airfoil: Object.assign({}, state.airfoil, {
+          filename: action.filename,
+          uid: action.filename,
+          data: [...action.airfoil.data],
+          name: action.airfoil.name,
+        }),
+      })
 
     default:
       return state
