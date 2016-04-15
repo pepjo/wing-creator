@@ -62,7 +62,7 @@ function solveSystemForK (airfoil) {
 }
 
 function findPoint (airfoil, x, upSide) {
-  if (upSide) {
+  if (upSide === 'extrados') {
     for (let i = 0, len = airfoil.length; i < len; i++) {
       if (airfoil[i][0] <= x) {
         return i

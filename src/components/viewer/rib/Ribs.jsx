@@ -19,7 +19,7 @@ class Ribs extends React.Component {
   }
 
   componentDidMount () {
-    // TODO: Update the mesh if the props change
+    // TODO: Generate mesh if possible
   }
 
   componentDidUpdate (prevProps) {
