@@ -13,7 +13,7 @@ import airfoilFrom from './airfoil'
 import generateRibFromPoints from './rib-from-shell'
 
 // Actions
-import { updateInternalMesh, updateAirfoilPoints } from '../../actions/meshes'
+import { updateInternalMesh, updateExternalMesh, updateAirfoilPoints } from '../../actions/meshes'
 
 // Styles
 import * as style from './simpleViewer.style'
@@ -27,8 +27,10 @@ const propTypes = {
   width: React.PropTypes.number,
   height: React.PropTypes.number,
   updateInternalMesh: React.PropTypes.func.isRequired,
+  updateExternalMesh: React.PropTypes.func.isRequired,
   updateAirfoilPoints: React.PropTypes.func.isRequired,
   internalMesh: React.PropTypes.object,
+  externalMesh: React.PropTypes.object,
   airfoilShell: React.PropTypes.object,
 }
 
@@ -39,6 +41,7 @@ function mapStateToProps (state) {
     width: state.display.width,
     height: state.display.height,
     internalMesh: state.meshes.internalMesh,
+    externalMesh: state.meshes.externalMesh,
     airfoilShell: state.meshes.airfoilShell,
   }
 }
@@ -46,6 +49,7 @@ function mapStateToProps (state) {
 function mapDispatchToProps (dispatch) {
   return {
     updateInternalMesh: bindActionCreators(updateInternalMesh, dispatch),
+    updateExternalMesh: bindActionCreators(updateExternalMesh, dispatch),
     updateAirfoilPoints: bindActionCreators(updateAirfoilPoints, dispatch),
   }
 }
@@ -81,6 +85,9 @@ class Viewer extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
+    const prevGeometry = prevProps.geometry
+    const geometry = this.props.geometry
+
     if (this.props.width !== prevProps.width || this.props.height !== prevProps.height) {
       const size = this.getSize()
       this.camera.aspect = size.width / size.height
@@ -90,22 +97,31 @@ class Viewer extends React.Component {
       requestAnimationFrame(this.threeRender)
     }
 
-    if (prevProps.geometry.airfoil.filename !== this.props.geometry.airfoil.filename ||
-        prevProps.geometry.airfoil.nPoints !== this.props.geometry.airfoil.nPoints) {
+    if (prevGeometry.airfoil.filename !== geometry.airfoil.filename ||
+        prevGeometry.structureParameters.beamCoord !== geometry.structureParameters.beamCoord ||
+        prevGeometry.airfoil.nPoints !== geometry.airfoil.nPoints) {
       this.generateAirfoilShell()
     }
 
     if (prevProps.airfoilShell.vertices !== this.props.airfoilShell.vertices ||
-        prevProps.geometry.wingParameters.ribs !== this.props.geometry.wingParameters.ribs ||
-        prevProps.geometry.wingParameters.length !== this.props.geometry.wingParameters.length ||
-        prevProps.geometry.wingParameters.root !== this.props.geometry.wingParameters.root ||
-        prevProps.geometry.wingParameters.tip !== this.props.geometry.wingParameters.tip ||
-        prevProps.geometry.wingParameters.sweep !== this.props.geometry.wingParameters.sweep) {
+        prevGeometry.wingParameters.length !== geometry.wingParameters.length ||
+        prevGeometry.wingParameters.root !== geometry.wingParameters.root ||
+        prevGeometry.wingParameters.tip !== geometry.wingParameters.tip ||
+        prevGeometry.wingParameters.sweep !== geometry.wingParameters.sweep) {
+      this.generateInternalMesh()
+      this.generateExternalMesh()
+    }
+
+    if (prevGeometry.wingParameters.ribs !== geometry.wingParameters.ribs) {
       this.generateInternalMesh()
     }
 
     if (prevProps.internalMesh.vertices !== this.props.internalMesh.vertices) {
       this.renderMesh('internalMesh')
+    }
+
+    if (prevProps.externalMesh.vertices !== this.props.externalMesh.vertices) {
+      this.renderMesh('externalMesh')
     }
   }
 
@@ -121,19 +137,30 @@ class Viewer extends React.Component {
     }
   }
 
+  getImposedPoints () {
+    return [this.props.geometry.structureParameters.beamCoord]
+  }
+
+  getZcoord (i) {
+    const geometry = this.props.geometry
+    const centerZOffset = geometry.wingParameters.length / 2
+    return i * geometry.wingParameters.length / (geometry.wingParameters.ribs - 1) - centerZOffset
+  }
+
   generateAirfoilShell () {
     const geometry = this.props.geometry
 
     const airfoilFunction = airfoilFrom(this.props.airfoils, geometry)
 
     // Update mesh
-    if (airfoilFunction) {
+    if (airfoilFunction && geometry.airfoil.nPoints > 8) {
       this.props.updateAirfoilPoints(
         shellFromAirfoilGenerator(
           airfoilFunction,
-          geometry.airfoil.nPoints < 8 ? 8 : geometry.airfoil.nPoints,
+          geometry.airfoil.nPoints,
           geometry.airfoil.distribution,
           geometry.airfoil.interpolation,
+          this.getImposedPoints(),
         )
       )
     }
@@ -147,22 +174,79 @@ class Viewer extends React.Component {
       faces: [],
     }
 
-    const centerZOffset = geometry.wingParameters.length / 2
+    if (shell) {
+      let prevImposedVertices = []
 
-    for (let i = 0; i < geometry.wingParameters.ribs; i++) {
-      const rib = generateRibFromPoints(
-        _.cloneDeep(shell),
-        i,
-        geometry.wingParameters.root,
-        i * geometry.wingParameters.length / (geometry.wingParameters.ribs - 1) - centerZOffset,
-        0,
-      )
+      for (let i = 0; i < geometry.wingParameters.ribs; i++) {
+        const rib = generateRibFromPoints(
+          _.cloneDeep(shell),
+          i,
+          geometry.wingParameters.root,
+          this.getZcoord(i),
+          0,
+          this.getImposedPoints(),
+        )
 
-      mesh.vertices = mesh.vertices.concat(rib.vertices)
-      mesh.faces = mesh.faces.concat(rib.faces)
+        const imposedVertices = rib.imposed.map((item) => (item + mesh.vertices.length))
+
+        mesh.vertices = mesh.vertices.concat(rib.vertices)
+        mesh.faces = mesh.faces.concat(rib.faces)
+
+        if (i !== 0) {
+          mesh.faces.push(
+            new THREE.Face3(imposedVertices[0], imposedVertices[1], prevImposedVertices[0])
+          )
+          mesh.faces.push(
+            new THREE.Face3(imposedVertices[1], prevImposedVertices[1], prevImposedVertices[0])
+          )
+        }
+
+        prevImposedVertices = imposedVertices
+      }
+
+      this.props.updateInternalMesh(mesh)
+    }
+  }
+
+  generateExternalMesh () {
+    const geometry = this.props.geometry
+    const shell = this.props.airfoilShell
+    const mesh = {
+      vertices: [],
+      faces: [],
     }
 
-    this.props.updateInternalMesh(mesh)
+    if (shell) {
+      for (let i = 0; i < geometry.wingParameters.ribs; i++) {
+        const rib = generateRibFromPoints(
+          _.cloneDeep(shell),
+          i,
+          geometry.wingParameters.root,
+          this.getZcoord(i),
+          0,
+          this.getImposedPoints(),
+        )
+
+        const le = mesh.vertices.length
+
+        mesh.vertices = mesh.vertices.concat(rib.vertices)
+        const faces = []
+
+        if (i !== 0) {
+          for (let j = 0, l = rib.vertices.length; j < l - 1; j++) {
+            faces.push(new THREE.Face3(le + j, le + j + 1, le + j - l))
+            faces.push(new THREE.Face3(le + j + 1, le + j + 1 - l, le + j - l))
+          }
+
+          faces.push(new THREE.Face3(le + rib.vertices.length - 1, le, le - 1))
+          faces.push(new THREE.Face3(le - 1, le, le - rib.vertices.length))
+        }
+
+        mesh.faces = mesh.faces.concat(faces)
+      }
+
+      this.props.updateExternalMesh(mesh)
+    }
   }
 
   init () {
@@ -245,20 +329,23 @@ class Viewer extends React.Component {
       const oldMesh = this[name]
       this.scene.remove(oldMesh)
     }
-    const geometry = new THREE.Geometry()
 
-    geometry.vertices = this.props[name].vertices
-    geometry.faces = this.props[name].faces
-    geometry.name = name
+    if (this.props[name].vertices) {
+      const geometry = new THREE.Geometry()
 
-    const mesh = new THREE.Mesh(geometry, this.material)
-    this.scene.add(mesh)
+      geometry.vertices = this.props[name].vertices
+      geometry.faces = this.props[name].faces
+      geometry.name = name
 
-    geometry.computeFaceNormals()
-    geometry.computeBoundingSphere()
+      const mesh = new THREE.Mesh(geometry, this.material)
+      this.scene.add(mesh)
 
-    this[name] = mesh
-    this.threeRender()
+      geometry.computeFaceNormals()
+      geometry.computeBoundingSphere()
+
+      this[name] = mesh
+      this.threeRender()
+    }
   }
 
   render () {

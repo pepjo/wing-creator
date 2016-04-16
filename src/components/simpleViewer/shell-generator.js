@@ -8,8 +8,23 @@ const distributionFunctions = {
   sin: () => {throw Error('Sin not yet implemented!')},
 }
 
-function pointsGenerator (airfoilFunction, n, distribution, interpolation) {
-  const x = (math.range(0, 1, 1 / (n - 1))).toArray()
+function imposePoints (points, imposed) {
+  for (let j = 0, o = imposed.length; j < o; j++) {
+    for (let i = 1; i < points.length; i++) {
+      if (points[i] > imposed[j] && points[i - 1] < imposed[j]) {
+        points.splice(i, 0, imposed[j])
+        break
+      }
+    }
+  }
+  return points
+}
+
+function pointsGenerator (airfoilFunction, n, distribution, interpolation, imposedPoints) {
+  const x = imposePoints(
+    (math.range(0, 1, 1 / (n / 2 - 1 - imposePoints.length))).toArray(),
+    imposedPoints,
+  )
   const data = [[1, 0]]
 
   for (let i = x.length - 1; i >= 0; i--) {
@@ -24,8 +39,8 @@ function pointsGenerator (airfoilFunction, n, distribution, interpolation) {
   return data
 }
 
-export default function ribsGenerator (airfoilFunction, nPoints, distribution, interpolation) {
-  const data = pointsGenerator(airfoilFunction, nPoints, distribution, interpolation)
+export default function (airfoilFunction, nPoints, distribution, interpolation, imposedPoints) {
+  const data = pointsGenerator(airfoilFunction, nPoints, distribution, interpolation, imposedPoints)
 
   // Console.log a Matlab compatible version of the points
   // console.log('data', data.reduce((s, i) => (s + i[0] + ',' + i[1] + ';'), ''))

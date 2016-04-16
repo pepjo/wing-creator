@@ -9,6 +9,10 @@ export const wingParametersShape = PropTypes.shape({
   sweep: PropTypes.number.isRequired,
 })
 
+export const structureParametersShape = PropTypes.shape({
+  beamCoord: PropTypes.number.isRequired,
+})
+
 export const meshPropsShape = PropTypes.shape({
   type: PropTypes.string.isRequired,
   thickness: PropTypes.number.isRequired,

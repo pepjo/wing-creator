@@ -5,6 +5,7 @@ import { bindActionCreators } from 'redux'
 
 // Components
 import WingParametersControls from './subgroups/WingParametersControls'
+import StructuresParametersControls from './subgroups/StructuresParametersControls'
 import MeshControls from './subgroups/MeshControls'
 import AirfoilControls from './subgroups/AirfoilControls'
 import Paper from 'material-ui/lib/paper'
@@ -51,6 +52,7 @@ class Controls extends React.Component {
     this.handleRootChange = this.handleRootChange.bind(this)
     this.handleTipChange = this.handleTipChange.bind(this)
     this.handleSweepChange = this.handleSweepChange.bind(this)
+    this.handleBeamCoordChange = this.handleBeamCoordChange.bind(this)
     this.handleInternalTypeChange = this.handleInternalTypeChange.bind(this)
     this.handleInternalThicknessChange = this.handleInternalThicknessChange.bind(this)
     this.handleExternalTypeChange = this.handleExternalTypeChange.bind(this)
@@ -80,6 +82,15 @@ class Controls extends React.Component {
   handleSweepChange (e) {
     this.props.changeGeometryParameter('wingParameters.sweep',
       parseFloat(e.target.value.replace(',', '.'), 10))
+  }
+  handleBeamCoordChange (e) {
+    let val = parseFloat(e.target.value.replace(',', '.'), 10)
+    if (isNaN(val) || val < 0) {
+      val = 0
+    } else if (val > 1) {
+      val = 1
+    }
+    this.props.changeGeometryParameter('structureParameters.beamCoord', val)
   }
   handleInternalTypeChange (e, index, value) {
     this.props.changeGeometryParameter('internal.type', value)
@@ -126,7 +137,7 @@ class Controls extends React.Component {
 
   render () {
     const { airfoils } = this.props
-    const { wingParameters, internal, external, airfoil } = this.props.geometry
+    const { wingParameters, structureParameters, internal, external, airfoil } = this.props.geometry
 
     return (
       <div style={style.scrollContainer(this.props.height)}>
@@ -141,6 +152,14 @@ class Controls extends React.Component {
               handleRootChange={this.handleRootChange}
               handleTipChange={this.handleTipChange}
               handleSweepChange={this.handleSweepChange}
+            />
+          </Foldable>
+          <Foldable
+            nom="Structures parameters"
+          >
+            <StructuresParametersControls
+              structureParameters={structureParameters}
+              handleBeamCoordChange={this.handleBeamCoordChange}
             />
           </Foldable>
           <Foldable
