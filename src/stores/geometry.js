@@ -9,6 +9,9 @@ const defaultState = {
     tip: 1.5,
     sweep: 0,
   },
+  structureParameters: {
+    beamCoord: 0.3,
+  },
   internal: {
     type: 'shell',
     thickness: 5,

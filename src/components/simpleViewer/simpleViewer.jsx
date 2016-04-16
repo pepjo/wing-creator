@@ -2,16 +2,18 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
+import _ from 'lodash'
 
 import THREE from 'three'
 import TrackballControls from 'three-trackballcontrols'
 import Detector from './publicDeps/Detector.js'
 
-import meshFromAirfoilGenerator from './mesh-generator'
-import airfoilFromFileGenerator from './airfoil-from-file'
+import shellFromAirfoilGenerator from './shell-generator'
+import airfoilFrom from './airfoil'
+import generateRibFromPoints from './rib-from-shell'
 
 // Actions
-import { updateInternalMesh } from '../../actions/meshes'
+import { updateInternalMesh, updateAirfoilPoints } from '../../actions/meshes'
 
 // Styles
 import * as style from './simpleViewer.style'
@@ -25,7 +27,9 @@ const propTypes = {
   width: React.PropTypes.number,
   height: React.PropTypes.number,
   updateInternalMesh: React.PropTypes.func.isRequired,
+  updateAirfoilPoints: React.PropTypes.func.isRequired,
   internalMesh: React.PropTypes.object,
+  airfoilShell: React.PropTypes.object,
 }
 
 function mapStateToProps (state) {
@@ -35,12 +39,14 @@ function mapStateToProps (state) {
     width: state.display.width,
     height: state.display.height,
     internalMesh: state.meshes.internalMesh,
+    airfoilShell: state.meshes.airfoilShell,
   }
 }
 
 function mapDispatchToProps (dispatch) {
   return {
     updateInternalMesh: bindActionCreators(updateInternalMesh, dispatch),
+    updateAirfoilPoints: bindActionCreators(updateAirfoilPoints, dispatch),
   }
 }
 
@@ -55,6 +61,8 @@ class Viewer extends React.Component {
     this.attatchLights = this.attatchLights.bind(this)
     this.animate = this.animate.bind(this)
     this.threeRender = this.threeRender.bind(this)
+    this.generateAirfoilShell = this.generateAirfoilShell.bind(this)
+    this.generateInternalMesh = this.generateInternalMesh.bind(this)
   }
 
   componentDidMount () {
@@ -82,9 +90,18 @@ class Viewer extends React.Component {
       requestAnimationFrame(this.threeRender)
     }
 
-    if ((prevProps.geometry.airfoil.filename !== this.props.geometry.airfoil.filename) ||
-        (prevProps.geometry.airfoil.nPoints !== this.props.geometry.airfoil.nPoints)) {
-      this.generateMesh()
+    if (prevProps.geometry.airfoil.filename !== this.props.geometry.airfoil.filename ||
+        prevProps.geometry.airfoil.nPoints !== this.props.geometry.airfoil.nPoints) {
+      this.generateAirfoilShell()
+    }
+
+    if (prevProps.airfoilShell.vertices !== this.props.airfoilShell.vertices ||
+        prevProps.geometry.wingParameters.ribs !== this.props.geometry.wingParameters.ribs ||
+        prevProps.geometry.wingParameters.length !== this.props.geometry.wingParameters.length ||
+        prevProps.geometry.wingParameters.root !== this.props.geometry.wingParameters.root ||
+        prevProps.geometry.wingParameters.tip !== this.props.geometry.wingParameters.tip ||
+        prevProps.geometry.wingParameters.sweep !== this.props.geometry.wingParameters.sweep) {
+      this.generateInternalMesh()
     }
 
     if (prevProps.internalMesh.vertices !== this.props.internalMesh.vertices) {
@@ -104,35 +121,48 @@ class Viewer extends React.Component {
     }
   }
 
-  generateMesh () {
-    let airfoilFunction
+  generateAirfoilShell () {
+    const geometry = this.props.geometry
 
-    // Generate interior mesh
-    if (this.props.geometry.airfoil.type === 'fromFile') {
-      if (this.props.geometry.airfoil.filename) {
-        airfoilFunction = airfoilFromFileGenerator(
-          this.props.airfoils.find((airfoilItem) => (
-            airfoilItem.filename === this.props.geometry.airfoil.filename
-          )),
-          this.props.geometry.airfoil.interpolation
-        )
-      }
-    } else {
-      console.warn('This type of airfoil is not yet implemented')
-      throw new Error('This type of airfoil is not yet implemented')
-    }
+    const airfoilFunction = airfoilFrom(this.props.airfoils, geometry)
 
     // Update mesh
     if (airfoilFunction) {
-      this.props.updateInternalMesh(
-        meshFromAirfoilGenerator(
+      this.props.updateAirfoilPoints(
+        shellFromAirfoilGenerator(
           airfoilFunction,
-          this.props.geometry.airfoil.nPoints < 8 ? 8 : this.props.geometry.airfoil.nPoints,
-          this.props.geometry.airfoil.distribution,
-          this.props.geometry.airfoil.interpolation,
+          geometry.airfoil.nPoints < 8 ? 8 : geometry.airfoil.nPoints,
+          geometry.airfoil.distribution,
+          geometry.airfoil.interpolation,
         )
       )
     }
+  }
+
+  generateInternalMesh () {
+    const geometry = this.props.geometry
+    const shell = this.props.airfoilShell
+    const mesh = {
+      vertices: [],
+      faces: [],
+    }
+
+    const centerZOffset = geometry.wingParameters.length / 2
+
+    for (let i = 0; i < geometry.wingParameters.ribs; i++) {
+      const rib = generateRibFromPoints(
+        _.cloneDeep(shell),
+        i,
+        geometry.wingParameters.root,
+        i * geometry.wingParameters.length / (geometry.wingParameters.ribs - 1) - centerZOffset,
+        0,
+      )
+
+      mesh.vertices = mesh.vertices.concat(rib.vertices)
+      mesh.faces = mesh.faces.concat(rib.faces)
+    }
+
+    this.props.updateInternalMesh(mesh)
   }
 
   init () {
@@ -142,13 +172,13 @@ class Viewer extends React.Component {
     const scene = new THREE.Scene()
 
     const camera = new THREE.PerspectiveCamera(60, size.width / size.height, 0.1, 20000)
-    camera.position.set(0, 0, 2)
+    camera.position.set(-2, 8, 10)
     scene.add(camera)
 
     this.attatchLights(scene)
     this.attatchControls(camera, container)
 
-    const gridHelper = new THREE.GridHelper(10, 1)
+    const gridHelper = new THREE.GridHelper(10, 2)
     gridHelper.setColors(0xCFD8DC, 0x90A4AE)
     scene.add(gridHelper)
 
@@ -169,16 +199,16 @@ class Viewer extends React.Component {
   }
 
   attatchLights (scene) {
-    const mainLigth = new THREE.PointLight(0xffffff, 1.2, 100)
-    mainLigth.position.set(5, 5, 5)
+    const mainLigth = new THREE.PointLight(0xffffff, 1.2, 150)
+    mainLigth.position.set(15, 15, 15)
     scene.add(mainLigth)
 
-    const secondLigth = new THREE.PointLight(0xffffff, 0.7, 100)
-    secondLigth.position.set(-5, -5, 5)
+    const secondLigth = new THREE.PointLight(0xffffff, 0.7, 150)
+    secondLigth.position.set(-15, -15, 15)
     scene.add(secondLigth)
 
-    const thirdLigth = new THREE.PointLight(0xffffff, 0.6, 100)
-    thirdLigth.position.set(-5, 5, -5)
+    const thirdLigth = new THREE.PointLight(0xffffff, 0.6, 150)
+    thirdLigth.position.set(-15, 15, -15)
     scene.add(thirdLigth)
   }
 

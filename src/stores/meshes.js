@@ -1,5 +1,5 @@
 
-import { UPDATE_INTERNAL_MESH, UPDATE_EXTERNAL_MESH } from '../actions/meshes'
+import { UPDATE_INTERNAL_MESH, UPDATE_EXTERNAL_MESH, UPDATE_AIRFOIL_SHELL } from '../actions/meshes'
 
 const defaultState = {
   internalMesh: {
@@ -10,10 +10,19 @@ const defaultState = {
     vertices: undefined,
     faces: undefined,
   },
+  airfoilShell: {
+    vertices: undefined,
+    faces: undefined,
+  },
 }
 
 export default (state = defaultState, action) => {
   switch (action.type) {
+    case UPDATE_AIRFOIL_SHELL:
+      return Object.assign({}, state, {
+        airfoilShell: Object.assign({}, action.shell),
+      })
+
     case UPDATE_INTERNAL_MESH:
       return Object.assign({}, state, {
         internalMesh: Object.assign({}, action.mesh),

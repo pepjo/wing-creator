@@ -145,6 +145,7 @@ class Controls extends React.Component {
           </Foldable>
           <Foldable
             nom="Airfoil"
+            obert
           >
             <AirfoilControls
               airfoil={airfoil}

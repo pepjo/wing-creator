@@ -2,7 +2,6 @@
 'use strict' // eslint-disable-line strict
 
 const path = require('path')
-const ReactDOMServer = require('react-dom/server')
 
 const components = {
   web: require(path.join(__dirname, '../../views/react/server')).default,
@@ -27,9 +26,10 @@ module.exports = (req, res, next) => {
           {
             body: {
               initialState: JSON.stringify(store.getState()),
-              rendered: ReactDOMServer.renderToString(
-                component.component(store)
-              ),
+              // rendered: ReactDOMServer.renderToString(component.component(store)),
+              rendered: `
+              <span>LOADING!</span>
+              `,
             },
           }
         ),
