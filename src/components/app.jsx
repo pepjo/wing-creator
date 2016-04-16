@@ -6,7 +6,7 @@ import axios from 'axios'
 
 // Components
 import AppBar from './interface/AppBar'
-import Viewer from './viewer/Viewer'
+import Viewer from './simpleViewer/simpleViewer'
 import Controls from './controls/Controls'
 import Container from './container'
 

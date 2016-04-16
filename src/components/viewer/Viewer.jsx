@@ -8,7 +8,7 @@ import THREE from 'three'
 import TrackballControls from './trackball'
 
 // Components
-import React3 from 'react-THREE-renderer'
+import React3 from 'react-three-renderer'
 import Ribs from './rib/Ribs'
 
 // Actions

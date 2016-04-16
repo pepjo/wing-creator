@@ -1,6 +1,7 @@
 
 import React from 'react'
 
+import meshBufferFromAirfoilGenerator from './meshBuffer-generator'
 import meshFromAirfoilGenerator from './mesh-generator'
 import airfoilFromFileGenerator from './airfoil-from-file'
 
@@ -44,14 +45,28 @@ class Ribs extends React.Component {
       throw new Error('This type of airfoil is not yet implemented')
     }
 
-    this.props.updateInternalMesh(
-      meshFromAirfoilGenerator(
-        airfoilFunction,
-        this.props.geometry.airfoil.nPoints,
-        this.props.geometry.airfoil.distribution,
-        this.props.geometry.airfoil.interpolation,
+    const type = 'geometryBuffer'
+
+    if (type === 'geometryBuffer') {
+      this.props.updateInternalMesh({
+        vertices: meshBufferFromAirfoilGenerator(
+          airfoilFunction,
+          this.props.geometry.airfoil.nPoints,
+          this.props.geometry.airfoil.distribution,
+          this.props.geometry.airfoil.interpolation,
+        ),
+        faces: [],
+      })
+    } else if (type === 'geometry') {
+      this.props.updateInternalMesh(
+        meshFromAirfoilGenerator(
+          airfoilFunction,
+          this.props.geometry.airfoil.nPoints,
+          this.props.geometry.airfoil.distribution,
+          this.props.geometry.airfoil.interpolation,
+        )
       )
-    )
+    }
   }
 
   render () {
@@ -63,6 +78,7 @@ class Ribs extends React.Component {
           <geometry
             vertices={vertices}
             faces={faces}
+            dynamic
           />
           <meshLambertMaterial
             color={0xff7777}

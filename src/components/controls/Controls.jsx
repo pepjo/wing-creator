@@ -99,7 +99,14 @@ class Controls extends React.Component {
     this.props.changeGeometryParameter('airfoil.type', value)
   }
   handleAirfoilNPointsChange (e) {
-    this.props.changeGeometryParameter('airfoil.nPoints', parseInt(e.target.value, 10))
+    let val = parseInt(e.target.value, 10)
+    if (isNaN(val)) {
+      val = 0
+    }
+    if (val > 1000) {
+      val = 1000
+    }
+    this.props.changeGeometryParameter('airfoil.nPoints', val)
   }
   handleAirfoilDistributionChange (e, index, value) {
     this.props.changeGeometryParameter('airfoil.distribution', value)

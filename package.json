@@ -45,7 +45,8 @@
     "redux-devtools-log-monitor": "^1.0.9",
     "redux-thunk": "^2.0.1",
     "serve-favicon": "^2.3.0",
-    "three": "^0.75.0"
+    "three": "^0.75.0",
+    "three-trackballcontrols": "0.0.5"
   },
   "devDependencies": {
     "babel-core": "^6.7.6",

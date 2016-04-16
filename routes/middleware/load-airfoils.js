@@ -47,7 +47,7 @@ function readFiles (dirname, onFileContent, onError, onEnd) {
 
 function parseFile (content) {
   const name = content.split('\n')[0]
-  const data = content
+  let data = content
     .split('\n') // separate by lines
     .slice(2, content.split('\n').length - 1) // Ignore first 2 lines
     .map((line) => ( // Parse lines into points
@@ -56,6 +56,14 @@ function parseFile (content) {
       .filter((item) => (item !== '')) // Delete blanks
       .map((item) => (parseFloat(item, 10))) // Parse numbers
     ))
+
+  if (data[0][0] !== 1) {
+    // We've got a situation here
+    const i = data.findIndex((item) => isNaN(item[0]))
+    const extrados = data.slice(0, i).reverse()
+    const intrados = data.slice(i + 1)
+    data = extrados.concat(intrados)
+  }
 
   return {
     name,
