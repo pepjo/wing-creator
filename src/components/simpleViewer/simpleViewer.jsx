@@ -19,13 +19,15 @@ import { updateInternalMesh, updateExternalMesh, updateAirfoilPoints } from '../
 import * as style from './simpleViewer.style'
 
 // Shapes
-import shape from '../../shapes/geometry'
+import geometryShape from '../../shapes/geometry'
+import displayShape from '../../shapes/display'
 
 const propTypes = {
-  geometry: shape,
+  geometry: geometryShape,
   airfoils: React.PropTypes.array.isRequired,
   width: React.PropTypes.number,
   height: React.PropTypes.number,
+  display: displayShape,
   updateInternalMesh: React.PropTypes.func.isRequired,
   updateExternalMesh: React.PropTypes.func.isRequired,
   updateAirfoilPoints: React.PropTypes.func.isRequired,
@@ -38,6 +40,7 @@ function mapStateToProps (state) {
   return {
     geometry: state.geometry,
     airfoils: state.data.airfoils,
+    display: state.display,
     width: state.display.width,
     height: state.display.height,
     internalMesh: state.meshes.internalMesh,
@@ -67,6 +70,8 @@ class Viewer extends React.Component {
     this.threeRender = this.threeRender.bind(this)
     this.generateAirfoilShell = this.generateAirfoilShell.bind(this)
     this.generateInternalMesh = this.generateInternalMesh.bind(this)
+    this.changeMeshVisibility = this.changeMeshVisibility.bind(this)
+    this.changeMeshMaterial = this.changeMeshMaterial.bind(this)
   }
 
   componentDidMount () {
@@ -122,6 +127,22 @@ class Viewer extends React.Component {
 
     if (prevProps.externalMesh.vertices !== this.props.externalMesh.vertices) {
       this.renderMesh('externalMesh')
+    }
+
+    if (prevProps.display.internalMesh.visible !== this.props.display.internalMesh.visible) {
+      this.changeMeshVisibility('internalMesh', this.props.display.internalMesh.visible)
+    }
+
+    if (prevProps.display.externalMesh.visible !== this.props.display.externalMesh.visible) {
+      this.changeMeshVisibility('externalMesh', this.props.display.externalMesh.visible)
+    }
+
+    if (prevProps.display.internalMesh.material !== this.props.display.internalMesh.material) {
+      this.changeMeshMaterial('internalMesh', this.props.display.internalMesh.material)
+    }
+
+    if (prevProps.display.externalMesh.material !== this.props.display.externalMesh.material) {
+      this.changeMeshMaterial('externalMesh', this.props.display.externalMesh.material)
     }
   }
 
@@ -265,7 +286,11 @@ class Viewer extends React.Component {
     gridHelper.setColors(0xCFD8DC, 0x90A4AE)
     scene.add(gridHelper)
 
-    const material = new THREE.MeshLambertMaterial({ color: 0xff7777 })
+    const materials = {
+      solid: new THREE.MeshLambertMaterial({ color: 0xff7777 }),
+      wireframe: new THREE.MeshLambertMaterial({ color: 0xff7777, wireframe: true }),
+    }
+    materials.solid.side = THREE.DoubleSide
 
     const renderer = new THREE.WebGLRenderer({
       alpha: true,
@@ -277,7 +302,7 @@ class Viewer extends React.Component {
 
     this.camera = camera
     this.scene = scene
-    this.material = material
+    this.materials = materials
     this.renderer = renderer
   }
 
@@ -314,6 +339,20 @@ class Viewer extends React.Component {
     this.controls = controls
   }
 
+  changeMeshVisibility (name, visibility) {
+    if (this[name]) {
+      this[name].visible = visibility
+      this.threeRender()
+    }
+  }
+
+  changeMeshMaterial (name, material) {
+    if (this[name]) {
+      this[name].material = this.materials[material]
+      this.threeRender()
+    }
+  }
+
   animate () {
     requestAnimationFrame(this.animate)
     this.controls.update()
@@ -336,11 +375,13 @@ class Viewer extends React.Component {
       geometry.faces = this.props[name].faces
       geometry.name = name
 
-      const mesh = new THREE.Mesh(geometry, this.material)
-      this.scene.add(mesh)
-
       geometry.computeFaceNormals()
       geometry.computeBoundingSphere()
+
+      const mesh = new THREE.Mesh(geometry, this.materials[this.props.display[name].material])
+      this.scene.add(mesh)
+
+      mesh.visible = this.props.display[name].visible
 
       this[name] = mesh
       this.threeRender()

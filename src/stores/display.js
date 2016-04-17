@@ -1,5 +1,5 @@
 
-import { PUSH_WINDOW_SIZE } from '../actions/display'
+import { PUSH_WINDOW_SIZE, UPDATE_DISPLAY_PARAM } from '../actions/display'
 
 // Set default state
 let height = 700
@@ -11,10 +11,29 @@ if (typeof window !== 'undefined') {
 const defaultState = {
   width,
   height,
+  internalMesh: {
+    material: 'solid',
+    visible: true,
+  },
+  externalMesh: {
+    material: 'solid',
+    visible: true,
+  },
+}
+
+function newState (param, value, state) {
+  const route = param.split('.')
+  const newstate = {}
+  newstate[route[0]] = Object.assign({}, state[route[0]])
+  newstate[route[0]][route[1]] = value
+  return newstate
 }
 
 export default (state = defaultState, action) => {
   switch (action.type) {
+    case UPDATE_DISPLAY_PARAM:
+      return Object.assign({}, state, newState(action.param, action.value, state))
+
     case PUSH_WINDOW_SIZE:
       return Object.assign({}, state, {
         width: action.width,

@@ -4,28 +4,33 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 
 // Components
-import WingParametersControls from './subgroups/WingParametersControls'
-import StructuresParametersControls from './subgroups/StructuresParametersControls'
-import MeshControls from './subgroups/MeshControls'
 import AirfoilControls from './subgroups/AirfoilControls'
+import DisplayControls from './subgroups/DisplayControls'
+import MeshControls from './subgroups/MeshControls'
+import StructuresParametersControls from './subgroups/StructuresParametersControls'
+import WingParametersControls from './subgroups/WingParametersControls'
 import Paper from 'material-ui/lib/paper'
 import Foldable from '../interface/Foldable'
 
 // Actions
 import { changeGeometryParameter, changeAirfoil } from '../../actions/geometry'
+import { changeDisplayParameter } from '../../actions/display'
 
 // Styles
 import * as style from './Controls.style'
 
 // Shapes
 import geometryShape from '../../shapes/geometry'
+import displayShape from '../../shapes/display'
 
 const propTypes = {
   height: React.PropTypes.number,
   geometry: geometryShape,
+  display: displayShape,
   airfoils: React.PropTypes.array,
   changeGeometryParameter: React.PropTypes.func,
   changeAirfoil: React.PropTypes.func,
+  changeDisplayParameter: React.PropTypes.func,
 }
 
 function mapStateToProps (state) { // eslint-disable-line no-unused-vars
@@ -33,12 +38,14 @@ function mapStateToProps (state) { // eslint-disable-line no-unused-vars
     height: state.display.height,
     geometry: state.geometry,
     airfoils: state.data.airfoils,
+    display: state.display,
   }
 }
 
 function mapDispatchToProps (dispatch) { // eslint-disable-line no-unused-vars
   return {
     changeGeometryParameter: bindActionCreators(changeGeometryParameter, dispatch),
+    changeDisplayParameter: bindActionCreators(changeDisplayParameter, dispatch),
     changeAirfoil: bindActionCreators(changeAirfoil, dispatch),
   }
 }
@@ -62,6 +69,10 @@ class Controls extends React.Component {
     this.handleAirfoilDistributionChange = this.handleAirfoilDistributionChange.bind(this)
     this.handleAirfoilInterpolationChange = this.handleAirfoilInterpolationChange.bind(this)
     this.handleAirfoilChange = this.handleAirfoilChange.bind(this)
+    this.handleDisplayInternalMaterialChange = this.handleDisplayInternalMaterialChange.bind(this)
+    this.handleDisplayExternalMaterialChange = this.handleDisplayExternalMaterialChange.bind(this)
+    this.handleDisplayInternalMeshViewChange = this.handleDisplayInternalMeshViewChange.bind(this)
+    this.handleDisplayExternalMeshViewChange = this.handleDisplayExternalMeshViewChange.bind(this)
   }
 
   handleRibsChange (e) {
@@ -125,18 +136,30 @@ class Controls extends React.Component {
   handleAirfoilInterpolationChange (e, index, value) {
     this.props.changeGeometryParameter('airfoil.interpolation', value)
   }
+  handleDisplayInternalMaterialChange (e, index, value) {
+    this.props.changeDisplayParameter('internalMesh.material', value)
+  }
+  handleDisplayExternalMaterialChange (e, index, value) {
+    this.props.changeDisplayParameter('externalMesh.material', value)
+  }
+  handleDisplayInternalMeshViewChange (e, val) {
+    this.props.changeDisplayParameter('internalMesh.visible', val)
+  }
+  handleDisplayExternalMeshViewChange (e, val) {
+    this.props.changeDisplayParameter('externalMesh.visible', val)
+  }
 
   handleAirfoilChange (e, index, value) {
     if (this.props.geometry.airfoil.type === 'fromFile') {
       const airfoil = this.props.airfoils.find((item) => (item.filename === value))
       this.props.changeAirfoil(value, airfoil)
     } else {
-      console.warn('This airfoil type has not been implemented yet')
+      throw new Error('This airfoil type has not been implemented yet')
     }
   }
 
   render () {
-    const { airfoils } = this.props
+    const { airfoils, display } = this.props
     const { wingParameters, structureParameters, internal, external, airfoil } = this.props.geometry
 
     return (
@@ -174,6 +197,16 @@ class Controls extends React.Component {
               handleAirfoilDistributionChange={this.handleAirfoilDistributionChange}
               handleAirfoilInterpolationChange={this.handleAirfoilInterpolationChange}
               handleAirfoilChange={this.handleAirfoilChange}
+            />
+          </Foldable>
+          <Foldable
+            nom="Display settings"
+          >
+            <DisplayControls display={display}
+              handleDisplayInternalMaterialChange={this.handleDisplayInternalMaterialChange}
+              handleDisplayExternalMaterialChange={this.handleDisplayExternalMaterialChange}
+              handleDisplayInternalMeshViewChange={this.handleDisplayInternalMeshViewChange}
+              handleDisplayExternalMeshViewChange={this.handleDisplayExternalMeshViewChange}
             />
           </Foldable>
           <Foldable
