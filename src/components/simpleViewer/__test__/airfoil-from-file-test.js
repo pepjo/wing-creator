@@ -9,9 +9,9 @@ describe('airfoil-from-file', () => {
     name: 'TEST',
     filename: 'testd.dat',
     data: [
+      [-1, 0.5],
       [0, 0],
-      [0.3, 0.3],
-      [0.4, 0.3],
+      [3, 3],
     ],
   }
 
@@ -22,47 +22,47 @@ describe('airfoil-from-file', () => {
   })
 
   describe('returned function should linearly interpolate', () => {
-    describe('if we pass the points [0, 0], [0.3, 0.3], [0.4, 0.3]', () => {
+    describe('if we pass the points [-1, 0.5], [0, 0], [3, 3]', () => {
       const interpolator = airfoilFromFileGenerator(airfoil, 'linear')
 
-      it('should return 0.2 for x=0.2', () => {
-        const p = interpolator(0.2, 'intrados')
+      it('should return 0.25 for x=-0.5', () => {
+        const p = interpolator(-0.5, 'intrados')
 
-        expect(p).to.equal(0.2)
+        expect(p).to.equal(0.25)
       })
-      it('should return 0.3 for x=0.3', () => {
-        const p = interpolator(0.3, 'intrados')
+      it('should return 0 for x=0', () => {
+        const p = interpolator(0, 'intrados')
 
-        expect(p).to.equal(0.3)
+        expect(p).to.equal(0)
       })
-      it('should return 0.3 for x=0.35', () => {
-        const p = interpolator(0.35, 'intrados')
+      it('should return 1 for x=1', () => {
+        const p = interpolator(1, 'intrados')
 
-        expect(p).to.equal(0.3)
+        expect(p).to.equal(1)
       })
     })
   })
 
   describe('returned function should cubic spline interpolate', () => {
-    describe('if we pass the points [0, 0], [0.3, 0.3], [0.4, 0.3]', () => {
+    describe('if we pass the points [-1, 0.5], [0, 0], [3, 3]', () => {
       const interpolator = airfoilFromFileGenerator(airfoil, 'spline')
 
       const pr = 10000 // Precission
 
-      it('should return 0.2 for x=0.2500', () => {
-        const p = interpolator(0.2, 'intrados')
+      it('should return 0.15625 for x=-0.5', () => {
+        const p = interpolator(-0.5, 'intrados')
 
-        expect(Math.round(p * pr) / pr).to.equal(Math.round(0.2500 * pr) / pr)
+        expect(Math.round(p * pr) / pr).to.equal(Math.round(0.15625 * pr) / pr)
       })
-      it('should return 0.3 for x=0.3', () => {
-        const p = interpolator(0.3, 'intrados')
+      it('should return 0 for x=0', () => {
+        const p = interpolator(0, 'intrados')
 
-        expect(p).to.equal(0.3)
+        expect(p).to.equal(0)
       })
-      it('should return 0.3 for x=0.30625', () => {
-        const p = interpolator(0.35, 'intrados')
+      it('should return 0.25 for x=1', () => {
+        const p = interpolator(1, 'intrados')
 
-        expect(Math.round(p * pr) / pr).to.equal(Math.round(0.30625 * pr) / pr)
+        expect(Math.round(p * pr) / pr).to.equal(Math.round(0.25 * pr) / pr)
       })
     })
   })

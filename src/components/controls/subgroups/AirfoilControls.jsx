@@ -78,7 +78,7 @@ function AirfoilControls ({
         floatingLabelText="Point distribuiton mechanism"
       >
         <MenuItem value="linear" primaryText="Lineal interpolation" />
-        <MenuItem value="spline" primaryText="Cubic spline" disabled />
+        <MenuItem value="spline" primaryText="Cubic spline" />
       </SelectField>
     </div>
   )

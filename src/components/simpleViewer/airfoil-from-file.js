@@ -78,32 +78,37 @@ function findPoint (airfoil, x, upSide) {
 }
 
 const sFHelpers = {
-  calculateTAtPoint: (x1, x2, x) => (
-    (x - x1) / (x2 - x1)
+  calculateTAtPoint: (x1, x0, x) => (
+    (x - x0) / (x1 - x0)
   ),
-  calculateAAtPoint: (airfoil, i, k) => (
-    k[i - 1] * (airfoil[i][0] - airfoil[i - 1][0]) - (airfoil[i][1] - airfoil[i - 1][1])
+  calculateAAtPoint: (x1, x0, y1, y0, k0) => (
+    k0 * (x1 - x0) - (y1 - y0)
   ),
-  calculateBAtPoint: (airfoil, i, k) => (
-    - k[i] * (airfoil[i][0] - airfoil[i - 1][0]) + (airfoil[i][1] - airfoil[i - 1][1])
+  calculateBAtPoint: (x1, x0, y1, y0, k1) => (
+    - k1 * (x1 - x0) + (y1 - y0)
   ),
 }
 
 function splineFunction (airfoil, k, interpolation, x, upSide) {
   const i = findPoint(airfoil, x, upSide)
   const x1 = airfoil[i][0]
-  const x2 = airfoil[i - 1][0]
+  const x0 = airfoil[i - 1][0]
   const y1 = airfoil[i][1]
-  const y2 = airfoil[i - 1][1]
+  const y0 = airfoil[i - 1][1]
 
   // TODO: FIX: spline behaviour
   if (interpolation === 'spline') {
-    const a = sFHelpers.calculateAAtPoint(airfoil, i, k)
-    const b = sFHelpers.calculateBAtPoint(airfoil, i, k)
-    const t = sFHelpers.calculateTAtPoint(x1, x2, x)
-    return (1 - t) * airfoil[i - 1][1] + t * airfoil[i - 1][1] + t * (1 - t) * (a * (1 - t) + b * t)
+    const k1 = k[i]
+    const k0 = k[i - 1]
+    const a = sFHelpers.calculateAAtPoint(x1, x0, y1, y0, k0)
+    const b = sFHelpers.calculateBAtPoint(x1, x0, y1, y0, k1)
+    const t = sFHelpers.calculateTAtPoint(x1, x0, x)
+    console.log(i, 'a', a)
+    console.log(i, 'b', b)
+    console.log(i, 't', t)
+    return (1 - t) * y0 + t * y1 + t * (1 - t) * (a * (1 - t) + b * t)
   } else if (interpolation === 'linear') {
-    const m = (y2 - y1) / (x2 - x1)
+    const m = (y0 - y1) / (x0 - x1)
     return y1 + (x - x1) * m
   }
   throw new Error('Airfoil interpolation type not recognized')
@@ -114,7 +119,8 @@ export default function airfoilPointsGnrtr (airfoil, interpolation = 'spline') {
 
   if (interpolation === 'spline') {
     // Retrive or solve the system
-    if (global.airfoils && global.airfoils[airfoil.filename]) {
+    if (global.airfoils && global.airfoils[airfoil.filename] &&
+    typeof global.it !== 'function') { // It's not a test
       k = global.airfoils[airfoil.filename]
     } else {
       k = solveSystemForK(airfoil.data)
