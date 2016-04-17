@@ -128,9 +128,9 @@ class Foldable extends React.Component {
           </span>
         </RaisedButton>
         <div style={bdy}>
-            <div className="opcions__container" ref="container">
-              {this.props.children}
-            </div>
+          <div className="opcions__container" ref="container">
+            {this.props.children}
+          </div>
         </div>
       </div>
     )

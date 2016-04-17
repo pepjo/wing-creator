@@ -323,7 +323,7 @@ class Viewer extends React.Component {
   attatchControls (camera, container) {
     const controls = new TrackballControls(camera, container)
 
-    controls.rotateSpeed = 10
+    controls.rotateSpeed = 3
     controls.zoomSpeed = 1.2
     controls.panSpeed = 0.8
 
