@@ -78,8 +78,8 @@ function findPoint (airfoil, x, upSide) {
 }
 
 const sFHelpers = {
-  calculateTAtPoint: (airfoil, i, x) => (
-    (x - airfoil[i - 1][0]) / (airfoil[i][0] - airfoil[i - 1][0])
+  calculateTAtPoint: (x1, x2, x) => (
+    (x - x1) / (x2 - x1)
   ),
   calculateAAtPoint: (airfoil, i, k) => (
     k[i - 1] * (airfoil[i][0] - airfoil[i - 1][0]) - (airfoil[i][1] - airfoil[i - 1][1])
@@ -91,14 +91,20 @@ const sFHelpers = {
 
 function splineFunction (airfoil, k, x, upSide, interpolation) {
   const i = findPoint(airfoil, x, upSide)
-  const t = sFHelpers.calculateTAtPoint(airfoil, i, x)
+  const x1 = airfoil[i][0]
+  const x2 = airfoil[i - 1][0]
+  const y1 = airfoil[i][1]
+  const y2 = airfoil[i - 1][1]
+
   // TODO: FIX: spline behaviour
   if (interpolation === 'spline') {
     const a = sFHelpers.calculateAAtPoint(airfoil, i, k)
     const b = sFHelpers.calculateBAtPoint(airfoil, i, k)
+    const t = sFHelpers.calculateTAtPoint(x1, x2, x)
     return (1 - t) * airfoil[i - 1][1] + t * airfoil[i - 1][1] + t * (1 - t) * (a * (1 - t) + b * t)
   } else if (interpolation === 'linear') {
-    return (1 - t) * airfoil[i - 1][1] + t * airfoil[i - 1][1]
+    const m = (y2 - y1) / (x2 - x1)
+    return y1 + (x - x1) * m
   }
   console.error('interpolation type not recognized')
   throw new Error('airfoil interpolation type not recognized')
