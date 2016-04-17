@@ -27,3 +27,9 @@ export const input = {
 export const warning = {
   position: 'static',
 }
+
+export const actionBtnContainer = {
+  position: 'fixed',
+  bottom: 25,
+  right: 25,
+}
