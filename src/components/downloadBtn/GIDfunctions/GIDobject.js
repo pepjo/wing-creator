@@ -92,8 +92,22 @@ ${segment[0] + 1} ${segment[1] + 1}
 
     return geo
   }
-  
+
   generateFile () {
-    
+    const str = this.generateString()
+
+    const buf = new ArrayBuffer(str.length + 1)
+    const bufView = new Uint8Array(buf)
+    for (let i = 0, strLen = str.length; i < strLen + 1; i++) {
+      if (i < strLen - 147) {
+        bufView[i] = str.charCodeAt(i)
+      } else if (i === strLen - 147) {
+        bufView[i] = 0
+      } else {
+        bufView[i] = str.charCodeAt(i - 1)
+      }
+    }
+
+    return new Blob([buf], { type: 'text/plain;charset=us-ascii' })
   }
 }
