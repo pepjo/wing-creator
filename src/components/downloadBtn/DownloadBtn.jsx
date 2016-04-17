@@ -1,5 +1,6 @@
 
 import React from 'react'
+import JSZip from 'jszip'
 import saveAs from 'browser-saveas'
 
 // Functions
@@ -28,10 +29,18 @@ class DownloadBtn extends React.Component {
   }
 
   downloadGid () {
+    const zip = new JSZip()
+
     const GITobj = new GIDobject([data.objectData[0]])
     const file = GITobj.generateFile()
 
-    saveAs(file, 'GIDwing.geo')
+    const gid = zip.folder('GIDwing.gid')
+    gid.file('GIDwing.geo', file)
+
+    zip.generateAsync({ type: 'blob' })
+    .then((content) => {
+      saveAs(content, 'GIDwing.zip')
+    })
   }
 
   render () {
