@@ -1,7 +1,7 @@
 
 import React from 'react'
 import { Provider } from 'react-redux'
-import getMuiTheme from 'material-ui/lib/styles/getMuiTheme'
+import getMuiTheme from 'material-ui/styles/getMuiTheme'
 import { StyleRoot } from 'radium'
 
 // Style

@@ -2,9 +2,9 @@
 import React from 'react'
 
 // Components
-import SelectField from 'material-ui/lib/select-field'
-import MenuItem from 'material-ui/lib/menus/menu-item'
-import Toggle from 'material-ui/lib/toggle'
+import SelectField from 'material-ui/SelectField'
+import MenuItem from 'material-ui/MenuItem'
+import Toggle from 'material-ui/Toggle'
 
 // Styles
 import * as style from '../Controls.style'

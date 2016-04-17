@@ -6,10 +6,10 @@ import { pure } from 'recompose'
 import downloadGid from '../simpleViewer/dowloadGIDfile'
 
 // Components
-import Toolbar from 'material-ui/lib/toolbar/toolbar'
-import ToolbarGroup from 'material-ui/lib/toolbar/toolbar-group'
-import IconButton from 'material-ui/lib/icon-button'
-import DownloadIcon from 'material-ui/lib/svg-icons/file/file-download'
+import Toolbar from 'material-ui/Toolbar'
+import ToolbarGroup from 'material-ui/Toolbar/ToolbarGroup'
+import IconButton from 'material-ui/IconButton'
+import DownloadIcon from 'material-ui/svg-icons/file/file-download'
 
 // Styles
 import * as style from './AppBar.style.js'

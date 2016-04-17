@@ -1,8 +1,8 @@
 
-import * as Colors from 'material-ui/lib/styles/colors'
-import ColorManipulator from 'material-ui/lib/utils/color-manipulator'
-import Spacing from 'material-ui/lib/styles/spacing'
-import zIndex from 'material-ui/lib/styles/zIndex'
+import * as Colors from 'material-ui/styles/colors'
+import { fade } from 'material-ui/utils/colorManipulator'
+import Spacing from 'material-ui/styles/spacing'
+import zIndex from 'material-ui/styles/zIndex'
 
 export default {
   spacing: Spacing,
@@ -19,7 +19,7 @@ export default {
     alternateTextColor: Colors.white, // white
     canvasColor: Colors.white,
     borderColor: Colors.blueGrey900,
-    disabledColor: ColorManipulator.fade(Colors.darkBlack, 0.4),
+    disabledColor: fade(Colors.darkBlack, 0.4),
     pickerHeaderColor: Colors.blueGrey600,
   },
 }

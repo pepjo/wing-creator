@@ -2,7 +2,7 @@
 import React from 'react'
 
 // Components
-import TextField from 'material-ui/lib/text-field'
+import TextField from 'material-ui/TextField'
 
 // Styles
 import * as style from '../Controls.style'

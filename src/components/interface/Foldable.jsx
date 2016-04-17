@@ -2,7 +2,7 @@
 import React from 'react'
 
 // Components
-import RaisedButton from 'material-ui/lib/raised-button'
+import RaisedButton from 'material-ui/RaisedButton'
 
 // Syles
 import * as style from './Foldable.style'

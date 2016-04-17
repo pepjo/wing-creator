@@ -2,9 +2,9 @@
 import React from 'react'
 
 // Components
-import TextField from 'material-ui/lib/text-field'
-import SelectField from 'material-ui/lib/select-field'
-import MenuItem from 'material-ui/lib/menus/menu-item'
+import TextField from 'material-ui/TextField'
+import SelectField from 'material-ui/SelectField'
+import MenuItem from 'material-ui/MenuItem'
 
 // Styles
 import * as style from '../Controls.style'
