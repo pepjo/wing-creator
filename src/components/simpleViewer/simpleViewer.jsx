@@ -159,7 +159,6 @@ class Viewer extends React.Component {
           airfoilFunction,
           geometry.airfoil.nPoints,
           geometry.airfoil.distribution,
-          geometry.airfoil.interpolation,
           this.getImposedPoints(),
         )
       )
@@ -305,7 +304,7 @@ class Viewer extends React.Component {
 
     controls.noRotate = false
     controls.noZoom = false
-    controls.noPan = true
+    controls.noPan = process.env.NODE_ENV !== 'development'
 
     controls.staticMoving = false
     controls.dynamicDampingFactor = 0.3

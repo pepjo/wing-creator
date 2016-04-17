@@ -20,7 +20,7 @@ function imposePoints (points, imposed) {
   return points
 }
 
-function pointsGenerator (airfoilFunction, n, distribution, interpolation, imposedPoints) {
+function pointsGenerator (airfoilFunction, n, distribution, imposedPoints) {
   const x = imposePoints(
     (math.range(0, 1, 1 / (n / 2 - 1 - imposePoints.length))).toArray(),
     imposedPoints,
@@ -29,18 +29,18 @@ function pointsGenerator (airfoilFunction, n, distribution, interpolation, impos
 
   for (let i = x.length - 1; i >= 0; i--) {
     const xx = distributionFunctions[distribution](x[i])
-    data.push([xx, airfoilFunction(xx, 'extrados', interpolation)])
+    data.push([xx, airfoilFunction(xx, 'extrados')])
   }
   for (let i = 0; i < x.length; i++) {
     const xx = distributionFunctions[distribution](x[i])
-    data.push([xx, airfoilFunction(xx, 'intrados', interpolation)])
+    data.push([xx, airfoilFunction(xx, 'intrados')])
   }
 
   return data
 }
 
-export default function (airfoilFunction, nPoints, distribution, interpolation, imposedPoints) {
-  const data = pointsGenerator(airfoilFunction, nPoints, distribution, interpolation, imposedPoints)
+export default function (airfoilFunction, nPoints, distribution, imposedPoints) {
+  const data = pointsGenerator(airfoilFunction, nPoints, distribution, imposedPoints)
 
   // Console.log a Matlab compatible version of the points
   // console.log('data', data.reduce((s, i) => (s + i[0] + ',' + i[1] + ';'), ''))

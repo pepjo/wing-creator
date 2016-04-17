@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "nf start",
-    "test": "mocha --compilers .:babel-core/register \"src/**/*-test.jsx\"",
+    "test": "mocha --compilers .:babel-core/register \"src/**/*-test.js\"",
+    "test-watch": "mocha --compilers .:babel-core/register \"src/**/*-test.js\" --watch",
     "lint": "eslint ./",
     "heroku-postbuild": "npm run build",
     "build-react-server": "babel --retain-lines --ignore *-test.js src --out-dir views/react",

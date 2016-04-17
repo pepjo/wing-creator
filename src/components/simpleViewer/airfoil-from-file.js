@@ -89,7 +89,7 @@ const sFHelpers = {
   ),
 }
 
-function splineFunction (airfoil, k, x, upSide, interpolation) {
+function splineFunction (airfoil, k, interpolation, x, upSide) {
   const i = findPoint(airfoil, x, upSide)
   const x1 = airfoil[i][0]
   const x2 = airfoil[i - 1][0]
@@ -106,8 +106,7 @@ function splineFunction (airfoil, k, x, upSide, interpolation) {
     const m = (y2 - y1) / (x2 - x1)
     return y1 + (x - x1) * m
   }
-  console.error('interpolation type not recognized')
-  throw new Error('airfoil interpolation type not recognized')
+  throw new Error('Airfoil interpolation type not recognized')
 }
 
 export default function airfoilPointsGnrtr (airfoil, interpolation = 'spline') {
@@ -130,5 +129,5 @@ export default function airfoilPointsGnrtr (airfoil, interpolation = 'spline') {
     }
   }
 
-  return splineFunction.bind(undefined, airfoil.data, k)
+  return splineFunction.bind(undefined, airfoil.data, k, interpolation)
 }
