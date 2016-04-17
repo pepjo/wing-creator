@@ -1,5 +1,6 @@
 
 import React from 'react'
+import { connect } from 'react-redux'
 import JSZip from 'jszip'
 import saveAs from 'browser-saveas'
 
@@ -17,8 +18,24 @@ import DownloadIcon from 'material-ui/svg-icons/file/file-download'
 // Styles
 import * as style from './DownloadBtn.style.js'
 
+// Shapes
+import geometryShape from '../../shapes/geometry'
+
 const propTypes = {
   circle: React.PropTypes.bool,
+  geometry: geometryShape,
+  airfoilShell: React.PropTypes.object,
+}
+
+function mapStateToProps (state) {
+  return {
+    geometry: state.geometry,
+    airfoilShell: state.meshes.airfoilShell,
+  }
+}
+
+function mapDispatchToProps () {
+  return {}
 }
 
 class DownloadBtn extends React.Component {
@@ -31,7 +48,21 @@ class DownloadBtn extends React.Component {
   downloadGid () {
     const zip = new JSZip()
 
-    const GITobj = new GIDobject([data.objectData[0]])
+    const vertices = this.props.airfoilShell.vertices.map((airfoil) => (
+      [airfoil.x, airfoil.y, airfoil.z]
+    ))
+
+    const GITobj = new GIDobject([{
+      vertices,
+      segments: vertices.map((vertex, j) => {
+        if (vertices.length - 1 === j) {
+          return [j, 0]
+        }
+        return [j, j + 1]
+      }),
+      faces: [],
+      volumes: [],
+    }])
     const file = GITobj.generateFile()
 
     const gid = zip.folder('GIDwing.gid')
@@ -65,4 +96,4 @@ class DownloadBtn extends React.Component {
 
 DownloadBtn.propTypes = propTypes
 
-export default DownloadBtn
+export default connect(mapStateToProps, mapDispatchToProps)(DownloadBtn)
