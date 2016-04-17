@@ -37,4 +37,5 @@ export const innerContainer = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
+  height: '100%',
 }
