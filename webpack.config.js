@@ -16,7 +16,10 @@ const configurations = [
     entry: './src/browser.jsx',
     output: {
       path: path.join(__dirname, '/public/scripts'),
-      filename: '[name].min.js',
+      filename: 'main.min.js',
+    },
+    resolve: {
+      extensions: ['', '.js', '.jsx'],
     },
     module: {
       loaders: [

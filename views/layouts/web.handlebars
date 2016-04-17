@@ -68,7 +68,12 @@
   <script>
     window.__INITIAL_STATE__ = {{{react.body.initialState}}}
   </script>
+
+  {{#if production}}
+  <script src="/scripts/main.min.js"></script>
+  {{else}}
   <script src="/scripts/main.js"></script>
+  {{/if}}
 
   <link href='https://fonts.googleapis.com/css?family=Roboto:400,300,500' rel='stylesheet' type='text/css'>
 

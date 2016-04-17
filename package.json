@@ -43,7 +43,7 @@
     "redux": "^3.4.0",
     "redux-devtools": "^3.2.0",
     "redux-devtools-dock-monitor": "^1.1.1",
-    "redux-devtools-log-monitor": "^1.0.9",
+    "redux-devtools-log-monitor": "1.0.10",
     "redux-thunk": "^2.0.1",
     "serve-favicon": "^2.3.0",
     "three": "^0.75.0",
