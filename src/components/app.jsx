@@ -37,7 +37,9 @@ class App extends React.Component {
   }
 
   componentDidMount () {
-    setInterval(() => { this.loadAirfoils() }, 10000)
+    if (window.location.hostname === 'loalhost') {
+      setInterval(() => { this.loadAirfoils() }, 10000)
+    }
   }
 
   loadAirfoils () {
