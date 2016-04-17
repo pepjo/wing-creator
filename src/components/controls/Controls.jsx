@@ -3,9 +3,6 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 
-// Functions
-import downloadGid from '../simpleViewer/dowloadGIDfile'
-
 // Components
 import AirfoilControls from './subgroups/AirfoilControls'
 import DisplayControls from './subgroups/DisplayControls'
@@ -14,8 +11,7 @@ import StructuresParametersControls from './subgroups/StructuresParametersContro
 import WingParametersControls from './subgroups/WingParametersControls'
 import Paper from 'material-ui/Paper'
 import Foldable from '../interface/Foldable'
-import FloatingActionButton from 'material-ui/FloatingActionButton'
-import DownloadIcon from 'material-ui/svg-icons/file/file-download'
+import DownloadBtn from '../downloadBtn/DownloadBtn'
 
 // Actions
 import { changeGeometryParameter, changeAirfoil } from '../../actions/geometry'
@@ -232,9 +228,7 @@ class Controls extends React.Component {
           </Foldable>
         </Paper>
         <div style={style.actionBtnContainer}>
-          <FloatingActionButton onClick={downloadGid}>
-            <DownloadIcon />
-          </FloatingActionButton>
+          <DownloadBtn circle />
         </div>
       </div>
     )

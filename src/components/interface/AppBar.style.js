@@ -19,7 +19,3 @@ export const bar = {
 export const container = {
   height: 55,
 }
-
-export const icon = {
-  marginTop: 4,
-}
