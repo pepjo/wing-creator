@@ -72,6 +72,7 @@ class Viewer extends React.Component {
     this.generateInternalMesh = this.generateInternalMesh.bind(this)
     this.changeMeshVisibility = this.changeMeshVisibility.bind(this)
     this.changeMeshMaterial = this.changeMeshMaterial.bind(this)
+    this.generateRib = this.generateRib.bind(this)
   }
 
   componentDidMount () {
@@ -188,6 +189,22 @@ class Viewer extends React.Component {
     }
   }
 
+  generateRib (i) {
+    const geometry = this.props.geometry
+    const shell = this.props.airfoilShell
+    const root = geometry.wingParameters.root < 0.1 ? 0.1 : geometry.wingParameters.root
+
+    return generateRibFromPoints(
+      _.cloneDeep(shell),
+      i,
+      root,
+      - root / 2,
+      0,
+      - this.getZcoord(i),
+      [geometry.structureParameters.beamCoord],
+    )
+  }
+
   generateInternalMesh () {
     const geometry = this.props.geometry
     const shell = this.props.airfoilShell
@@ -196,18 +213,11 @@ class Viewer extends React.Component {
       faces: [],
     }
 
-    if (shell) {
+    if (shell.vertices) {
       let prevBeamVertices = []
 
       for (let i = 0; i < geometry.wingParameters.ribs; i++) {
-        const rib = generateRibFromPoints(
-          _.cloneDeep(shell),
-          i,
-          geometry.wingParameters.root,
-          this.getZcoord(i),
-          0,
-          [geometry.structureParameters.beamCoord],
-        )
+        const rib = this.generateRib(i)
 
         const beamVertices = rib.found.map((item) => (item + mesh.vertices.length))
 
@@ -238,16 +248,9 @@ class Viewer extends React.Component {
       faces: [],
     }
 
-    if (shell) {
+    if (shell.vertices) {
       for (let i = 0; i < geometry.wingParameters.ribs; i++) {
-        const rib = generateRibFromPoints(
-          _.cloneDeep(shell),
-          i,
-          geometry.wingParameters.root,
-          this.getZcoord(i),
-          0,
-          this.getImposedPoints(),
-        )
+        const rib = this.generateRib(i)
 
         const le = mesh.vertices.length
 
@@ -376,31 +379,6 @@ class Viewer extends React.Component {
       geometry.vertices = this.props[name].vertices
       geometry.faces = this.props[name].faces
       geometry.name = name
-
-      console.log('checking ', name)
-      for (let i = 0, vL = geometry.vertices.length; i < vL; i++) {
-        try {
-          geometry.vertices[i].x
-        } catch (err) {
-          console.log('ERROR FOUND!, accessing vertex', i)
-        }
-      }
-
-      for (let i = 0, fL = geometry.faces.length; i < fL; i++) {
-        try {
-          if (typeof geometry.vertices[geometry.faces[i].a] === 'undefined') {
-            throw new Error('On face ' + i + ' vertex ' + geometry.faces[i].a + ' was referenced but it does not exist')
-          }
-          if (typeof geometry.vertices[geometry.faces[i].c] === 'undefined') {
-            throw new Error('On face ' + i + ' vertex ' + geometry.faces[i].c + ' was referenced but it does not exist')
-          }
-          if (typeof geometry.vertices[geometry.faces[i].b] === 'undefined') {
-            throw new Error('On face ' + i + ' vertex ' + geometry.faces[i].b + ' was referenced but it does not exist')
-          }
-        } catch (err) {
-          console.log(err)
-        }
-      }
 
       geometry.computeFaceNormals()
       geometry.computeBoundingSphere()

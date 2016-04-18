@@ -1,7 +1,7 @@
 
 import THREE from 'three'
 
-export default function (shell, i, chord, x, y, find) {
+export default function (shell, i, chord, x, y, z, find) {
   const length = shell.vertices.length
 
   const found = shell.vertices.filter((vertex) => {
@@ -16,7 +16,11 @@ export default function (shell, i, chord, x, y, find) {
   ))
 
   const vertices = shell.vertices.map((p) => (
-    new THREE.Vector3(p.x, p.y + y, p.z - x)
+    new THREE.Vector3(
+      (p.x * chord) + x,
+      (p.y * chord) + y,
+      p.z + z
+    )
   ))
 
   return {
