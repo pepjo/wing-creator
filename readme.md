@@ -3,7 +3,7 @@
 ## TODO
 
 - [x] Nova distribution
-- [ ] Canvia mida root i tip
+- [x] Canvia mida root i tip
 - [x] Centrar en les x
 - [x] Sweep angle
 - [ ] Exportar a GID tota l'estructura
