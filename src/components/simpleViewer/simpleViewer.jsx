@@ -5,9 +5,8 @@ import { bindActionCreators } from 'redux'
 import _ from 'lodash'
 import math from 'mathjs'
 
-import THREE from 'three'
+import { generateInternalMesh, generateExternalMesh } from './mesh-from-rib'
 import ThreejsObject from './threejsObject'
-
 import shellFromAirfoilGenerator from './shell-generator'
 import airfoilFrom from './airfoil'
 import generateRibFromPoints from './rib-from-shell'
@@ -66,6 +65,9 @@ class Viewer extends React.Component {
     this.generateAirfoilShell = this.generateAirfoilShell.bind(this)
     this.generateInternalMesh = this.generateInternalMesh.bind(this)
     this.generateRib = this.generateRib.bind(this)
+    this.getZcoord = this.getZcoord.bind(this)
+    this.getXcoord = this.getXcoord.bind(this)
+    this.getChord = this.getChord.bind(this)
   }
 
   componentDidMount () {
@@ -151,6 +153,24 @@ class Viewer extends React.Component {
     return [this.props.geometry.structureParameters.beamCoord]
   }
 
+  generateAirfoilShell () { // eslint-disable-line
+    const geometry = this.props.geometry
+
+    const airfoilFunction = airfoilFrom(this.props.airfoils, geometry)
+
+    // Update mesh
+    if (airfoilFunction && geometry.airfoil.nPoints > 8) {
+      this.props.updateAirfoilPoints(
+        shellFromAirfoilGenerator(
+          airfoilFunction,
+          geometry.airfoil.nPoints,
+          geometry.airfoil.distribution,
+          this.getImposedPoints(),
+        )
+      )
+    }
+  }
+
   getZcoord (i) {
     const geometry = this.props.geometry
     const centerZOffset = geometry.wingParameters.length / 2
@@ -175,24 +195,6 @@ class Viewer extends React.Component {
     return ((z + l / 2) / l) * (tip - root) + root
   }
 
-  generateAirfoilShell () {
-    const geometry = this.props.geometry
-
-    const airfoilFunction = airfoilFrom(this.props.airfoils, geometry)
-
-    // Update mesh
-    if (airfoilFunction && geometry.airfoil.nPoints > 8) {
-      this.props.updateAirfoilPoints(
-        shellFromAirfoilGenerator(
-          airfoilFunction,
-          geometry.airfoil.nPoints,
-          geometry.airfoil.distribution,
-          this.getImposedPoints(),
-        )
-      )
-    }
-  }
-
   generateRib (i) {
     const geometry = this.props.geometry
     const shell = this.props.airfoilShell
@@ -214,34 +216,9 @@ class Viewer extends React.Component {
   generateInternalMesh () {
     const geometry = this.props.geometry
     const shell = this.props.airfoilShell
-    const mesh = {
-      vertices: [],
-      faces: [],
-    }
 
-    if (shell.vertices) {
-      let prevBeamVertices = []
-
-      for (let i = 0; i < geometry.wingParameters.ribs; i++) {
-        const rib = this.generateRib(i)
-
-        const beamVertices = rib.found.map((item) => (item + mesh.vertices.length))
-
-        mesh.vertices = mesh.vertices.concat(rib.vertices)
-        mesh.faces = mesh.faces.concat(rib.faces)
-
-        if (i !== 0 && beamVertices.length !== 0) {
-          mesh.faces.push(
-            new THREE.Face3(beamVertices[0], beamVertices[1], prevBeamVertices[0])
-          )
-          mesh.faces.push(
-            new THREE.Face3(beamVertices[1], prevBeamVertices[1], prevBeamVertices[0])
-          )
-        }
-
-        prevBeamVertices = beamVertices
-      }
-
+    const mesh = generateInternalMesh(geometry, shell, this.generateRib)
+    if (mesh) {
       this.props.updateInternalMesh(mesh)
     }
   }
@@ -249,33 +226,9 @@ class Viewer extends React.Component {
   generateExternalMesh () {
     const geometry = this.props.geometry
     const shell = this.props.airfoilShell
-    const mesh = {
-      vertices: [],
-      faces: [],
-    }
 
-    if (shell.vertices) {
-      for (let i = 0; i < geometry.wingParameters.ribs; i++) {
-        const rib = this.generateRib(i)
-
-        const le = mesh.vertices.length
-
-        mesh.vertices = mesh.vertices.concat(rib.vertices)
-        const faces = []
-
-        if (i !== 0) {
-          for (let j = 0, l = rib.vertices.length; j < l - 1; j++) {
-            faces.push(new THREE.Face3(le + j, le + j + 1, le + j - l))
-            faces.push(new THREE.Face3(le + j + 1, le + j + 1 - l, le + j - l))
-          }
-
-          faces.push(new THREE.Face3(le + rib.vertices.length - 1, le, le - 1))
-          faces.push(new THREE.Face3(le - 1, le, le - rib.vertices.length))
-        }
-
-        mesh.faces = mesh.faces.concat(faces)
-      }
-
+    const mesh = generateExternalMesh(geometry, shell, this.generateRib)
+    if (mesh) {
       this.props.updateExternalMesh(mesh)
     }
   }
