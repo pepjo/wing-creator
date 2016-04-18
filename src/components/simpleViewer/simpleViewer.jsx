@@ -3,6 +3,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import _ from 'lodash'
+import math from 'mathjs'
 
 import THREE from 'three'
 import TrackballControls from 'three-trackballcontrols'
@@ -171,6 +172,15 @@ class Viewer extends React.Component {
     return i * geometry.wingParameters.length / (geometry.wingParameters.ribs - 1) - centerZOffset
   }
 
+  getXcoord (i, z) {
+    const geometry = this.props.geometry
+    const root = geometry.wingParameters.root / 2
+    const l = geometry.wingParameters.length
+    const tip = root - math.tan(geometry.wingParameters.sweep / 180 * math.pi) * l
+
+    return ((z + l / 2) / l) * (tip - root) + root
+  }
+
   getChord (i, z) {
     const geometry = this.props.geometry
     const root = geometry.wingParameters.root === 0 ? 0.1 : geometry.wingParameters.root
@@ -201,15 +211,15 @@ class Viewer extends React.Component {
   generateRib (i) {
     const geometry = this.props.geometry
     const shell = this.props.airfoilShell
-    const root = geometry.wingParameters.root
     const z = this.getZcoord(i)
+    const x = this.getXcoord(i, z)
     const chord = this.getChord(i, z)
 
     return generateRibFromPoints(
       _.cloneDeep(shell),
       i,
       chord,
-      - root / 2,
+      - x,
       0,
       - z,
       [geometry.structureParameters.beamCoord],

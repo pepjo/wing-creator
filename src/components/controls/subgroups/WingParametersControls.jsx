@@ -53,7 +53,6 @@ function WingParametersControls ({
         value={wingParameters.sweep} onChange={handleSweepChange}
         style={style.field} inputStyle={style.input}
         floatingLabelText="Sweep angle [º]" type="number"
-        disabled
       />
     </div>
   )
