@@ -27,7 +27,7 @@ const defaultState = {
     data: undefined,
     name: undefined,
     nPoints: 50,
-    distribution: 'equal',
+    distribution: 'sin',
     interpolation: 'linear',
   },
 }
