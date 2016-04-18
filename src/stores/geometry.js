@@ -46,7 +46,6 @@ export default (state = defaultState, action) => {
       return Object.assign({}, state, newState(action.param, action.value, state))
 
     case UPDATE_AIRFOIL:
-      console.log('action', action)
       return Object.assign({}, state, {
         airfoil: Object.assign({}, state.airfoil, {
           filename: action.filename,
