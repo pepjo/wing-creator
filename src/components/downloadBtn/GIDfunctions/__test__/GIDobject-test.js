@@ -29,6 +29,14 @@ describe('GIDobject', () => {
       })
     })
 
+    describe('and when we call generateFaces', () => {
+      const text = GITobj.generateFaces()
+
+      it('should generate the faces correctly', () => {
+        expect(text).to.equal(data.facesText)
+      })
+    })
+
     describe('and when we call generateString', () => {
       const text = GITobj.generateString()
 
@@ -37,6 +45,7 @@ describe('GIDobject', () => {
           data.header +
           data.verticesText +
           data.segmentsText +
+          data.facesText +
           data.footer
         )
       })

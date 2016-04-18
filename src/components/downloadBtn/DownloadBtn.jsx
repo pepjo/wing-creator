@@ -56,7 +56,7 @@ class DownloadBtn extends React.Component {
     const GITobj = new GIDobject([{
       vertices,
       segments: this.props.meshes.internalMesh.segments,
-      faces: [],
+      faces: this.props.meshes.internalMesh.facesFromSegments,
       volumes: [],
     }])
     const file = GITobj.generateFile()

@@ -11,6 +11,7 @@ export function generateInternalMesh (geometry, shell, ribGen) {
 
   if (shell.vertices) {
     let prevBeamVertices = []
+    let prevSegmentIndex = 0
 
     for (let i = 0; i < geometry.structureParameters.ribs; i++) {
       const rib = ribGen(i)
@@ -25,17 +26,32 @@ export function generateInternalMesh (geometry, shell, ribGen) {
         mesh.faces.push(
           new THREE.Face3(beamVertices[0], beamVertices[1], prevBeamVertices[0])
         )
-        mesh.segments.push(
-          [beamVertices[0], prevBeamVertices[0]]
-        )
         mesh.faces.push(
           new THREE.Face3(beamVertices[1], prevBeamVertices[1], prevBeamVertices[0])
+        )
+
+        // Add segments for GID
+        mesh.segments.push(
+          [prevBeamVertices[0], beamVertices[0]]
         )
         mesh.segments.push(
           [beamVertices[1], prevBeamVertices[1]]
         )
+
+        // Add facesFromSegments (notice the last segment is still to be added)
+        mesh.facesFromSegments.push([
+          [mesh.segments.length, 1],
+          [mesh.segments.length - 1, 1],
+          [prevSegmentIndex - 1, 0],
+          [mesh.segments.length - 2, 1],
+        ])
       }
 
+      mesh.segments.push(
+        [beamVertices[0], beamVertices[1]]
+      )
+
+      prevSegmentIndex = mesh.segments.length
       prevBeamVertices = beamVertices
     }
 
