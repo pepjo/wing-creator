@@ -104,7 +104,9 @@ class Viewer extends React.Component {
 
     if (prevGeometry.airfoil.filename !== geometry.airfoil.filename ||
         prevGeometry.structureParameters.beamCoord !== geometry.structureParameters.beamCoord ||
-        prevGeometry.airfoil.nPoints !== geometry.airfoil.nPoints) {
+        prevGeometry.airfoil.nPoints !== geometry.airfoil.nPoints ||
+        prevGeometry.airfoil.distribution !== geometry.airfoil.distribution ||
+        prevGeometry.airfoil.interpolation !== geometry.airfoil.interpolation) {
       this.generateAirfoilShell()
     }
 
@@ -212,7 +214,12 @@ class Viewer extends React.Component {
         mesh.vertices = mesh.vertices.concat(rib.vertices)
         mesh.faces = mesh.faces.concat(rib.faces)
 
-        if (i !== 0) {
+        if (mesh.faces.length === 94 || mesh.faces.length === 95) {
+          console.log('add imposed vertices', imposedVertices[0], imposedVertices[1], prevImposedVertices[0], '|',
+          imposedVertices[1], prevImposedVertices[1], prevImposedVertices[0])
+        }
+
+        if (i !== 0 && imposedVertices.length !== 0) {
           mesh.faces.push(
             new THREE.Face3(imposedVertices[0], imposedVertices[1], prevImposedVertices[0])
           )
@@ -374,6 +381,31 @@ class Viewer extends React.Component {
       geometry.vertices = this.props[name].vertices
       geometry.faces = this.props[name].faces
       geometry.name = name
+
+      console.log('checking ', name)
+      for (let i = 0, vL = geometry.vertices.length; i < vL; i++) {
+        try {
+          geometry.vertices[i].x
+        } catch (err) {
+          console.log('ERROR FOUND!, accessing vertex', i)
+        }
+      }
+
+      for (let i = 0, fL = geometry.faces.length; i < fL; i++) {
+        try {
+          if (typeof geometry.vertices[geometry.faces[i].a] === 'undefined') {
+            throw new Error('On face ' + i + ' vertex ' + geometry.faces[i].a + ' was referenced but it does not exist')
+          }
+          if (typeof geometry.vertices[geometry.faces[i].c] === 'undefined') {
+            throw new Error('On face ' + i + ' vertex ' + geometry.faces[i].c + ' was referenced but it does not exist')
+          }
+          if (typeof geometry.vertices[geometry.faces[i].b] === 'undefined') {
+            throw new Error('On face ' + i + ' vertex ' + geometry.faces[i].b + ' was referenced but it does not exist')
+          }
+        } catch (err) {
+          console.log(err)
+        }
+      }
 
       geometry.computeFaceNormals()
       geometry.computeBoundingSphere()

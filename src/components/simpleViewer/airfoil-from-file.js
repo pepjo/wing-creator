@@ -89,8 +89,11 @@ const sFHelpers = {
   ),
 }
 
-function splineFunction (airfoil, k, interpolation, x, upSide) {
+function interpolatorFunction (airfoil, k, interpolation, x, upSide) {
   const i = findPoint(airfoil, x, upSide)
+  if (i === 0 || i === airfoil.length) {
+    return airfoil[0][1]
+  }
   const x1 = airfoil[i][0]
   const x0 = airfoil[i - 1][0]
   const y1 = airfoil[i][1]
@@ -103,9 +106,9 @@ function splineFunction (airfoil, k, interpolation, x, upSide) {
     const a = sFHelpers.calculateAAtPoint(x1, x0, y1, y0, k0)
     const b = sFHelpers.calculateBAtPoint(x1, x0, y1, y0, k1)
     const t = sFHelpers.calculateTAtPoint(x1, x0, x)
-    console.log(i, 'a', a)
-    console.log(i, 'b', b)
-    console.log(i, 't', t)
+    // console.log(i, 'a', a)
+    // console.log(i, 'b', b)
+    // console.log(i, 't', t)
     return (1 - t) * y0 + t * y1 + t * (1 - t) * (a * (1 - t) + b * t)
   } else if (interpolation === 'linear') {
     const m = (y0 - y1) / (x0 - x1)
@@ -135,5 +138,5 @@ export default function airfoilPointsGnrtr (airfoil, interpolation = 'spline') {
     }
   }
 
-  return splineFunction.bind(undefined, airfoil.data, k, interpolation)
+  return interpolatorFunction.bind(undefined, airfoil.data, k, interpolation)
 }

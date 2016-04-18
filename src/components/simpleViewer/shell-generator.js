@@ -2,10 +2,9 @@
 import THREE from 'three'
 import math from 'mathjs'
 
-const distributionFunctions = {
+export const distributionFunctions = {
   equal: (x) => (x),
-  // TODO: implement this
-  sin: () => {throw Error('Sin not yet implemented!')},
+  sin: (x) => (math.cos((x - 2) * math.pi / 2) + 1),
 }
 
 function imposePoints (points, imposed) {
@@ -20,20 +19,53 @@ function imposePoints (points, imposed) {
   return points
 }
 
-function pointsGenerator (airfoilFunction, n, distribution, imposedPoints) {
-  const x = imposePoints(
-    (math.range(0, 1, 1 / (n / 2 - 1 - imposePoints.length))).toArray(),
-    imposedPoints,
-  )
-  const data = [[1, 0]]
+// Fixes the inpressions ints might have.
+// Me want real 0. and 1. not 0.999999 etc
+function fix (x) {
+  const pr = 1e14 // Precission
+  return Math.round(x * pr) / pr
+}
 
+function pointsGenerator (airfoilFunction, n, distribution, imposedPoints) {
+  let lastX = 1
+  let impoToBeFound = [...imposedPoints]
+  const x = (math.range(0, 1, 1 / (n / 2 - imposePoints.length + 1))).toArray()
+  const data = [new THREE.Vector3(1, 0, 0)]
+
+  // Extrados
   for (let i = x.length - 1; i >= 0; i--) {
-    const xx = distributionFunctions[distribution](x[i])
-    data.push([xx, airfoilFunction(xx, 'extrados')])
+    const xx = distributionFunctions[distribution](fix(x[i]))
+
+    // Add imposed points
+    for (let j = 0; j < impoToBeFound.length; j++) {
+      if (xx < impoToBeFound[j] && lastX > impoToBeFound[j]) {
+        data.push(new THREE.Vector3(impoToBeFound[j], airfoilFunction(xx, 'extrados')))
+        impoToBeFound.splice(j, 1)
+      }
+    }
+
+    // Add point
+    data.push(new THREE.Vector3(xx, airfoilFunction(xx, 'extrados')))
+    lastX = xx
   }
-  for (let i = 0; i < x.length; i++) {
-    const xx = distributionFunctions[distribution](x[i])
-    data.push([xx, airfoilFunction(xx, 'intrados')])
+
+  // Reset
+  impoToBeFound = [...imposedPoints]
+
+  // Intrados
+  for (let i = 1, len = x.length; i < len; i++) {
+    const xx = distributionFunctions[distribution](fix(x[i]))
+
+    // Add imposed points
+    for (let j = 0; j < impoToBeFound.length; j++) {
+      if (xx > impoToBeFound[j] && lastX < impoToBeFound[j]) {
+        data.push(new THREE.Vector3(impoToBeFound[j], airfoilFunction(xx, 'intrados')))
+        impoToBeFound.splice(j, 1)
+      }
+    }
+
+    data.push(new THREE.Vector3(xx, airfoilFunction(xx, 'intrados'), 0))
+    lastX = xx
   }
 
   return data
@@ -45,7 +77,7 @@ export default function (airfoilFunction, nPoints, distribution, imposedPoints) 
   // Console.log a Matlab compatible version of the points
   // console.log('data', data.reduce((s, i) => (s + i[0] + ',' + i[1] + ';'), ''))
 
-  const vertices = data.map((point) => (new THREE.Vector3(point[0], point[1], 0)))
+  const vertices = data
 
   const faces = []
 

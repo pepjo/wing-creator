@@ -66,16 +66,16 @@ function AirfoilControls ({
         value={airfoil.distribution}
         onChange={handleAirfoilDistributionChange}
         style={style.field}
-        floatingLabelText="Point interpolation mechanism"
+        floatingLabelText="Point distribuiton mechanism"
       >
         <MenuItem value="equal" primaryText="Equally distributed" />
-        <MenuItem value="sin" primaryText="Sinusoidal distribution" disabled />
+        <MenuItem value="sin" primaryText="Sinusoidal distribution" />
       </SelectField>
       <SelectField
         value={airfoil.interpolation}
         onChange={handleAirfoilInterpolationChange}
         style={style.field}
-        floatingLabelText="Point distribuiton mechanism"
+        floatingLabelText="Point interpolation mechanism"
       >
         <MenuItem value="linear" primaryText="Lineal interpolation" />
         <MenuItem value="spline" primaryText="Cubic spline" />
