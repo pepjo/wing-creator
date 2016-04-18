@@ -1,12 +1,12 @@
 
 import THREE from 'three'
 
-export default function (shell, i, chord, x, y, imposed) {
+export default function (shell, i, chord, x, y, find) {
   const length = shell.vertices.length
 
-  const resImposed = shell.vertices.filter((vertex) => {
-    for (let j = 0; j < imposed.length; j++) {
-      return imposed[j] === vertex.x
+  const found = shell.vertices.filter((vertex) => {
+    for (let j = 0; j < find.length; j++) {
+      return find[j] === vertex.x
     }
     return false
   }).map((vertex) => shell.vertices.indexOf(vertex))
@@ -20,7 +20,7 @@ export default function (shell, i, chord, x, y, imposed) {
   ))
 
   return {
-    imposed: resImposed,
+    found,
     faces,
     vertices,
   }

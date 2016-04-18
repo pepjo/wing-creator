@@ -197,7 +197,7 @@ class Viewer extends React.Component {
     }
 
     if (shell) {
-      let prevImposedVertices = []
+      let prevBeamVertices = []
 
       for (let i = 0; i < geometry.wingParameters.ribs; i++) {
         const rib = generateRibFromPoints(
@@ -206,29 +206,24 @@ class Viewer extends React.Component {
           geometry.wingParameters.root,
           this.getZcoord(i),
           0,
-          this.getImposedPoints(),
+          [geometry.structureParameters.beamCoord],
         )
 
-        const imposedVertices = rib.imposed.map((item) => (item + mesh.vertices.length))
+        const beamVertices = rib.found.map((item) => (item + mesh.vertices.length))
 
         mesh.vertices = mesh.vertices.concat(rib.vertices)
         mesh.faces = mesh.faces.concat(rib.faces)
 
-        if (mesh.faces.length === 94 || mesh.faces.length === 95) {
-          console.log('add imposed vertices', imposedVertices[0], imposedVertices[1], prevImposedVertices[0], '|',
-          imposedVertices[1], prevImposedVertices[1], prevImposedVertices[0])
-        }
-
-        if (i !== 0 && imposedVertices.length !== 0) {
+        if (i !== 0 && beamVertices.length !== 0) {
           mesh.faces.push(
-            new THREE.Face3(imposedVertices[0], imposedVertices[1], prevImposedVertices[0])
+            new THREE.Face3(beamVertices[0], beamVertices[1], prevBeamVertices[0])
           )
           mesh.faces.push(
-            new THREE.Face3(imposedVertices[1], prevImposedVertices[1], prevImposedVertices[0])
+            new THREE.Face3(beamVertices[1], prevBeamVertices[1], prevBeamVertices[0])
           )
         }
 
-        prevImposedVertices = imposedVertices
+        prevBeamVertices = beamVertices
       }
 
       this.props.updateInternalMesh(mesh)
