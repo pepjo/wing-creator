@@ -5,14 +5,20 @@ const defaultState = {
   internalMesh: {
     vertices: undefined,
     faces: undefined,
+    segments: undefined,
+    facesFromSegments: undefined,
   },
   externalMesh: {
     vertices: undefined,
     faces: undefined,
+    segments: undefined,
+    facesFromSegments: undefined,
   },
   airfoilShell: {
     vertices: undefined,
     faces: undefined,
+    segments: undefined,
+    facesFromSegments: undefined,
   },
 }
 

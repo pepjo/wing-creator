@@ -18,14 +18,21 @@ export function generateInternalMesh (geometry, shell, ribGen) {
       const beamVertices = rib.found.map((item) => (item + mesh.vertices.length))
 
       mesh.vertices = mesh.vertices.concat(rib.vertices)
+      mesh.segments = mesh.segments.concat(rib.segments)
       mesh.faces = mesh.faces.concat(rib.faces)
 
       if (i !== 0 && beamVertices.length !== 0) {
         mesh.faces.push(
           new THREE.Face3(beamVertices[0], beamVertices[1], prevBeamVertices[0])
         )
+        mesh.segments.push(
+          [beamVertices[0], prevBeamVertices[0]]
+        )
         mesh.faces.push(
           new THREE.Face3(beamVertices[1], prevBeamVertices[1], prevBeamVertices[0])
+        )
+        mesh.segments.push(
+          [beamVertices[1], prevBeamVertices[1]]
         )
       }
 

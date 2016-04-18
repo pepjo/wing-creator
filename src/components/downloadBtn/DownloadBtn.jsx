@@ -17,19 +17,14 @@ import FlatButton from 'material-ui/FlatButton'
 // Styles
 import * as style from './DownloadBtn.style.js'
 
-// Shapes
-import geometryShape from '../../shapes/geometry'
-
 const propTypes = {
   circle: React.PropTypes.bool,
-  geometry: geometryShape,
-  airfoilShell: React.PropTypes.object,
+  meshes: React.PropTypes.object,
 }
 
 function mapStateToProps (state) {
   return {
-    geometry: state.geometry,
-    airfoilShell: state.meshes.airfoilShell,
+    meshes: state.meshes,
   }
 }
 
@@ -54,18 +49,13 @@ class DownloadBtn extends React.Component {
 
     const zip = new JSZip()
 
-    const vertices = this.props.airfoilShell.vertices.map((airfoil) => (
+    const vertices = this.props.meshes.internalMesh.vertices.map((airfoil) => (
       [airfoil.x, airfoil.y, airfoil.z]
     ))
 
     const GITobj = new GIDobject([{
       vertices,
-      segments: vertices.map((vertex, j) => {
-        if (vertices.length - 1 === j) {
-          return [j, 0]
-        }
-        return [j, j + 1]
-      }),
+      segments: this.props.meshes.internalMesh.segments,
       faces: [],
       volumes: [],
     }])

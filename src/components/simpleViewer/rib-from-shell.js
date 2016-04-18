@@ -11,6 +11,10 @@ export default function (shell, i, chord, x, y, z, find) {
     return false
   }).map((vertex) => shell.vertices.indexOf(vertex))
 
+  const segments = shell.segments.map((s) => (
+    [s[0] + length * i, s[1] + length * i]
+  ))
+
   const faces = shell.faces.map((f) => (
     new THREE.Face3(f.a + length * i, f.b + length * i, f.c + length * i)
   ))
@@ -27,5 +31,6 @@ export default function (shell, i, chord, x, y, z, find) {
     found,
     faces,
     vertices,
+    segments,
   }
 }

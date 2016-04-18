@@ -79,14 +79,18 @@ export default function (airfoilFunction, nPoints, distribution, imposedPoints) 
 
   const vertices = data
 
+  const segments = []
+  const facesFromSegments = []
   const faces = []
-
   for (let i = 1, len = data.length - 1; i < len; i++) {
+    segments.push([i, i + 1])
     faces.push(new THREE.Face3(0, i, i + 1))
   }
 
   return {
     vertices,
     faces,
+    segments,
+    facesFromSegments,
   }
 }
