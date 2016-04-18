@@ -48,7 +48,6 @@ function WingParametersControls ({
         value={wingParameters.tip} onChange={handleTipChange}
         style={style.field} inputStyle={style.input}
         floatingLabelText="TipChord [m]" type="number"
-        disabled
       />
       <TextField
         value={wingParameters.sweep} onChange={handleSweepChange}

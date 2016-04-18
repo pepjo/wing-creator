@@ -171,6 +171,15 @@ class Viewer extends React.Component {
     return i * geometry.wingParameters.length / (geometry.wingParameters.ribs - 1) - centerZOffset
   }
 
+  getChord (i, z) {
+    const geometry = this.props.geometry
+    const root = geometry.wingParameters.root === 0 ? 0.1 : geometry.wingParameters.root
+    const tip = geometry.wingParameters.tip === 0 ? 0.1 : geometry.wingParameters.tip
+    const l = geometry.wingParameters.length
+
+    return ((z + l / 2) / l) * (tip - root) + root
+  }
+
   generateAirfoilShell () {
     const geometry = this.props.geometry
 
@@ -192,15 +201,17 @@ class Viewer extends React.Component {
   generateRib (i) {
     const geometry = this.props.geometry
     const shell = this.props.airfoilShell
-    const root = geometry.wingParameters.root < 0.1 ? 0.1 : geometry.wingParameters.root
+    const root = geometry.wingParameters.root
+    const z = this.getZcoord(i)
+    const chord = this.getChord(i, z)
 
     return generateRibFromPoints(
       _.cloneDeep(shell),
       i,
-      root,
+      chord,
       - root / 2,
       0,
-      - this.getZcoord(i),
+      - z,
       [geometry.structureParameters.beamCoord],
     )
   }
