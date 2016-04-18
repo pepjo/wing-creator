@@ -3,13 +3,13 @@ import { UPDATE_GEOMETRY_PARAM, UPDATE_AIRFOIL } from '../actions/geometry'
 
 const defaultState = {
   wingParameters: {
-    ribs: 5,
     length: 10,
     root: 1.5,
     tip: 1.5,
     sweep: 0,
   },
   structureParameters: {
+    ribs: 5,
     beamCoord: 0.3,
   },
   internal: {

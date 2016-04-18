@@ -51,6 +51,18 @@ function mapDispatchToProps (dispatch) { // eslint-disable-line no-unused-vars
   }
 }
 
+function proccessInputVal (value, min, max) {
+  const val = parseFloat(value.replace(',', '.'), 10)
+  if (isNaN(val)) {
+    return 0
+  } else if (typeof min !== 'undefined' && val < min) {
+    return min
+  } else if (typeof max !== 'undefined' && val > max) {
+    return max
+  }
+  return val
+}
+
 class Controls extends React.Component {
   constructor (props) {
     super(props)
@@ -76,60 +88,50 @@ class Controls extends React.Component {
     this.handleDisplayExternalMeshViewChange = this.handleDisplayExternalMeshViewChange.bind(this)
   }
 
-  handleRibsChange (e) {
-    this.props.changeGeometryParameter('wingParameters.ribs', parseInt(e.target.value, 10))
-  }
   handleLengthChange (e) {
     this.props.changeGeometryParameter('wingParameters.length',
-      parseFloat(e.target.value.replace(',', '.'), 10))
+      proccessInputVal(e.target.value, 0))
   }
   handleRootChange (e) {
     this.props.changeGeometryParameter('wingParameters.root',
-      parseFloat(e.target.value.replace(',', '.'), 10))
+      proccessInputVal(e.target.value, 0))
   }
   handleTipChange (e) {
     this.props.changeGeometryParameter('wingParameters.tip',
-      parseFloat(e.target.value.replace(',', '.'), 10))
+      proccessInputVal(e.target.value, 0))
   }
   handleSweepChange (e) {
     this.props.changeGeometryParameter('wingParameters.sweep',
-      parseFloat(e.target.value.replace(',', '.'), 10))
+      proccessInputVal(e.target.value, -90, 90))
+  }
+  handleRibsChange (e) {
+    this.props.changeGeometryParameter('structureParameters.ribs',
+      proccessInputVal(e.target.value, 2))
   }
   handleBeamCoordChange (e) {
-    let val = parseFloat(e.target.value.replace(',', '.'), 10)
-    if (isNaN(val) || val < 0) {
-      val = 0
-    } else if (val > 1) {
-      val = 1
-    }
-    this.props.changeGeometryParameter('structureParameters.beamCoord', val)
+    this.props.changeGeometryParameter('structureParameters.beamCoord',
+      proccessInputVal(e.target.value, 0, 1))
   }
   handleInternalTypeChange (e, index, value) {
     this.props.changeGeometryParameter('internal.type', value)
   }
   handleInternalThicknessChange (e) {
     this.props.changeGeometryParameter('internal.thickness',
-      parseFloat(e.target.value.replace(',', '.'), 10))
+      proccessInputVal(e.target.value, 0))
   }
   handleExternalTypeChange (e, index, value) {
     this.props.changeGeometryParameter('external.type', value)
   }
   handleExternalThicknessChange (e) {
     this.props.changeGeometryParameter('external.thickness',
-      parseFloat(e.target.value.replace(',', '.'), 10))
+      proccessInputVal(e.target.value, 0))
   }
   handleAirfoilTypeChange (e, index, value) {
     this.props.changeGeometryParameter('airfoil.type', value)
   }
   handleAirfoilNPointsChange (e) {
-    let val = parseInt(e.target.value, 10)
-    if (isNaN(val)) {
-      val = 0
-    }
-    if (val > 1000) {
-      val = 1000
-    }
-    this.props.changeGeometryParameter('airfoil.nPoints', val)
+    this.props.changeGeometryParameter('airfoil.nPoints',
+      proccessInputVal(e.target.value, 0, 5000))
   }
   handleAirfoilDistributionChange (e, index, value) {
     this.props.changeGeometryParameter('airfoil.distribution', value)
@@ -171,7 +173,6 @@ class Controls extends React.Component {
           >
             <WingParametersControls
               wingParameters={wingParameters}
-              handleRibsChange={this.handleRibsChange}
               handleLengthChange={this.handleLengthChange}
               handleRootChange={this.handleRootChange}
               handleTipChange={this.handleTipChange}
@@ -183,6 +184,7 @@ class Controls extends React.Component {
           >
             <StructuresParametersControls
               structureParameters={structureParameters}
+              handleRibsChange={this.handleRibsChange}
               handleBeamCoordChange={this.handleBeamCoordChange}
             />
           </Foldable>

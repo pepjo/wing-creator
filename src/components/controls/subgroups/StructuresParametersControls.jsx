@@ -13,14 +13,21 @@ import { structureParametersShape } from '../../../shapes/geometry'
 const propTypes = {
   structureParameters: structureParametersShape,
   handleBeamCoordChange: React.PropTypes.func,
+  handleRibsChange: React.PropTypes.func,
 }
 
 function WingParametersControls ({
   structureParameters,
   handleBeamCoordChange,
+  handleRibsChange,
 }) {
   return (
     <div>
+      <TextField
+        value={structureParameters.ribs} onChange={handleRibsChange}
+        style={style.field} inputStyle={style.input}
+        floatingLabelText="Number of ribs" type="number"
+      />
       <TextField
         value={structureParameters.beamCoord} onChange={handleBeamCoordChange}
         style={style.field} inputStyle={style.input}

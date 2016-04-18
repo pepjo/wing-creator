@@ -12,7 +12,6 @@ import { wingParametersShape } from '../../../shapes/geometry'
 
 const propTypes = {
   wingParameters: wingParametersShape,
-  handleRibsChange: React.PropTypes.func,
   handleLengthChange: React.PropTypes.func,
   handleRootChange: React.PropTypes.func,
   handleTipChange: React.PropTypes.func,
@@ -21,7 +20,6 @@ const propTypes = {
 
 function WingParametersControls ({
   wingParameters,
-  handleRibsChange,
   handleLengthChange,
   handleRootChange,
   handleTipChange,
@@ -29,11 +27,6 @@ function WingParametersControls ({
 }) {
   return (
     <div>
-      <TextField
-        value={wingParameters.ribs} onChange={handleRibsChange}
-        style={style.field} inputStyle={style.input}
-        floatingLabelText="Number of ribs" type="number"
-      />
       <TextField
         value={wingParameters.length} onChange={handleLengthChange}
         style={style.field} inputStyle={style.input}

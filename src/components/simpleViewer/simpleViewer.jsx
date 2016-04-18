@@ -100,7 +100,7 @@ class Viewer extends React.Component {
       this.generateExternalMesh()
     }
 
-    if (prevGeometry.wingParameters.ribs !== geometry.wingParameters.ribs) {
+    if (prevGeometry.structureParameters.ribs !== geometry.structureParameters.ribs) {
       this.generateInternalMesh()
     }
 
@@ -173,8 +173,9 @@ class Viewer extends React.Component {
 
   getZcoord (i) {
     const geometry = this.props.geometry
-    const centerZOffset = geometry.wingParameters.length / 2
-    return i * geometry.wingParameters.length / (geometry.wingParameters.ribs - 1) - centerZOffset
+    const l = geometry.wingParameters.length
+    const centerZOffset = l / 2
+    return i * l / (geometry.structureParameters.ribs - 1) - centerZOffset
   }
 
   getXcoord (i, z) {

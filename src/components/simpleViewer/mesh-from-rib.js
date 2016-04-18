@@ -12,7 +12,7 @@ export function generateInternalMesh (geometry, shell, ribGen) {
   if (shell.vertices) {
     let prevBeamVertices = []
 
-    for (let i = 0; i < geometry.wingParameters.ribs; i++) {
+    for (let i = 0; i < geometry.structureParameters.ribs; i++) {
       const rib = ribGen(i)
 
       const beamVertices = rib.found.map((item) => (item + mesh.vertices.length))
@@ -46,7 +46,7 @@ export function generateExternalMesh (geometry, shell, ribGen) {
   }
 
   if (shell.vertices) {
-    for (let i = 0; i < geometry.wingParameters.ribs; i++) {
+    for (let i = 0; i < geometry.structureParameters.ribs; i++) {
       const rib = ribGen(i)
 
       const le = mesh.vertices.length

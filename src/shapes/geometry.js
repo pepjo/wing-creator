@@ -2,7 +2,6 @@
 import { PropTypes } from 'react'
 
 export const wingParametersShape = PropTypes.shape({
-  ribs: PropTypes.number.isRequired,
   length: PropTypes.number.isRequired,
   root: PropTypes.number.isRequired,
   tip: PropTypes.number.isRequired,
@@ -10,6 +9,7 @@ export const wingParametersShape = PropTypes.shape({
 })
 
 export const structureParametersShape = PropTypes.shape({
+  ribs: PropTypes.number.isRequired,
   beamCoord: PropTypes.number.isRequired,
 })
 
