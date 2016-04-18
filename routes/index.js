@@ -16,10 +16,10 @@ router.get('/', (req, res) => {
   res.reactRender({
     lang: 'ca',
     pageinfo: {
-      title: 'Home page',
-      name: 'Home page',
-      description: 'Home page',
-      keywords: 'Home page',
+      title: 'Wing creator',
+      name: 'Wing creator',
+      description: 'This app allows to create wings and export them to GID',
+      keywords: 'GID, wing, airfoil, creator',
     },
     initial: {
       data: {

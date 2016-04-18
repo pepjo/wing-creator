@@ -6,8 +6,7 @@ import _ from 'lodash'
 import math from 'mathjs'
 
 import THREE from 'three'
-import TrackballControls from 'three-trackballcontrols'
-import Detector from './publicDeps/Detector.js'
+import ThreejsObject from './threejsObject'
 
 import shellFromAirfoilGenerator from './shell-generator'
 import airfoilFrom from './airfoil'
@@ -64,31 +63,14 @@ class Viewer extends React.Component {
 
     // Link functions to this
     this.getSize = this.getSize.bind(this)
-    this.init = this.init.bind(this)
-    this.attatchControls = this.attatchControls.bind(this)
-    this.attatchLights = this.attatchLights.bind(this)
-    this.animate = this.animate.bind(this)
-    this.threeRender = this.threeRender.bind(this)
     this.generateAirfoilShell = this.generateAirfoilShell.bind(this)
     this.generateInternalMesh = this.generateInternalMesh.bind(this)
-    this.changeMeshVisibility = this.changeMeshVisibility.bind(this)
-    this.changeMeshMaterial = this.changeMeshMaterial.bind(this)
     this.generateRib = this.generateRib.bind(this)
   }
 
   componentDidMount () {
-    if (!Detector.webgl) {
-      Detector.addGetWebGLMessage()
-      document.getElementById('three-container').innerHTML = ''
-    }
-
-    this.init()
-    this.animate()
-
-    // TODO: Delete this
-    window.view = this
-
-    requestAnimationFrame(this.threeRender)
+    // Start three.js object
+    this.tobj = new ThreejsObject(this.getSize())
   }
 
   componentDidUpdate (prevProps) {
@@ -96,12 +78,7 @@ class Viewer extends React.Component {
     const geometry = this.props.geometry
 
     if (this.props.width !== prevProps.width || this.props.height !== prevProps.height) {
-      const size = this.getSize()
-      this.camera.aspect = size.width / size.height
-      this.camera.updateProjectionMatrix()
-      this.renderer.setSize(size.width, size.height)
-      this.controls.handleResize()
-      requestAnimationFrame(this.threeRender)
+      this.tobj.resize(this.getSize())
     }
 
     if (prevGeometry.airfoil.filename !== geometry.airfoil.filename ||
@@ -126,27 +103,35 @@ class Viewer extends React.Component {
     }
 
     if (prevProps.internalMesh.vertices !== this.props.internalMesh.vertices) {
-      this.renderMesh('internalMesh')
+      const vertices = this.props.internalMesh.vertices
+      const faces = this.props.internalMesh.faces
+      const material = this.props.display.internalMesh.material
+      const visible = this.props.display.internalMesh.visible
+      this.tobj.renderMesh('internalMesh', vertices, faces, material, visible)
     }
 
     if (prevProps.externalMesh.vertices !== this.props.externalMesh.vertices) {
-      this.renderMesh('externalMesh')
+      const vertices = this.props.externalMesh.vertices
+      const faces = this.props.externalMesh.faces
+      const material = this.props.display.externalMesh.material
+      const visible = this.props.display.externalMesh.visible
+      this.tobj.renderMesh('externalMesh', vertices, faces, material, visible)
     }
 
     if (prevProps.display.internalMesh.visible !== this.props.display.internalMesh.visible) {
-      this.changeMeshVisibility('internalMesh', this.props.display.internalMesh.visible)
+      this.tobj.changeMeshVisibility('internalMesh', this.props.display.internalMesh.visible)
     }
 
     if (prevProps.display.externalMesh.visible !== this.props.display.externalMesh.visible) {
-      this.changeMeshVisibility('externalMesh', this.props.display.externalMesh.visible)
+      this.tobj.changeMeshVisibility('externalMesh', this.props.display.externalMesh.visible)
     }
 
     if (prevProps.display.internalMesh.material !== this.props.display.internalMesh.material) {
-      this.changeMeshMaterial('internalMesh', this.props.display.internalMesh.material)
+      this.tobj.changeMeshMaterial('internalMesh', this.props.display.internalMesh.material)
     }
 
     if (prevProps.display.externalMesh.material !== this.props.display.externalMesh.material) {
-      this.changeMeshMaterial('externalMesh', this.props.display.externalMesh.material)
+      this.tobj.changeMeshMaterial('externalMesh', this.props.display.externalMesh.material)
     }
   }
 
@@ -292,125 +277,6 @@ class Viewer extends React.Component {
       }
 
       this.props.updateExternalMesh(mesh)
-    }
-  }
-
-  init () {
-    const size = this.getSize()
-    const container = document.getElementById('three-container')
-
-    const scene = new THREE.Scene()
-
-    const camera = new THREE.PerspectiveCamera(60, size.width / size.height, 0.1, 20000)
-    camera.position.set(-2, 8, 10)
-    scene.add(camera)
-
-    this.attatchLights(scene)
-    this.attatchControls(camera, container)
-
-    const gridHelper = new THREE.GridHelper(10, 2)
-    gridHelper.setColors(0xCFD8DC, 0x90A4AE)
-    scene.add(gridHelper)
-
-    const materials = {
-      solid: new THREE.MeshLambertMaterial({ color: 0xff7777 }),
-      wireframe: new THREE.MeshLambertMaterial({ color: 0xff7777, wireframe: true }),
-    }
-    materials.solid.side = THREE.DoubleSide
-
-    const renderer = new THREE.WebGLRenderer({
-      alpha: true,
-    })
-    renderer.setPixelRatio(window.devicePixelRatio)
-    renderer.setSize(size.width, size.height)
-    container.innerHTML = ''
-    container.appendChild(renderer.domElement)
-
-    this.camera = camera
-    this.scene = scene
-    this.materials = materials
-    this.renderer = renderer
-  }
-
-  attatchLights (scene) {
-    const mainLigth = new THREE.PointLight(0xffffff, 1.2, 150)
-    mainLigth.position.set(15, 15, 15)
-    scene.add(mainLigth)
-
-    const secondLigth = new THREE.PointLight(0xffffff, 0.7, 150)
-    secondLigth.position.set(-15, -15, 15)
-    scene.add(secondLigth)
-
-    const thirdLigth = new THREE.PointLight(0xffffff, 0.6, 150)
-    thirdLigth.position.set(-15, 15, -15)
-    scene.add(thirdLigth)
-  }
-
-  attatchControls (camera, container) {
-    const controls = new TrackballControls(camera, container)
-
-    controls.rotateSpeed = 3
-    controls.zoomSpeed = 1.2
-    controls.panSpeed = 0.8
-
-    controls.noRotate = false
-    controls.noZoom = false
-    controls.noPan = process.env.NODE_ENV !== 'development'
-
-    controls.staticMoving = false
-    controls.dynamicDampingFactor = 0.3
-
-    controls.addEventListener('change', this.threeRender)
-
-    this.controls = controls
-  }
-
-  changeMeshVisibility (name, visibility) {
-    if (this[name]) {
-      this[name].visible = visibility
-      this.threeRender()
-    }
-  }
-
-  changeMeshMaterial (name, material) {
-    if (this[name]) {
-      this[name].material = this.materials[material]
-      this.threeRender()
-    }
-  }
-
-  animate () {
-    requestAnimationFrame(this.animate)
-    this.controls.update()
-  }
-
-  threeRender () {
-    this.renderer.render(this.scene, this.camera)
-  }
-
-  renderMesh (name) {
-    if (this[name]) {
-      const oldMesh = this[name]
-      this.scene.remove(oldMesh)
-    }
-
-    if (this.props[name].vertices) {
-      const geometry = new THREE.Geometry()
-
-      geometry.vertices = this.props[name].vertices
-      geometry.faces = this.props[name].faces
-      geometry.name = name
-
-      geometry.computeFaceNormals()
-      geometry.computeBoundingSphere()
-
-      const mesh = new THREE.Mesh(geometry, this.materials[this.props.display[name].material])
-      this.scene.add(mesh)
-
-      mesh.visible = this.props.display[name].visible
-
-      this[name] = mesh
-      this.threeRender()
     }
   }
 
