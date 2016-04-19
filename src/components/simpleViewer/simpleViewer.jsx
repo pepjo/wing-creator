@@ -83,7 +83,7 @@ class Viewer extends React.Component {
       this.tobj.resize(this.getSize())
     }
 
-    if (prevGeometry.airfoil.filename !== geometry.airfoil.filename ||
+    if (prevGeometry.airfoil.uid !== geometry.airfoil.uid ||
         prevGeometry.structureParameters.beamCoord !== geometry.structureParameters.beamCoord ||
         prevGeometry.airfoil.nPoints !== geometry.airfoil.nPoints ||
         prevGeometry.airfoil.distribution !== geometry.airfoil.distribution ||

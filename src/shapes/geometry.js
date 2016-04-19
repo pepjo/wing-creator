@@ -22,7 +22,7 @@ export const airfoilShape = PropTypes.shape({
   type: PropTypes.string.isRequired,
   filename: PropTypes.string,
   uid: PropTypes.string,
-  data: PropTypes.array,
+  data: PropTypes.oneOfType([PropTypes.array, PropTypes.string]),
   name: PropTypes.string,
   nPoints: PropTypes.number.isRequired,
   distribution: PropTypes.string.isRequired,

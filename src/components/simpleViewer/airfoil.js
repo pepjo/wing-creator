@@ -1,5 +1,6 @@
 
 import airfoilFromFileGenerator from './airfoil-from-file'
+import airfoilFromNaca4 from './airfoil-from-naca4'
 
 export default function (airfoils, geometry) {
   let airfoilFunction
@@ -14,8 +15,11 @@ export default function (airfoils, geometry) {
         geometry.airfoil.interpolation
       )
     }
+  } else if (geometry.airfoil.type === 'fromNACA4') {
+    if (geometry.airfoil.data.length === 4) {
+      airfoilFunction = airfoilFromNaca4(geometry.airfoil.data)
+    }
   } else {
-    console.warn('This type of airfoil is not yet implemented')
     throw new Error('This type of airfoil is not yet implemented')
   }
 

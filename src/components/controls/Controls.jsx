@@ -15,7 +15,7 @@ import Foldable from '../interface/Foldable'
 import DownloadBtn from '../downloadBtn/DownloadBtn'
 
 // Actions
-import { changeGeometryParameter, changeAirfoil } from '../../actions/geometry'
+import { changeGeometryParameter, changeAirfoil, changeAirfoilType } from '../../actions/geometry'
 import { changeDisplayParameter } from '../../actions/display'
 
 // Styles
@@ -32,6 +32,7 @@ const propTypes = {
   airfoils: React.PropTypes.array,
   changeGeometryParameter: React.PropTypes.func,
   changeAirfoil: React.PropTypes.func,
+  changeAirfoilType: React.PropTypes.func,
   changeDisplayParameter: React.PropTypes.func,
 }
 
@@ -48,6 +49,7 @@ function mapDispatchToProps (dispatch) { // eslint-disable-line no-unused-vars
   return {
     changeGeometryParameter: bindActionCreators(changeGeometryParameter, dispatch),
     changeDisplayParameter: bindActionCreators(changeDisplayParameter, dispatch),
+    changeAirfoilType: bindActionCreators(changeAirfoilType, dispatch),
     changeAirfoil: bindActionCreators(changeAirfoil, dispatch),
   }
 }
@@ -129,7 +131,7 @@ class Controls extends React.Component {
       proccessInputVal(e.target.value, 0))
   }
   handleAirfoilTypeChange (e, index, value) {
-    this.props.changeGeometryParameter('airfoil.type', value)
+    this.props.changeAirfoilType(value)
   }
   handleAirfoilNPointsChange (e) {
     this.props.changeGeometryParameter('airfoil.nPoints',
@@ -157,7 +159,9 @@ class Controls extends React.Component {
   handleAirfoilChange (e, index, value) {
     if (this.props.geometry.airfoil.type === 'fromFile') {
       const airfoil = this.props.airfoils.find((item) => (item.filename === value))
-      this.props.changeAirfoil(value, airfoil)
+      this.props.changeAirfoil(airfoil, value)
+    } else if (this.props.geometry.airfoil.type === 'fromNACA4') {
+      this.props.changeAirfoil(e.target.value)
     } else {
       throw new Error('This airfoil type has not been implemented yet')
     }

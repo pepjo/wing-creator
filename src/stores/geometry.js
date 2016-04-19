@@ -1,5 +1,5 @@
 
-import { UPDATE_GEOMETRY_PARAM, UPDATE_AIRFOIL } from '../actions/geometry'
+import { UPDATE_GEOMETRY_PARAM, UPDATE_AIRFOIL, CHANGE_AIRFOIL_TYPE } from '../actions/geometry'
 
 const defaultState = {
   wingParameters: {
@@ -46,12 +46,34 @@ export default (state = defaultState, action) => {
       return Object.assign({}, state, newState(action.param, action.value, state))
 
     case UPDATE_AIRFOIL:
+      if (state.airfoil.type === 'fromFile') {
+        return Object.assign({}, state, {
+          airfoil: Object.assign({}, state.airfoil, {
+            filename: action.filename,
+            uid: action.filename,
+            data: [...action.airfoil.data],
+            name: action.airfoil.name,
+          }),
+        })
+      } else if (state.airfoil.type === 'fromNACA4') {
+        return Object.assign({}, state, {
+          airfoil: Object.assign({}, state.airfoil, {
+            uid: `naca4-${action.airfoil}`,
+            data: action.airfoil,
+            name: `NACA${action.airfoil}`,
+          }),
+        })
+      }
+      return state
+
+    case CHANGE_AIRFOIL_TYPE:
       return Object.assign({}, state, {
         airfoil: Object.assign({}, state.airfoil, {
-          filename: action.filename,
-          uid: action.filename,
-          data: [...action.airfoil.data],
-          name: action.airfoil.name,
+          type: `${action.airType}`,
+          filename: undefined,
+          uid: undefined,
+          data: undefined,
+          name: undefined,
         }),
       })
 

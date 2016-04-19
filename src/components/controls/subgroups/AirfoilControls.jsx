@@ -15,11 +15,11 @@ import { airfoilShape } from '../../../shapes/geometry'
 const propTypes = {
   airfoil: airfoilShape,
   airfoils: React.PropTypes.array,
-  handleAirfoilTypeChange: React.PropTypes.func,
-  handleAirfoilNPointsChange: React.PropTypes.func,
-  handleAirfoilDistributionChange: React.PropTypes.func,
-  handleAirfoilInterpolationChange: React.PropTypes.func,
-  handleAirfoilChange: React.PropTypes.func,
+  handleAirfoilTypeChange: React.PropTypes.func.isRequired,
+  handleAirfoilNPointsChange: React.PropTypes.func.isRequired,
+  handleAirfoilDistributionChange: React.PropTypes.func.isRequired,
+  handleAirfoilInterpolationChange: React.PropTypes.func.isRequired,
+  handleAirfoilChange: React.PropTypes.func.isRequired,
 }
 
 function AirfoilControls ({
@@ -31,18 +31,10 @@ function AirfoilControls ({
   handleAirfoilInterpolationChange,
   handleAirfoilChange,
 }) {
-  return (
-    <div>
-      <SelectField
-        style={style.field}
-        value={airfoil.type} onChange={handleAirfoilTypeChange}
-        floatingLabelText="Airfoil source"
-      >
-        <MenuItem value="fromFile" primaryText="From .dat file" />
-        <MenuItem value="fromNACA4" primaryText="NACA 4" disabled />
-        <MenuItem value="fromNACA5" primaryText="NACA 5" disabled />
-        <MenuItem value="fromNACA6" primaryText="NACA 6" disabled />
-      </SelectField>
+  let airfoilDetails
+
+  if (airfoil.type === 'fromFile') {
+    airfoilDetails = (
       <SelectField
         style={style.field}
         value={airfoil.uid} onChange={handleAirfoilChange}
@@ -56,6 +48,31 @@ function AirfoilControls ({
           />
         ))}
       </SelectField>
+    )
+  } else if (airfoil.type === 'fromNACA4') {
+    airfoilDetails = (
+      <TextField
+        value={airfoil.data || ''}
+        onChange={handleAirfoilChange}
+        style={style.field} inputStyle={style.input}
+        floatingLabelText="NACA4 code" type="number"
+      />
+    )
+  }
+
+  return (
+    <div>
+      <SelectField
+        style={style.field}
+        value={airfoil.type} onChange={handleAirfoilTypeChange}
+        floatingLabelText="Airfoil source"
+      >
+        <MenuItem value="fromFile" primaryText="From .dat file" />
+        <MenuItem value="fromNACA4" primaryText="NACA 4" />
+        <MenuItem value="fromNACA5" primaryText="NACA 5" disabled />
+        <MenuItem value="fromNACA6" primaryText="NACA 6" disabled />
+      </SelectField>
+      {airfoilDetails}
       <TextField
         value={airfoil.nPoints}
         onChange={handleAirfoilNPointsChange}
