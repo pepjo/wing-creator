@@ -2,6 +2,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
+import bezier from 'cubic-bezier'
 
 // Components
 import AirfoilControls from './subgroups/AirfoilControls'
@@ -67,6 +68,7 @@ class Controls extends React.Component {
   constructor (props) {
     super(props)
 
+    this.handleToggle = this.handleToggle.bind(this)
     this.handleRibsChange = this.handleRibsChange.bind(this)
     this.handleLengthChange = this.handleLengthChange.bind(this)
     this.handleRootChange = this.handleRootChange.bind(this)
@@ -161,15 +163,44 @@ class Controls extends React.Component {
     }
   }
 
+  handleToggle (el, open, height) {
+    const top = el.getBoundingClientRect().top
+    const displayHeight = this.props.display.height
+    if (top + height + 20 > displayHeight && open) {
+      const containerScroll = this.refs.scrollContainer
+      const initialTime = performance.now()
+      const goal = containerScroll.scrollTop + top + height + 55 - displayHeight
+      const origin = containerScroll.scrollTop
+      const totalTime = 200
+      const easeIn = bezier(0, 0.02, 0.55, 1, 400)
+
+      const animate = () => {
+        const time = performance.now() - initialTime
+        if (time > totalTime) {
+          containerScroll.scrollTop = goal
+        } else {
+          containerScroll.scrollTop = origin + (goal - origin) * easeIn(time / totalTime)
+          requestAnimationFrame(animate)
+        }
+      }
+
+      animate()
+    }
+  }
+
   render () {
     const { airfoils, display } = this.props
     const { wingParameters, structureParameters, internal, external, airfoil } = this.props.geometry
 
     return (
-      <div style={style.scrollContainer(this.props.height)}>
+      <div
+        ref="scrollContainer"
+        style={style.scrollContainer(this.props.height)}
+      >
         <Paper style={style.container}>
           <Foldable
             nom="Wing parameters"
+            onToggle={this.handleToggle}
           >
             <WingParametersControls
               wingParameters={wingParameters}
@@ -181,6 +212,7 @@ class Controls extends React.Component {
           </Foldable>
           <Foldable
             nom="Structures parameters"
+            onToggle={this.handleToggle}
           >
             <StructuresParametersControls
               structureParameters={structureParameters}
@@ -190,6 +222,7 @@ class Controls extends React.Component {
           </Foldable>
           <Foldable
             nom="Airfoil"
+            onToggle={this.handleToggle}
             obert
           >
             <AirfoilControls
@@ -204,6 +237,7 @@ class Controls extends React.Component {
           </Foldable>
           <Foldable
             nom="Display settings"
+            onToggle={this.handleToggle}
           >
             <DisplayControls display={display}
               handleDisplayInternalMaterialChange={this.handleDisplayInternalMaterialChange}
@@ -214,6 +248,7 @@ class Controls extends React.Component {
           </Foldable>
           <Foldable
             nom="Internal structure"
+            onToggle={this.handleToggle}
           >
             <MeshControls meshProps={internal}
               handleTypeChange={this.handleInternalTypeChange}
@@ -222,6 +257,7 @@ class Controls extends React.Component {
           </Foldable>
           <Foldable
             nom="External structure"
+            onToggle={this.handleToggle}
           >
             <MeshControls meshProps={external}
               handleTypeChange={this.handleExternalTypeChange}

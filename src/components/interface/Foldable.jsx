@@ -15,6 +15,7 @@ const propTypes = {
   nom: React.PropTypes.node,
   obert: React.PropTypes.bool,
   toggleOnLoad: React.PropTypes.bool,
+  onToggle: React.PropTypes.func,
 }
 
 const defaultProps = {
@@ -78,6 +79,10 @@ class Foldable extends React.Component {
   }
 
   togle () {
+    if (this.props.onToggle) {
+      this.props.onToggle(
+        this.refs.bigContainer, !this.state.obert, this.refs.container.offsetHeight)
+    }
     if (this.state.obert) {
       this.close()
     } else {
@@ -108,7 +113,7 @@ class Foldable extends React.Component {
     ])
 
     return (
-      <div style={container}>
+      <div style={container} ref="bigContainer">
         <RaisedButton
           onClick={this.togle}
           style={btn}

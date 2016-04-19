@@ -10,7 +10,7 @@
 - [ ] Exportar a GID tota l'estructura exterior
 - [ ] Add more non-naca airfoils
 - [x] Check, when exporting profile 50 points beam 0.3; strange point below
-- [] Check, the airfoil tip is wierd
+- [ ] Check, the airfoil tip is wierd
 - [ ] Finish spline
 - [ ] Add NACA
 - [ ] Add solids
