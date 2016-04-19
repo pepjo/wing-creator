@@ -196,7 +196,7 @@ class Viewer extends React.Component {
     return ((z + l / 2) / l) * (tip - root) + root
   }
 
-  generateRib (i) {
+  generateRib (i, segmentOffset) {
     const geometry = this.props.geometry
     const shell = this.props.airfoilShell
     const z = this.getZcoord(i)
@@ -210,6 +210,7 @@ class Viewer extends React.Component {
       - x,
       0,
       - z,
+      segmentOffset,
       [geometry.structureParameters.beamCoord],
     )
   }

@@ -14,13 +14,14 @@ export function generateInternalMesh (geometry, shell, ribGen) {
     let prevSegmentIndex = 0
 
     for (let i = 0; i < geometry.structureParameters.ribs; i++) {
-      const rib = ribGen(i)
+      const rib = ribGen(i, mesh.segments.length)
 
       const beamVertices = rib.found.map((item) => (item + mesh.vertices.length))
 
       mesh.vertices = mesh.vertices.concat(rib.vertices)
       mesh.segments = mesh.segments.concat(rib.segments)
       mesh.faces = mesh.faces.concat(rib.faces)
+      mesh.facesFromSegments = mesh.facesFromSegments.concat(rib.facesFromSegments)
 
       if (i !== 0 && beamVertices.length !== 0) {
         mesh.faces.push(
@@ -40,10 +41,10 @@ export function generateInternalMesh (geometry, shell, ribGen) {
 
         // Add facesFromSegments (notice the last segment is still to be added)
         mesh.facesFromSegments.push([
-          [mesh.segments.length, 1],
-          [mesh.segments.length - 1, 1],
-          [prevSegmentIndex - 1, 0],
-          [mesh.segments.length - 2, 1],
+          [mesh.segments.length, 0],
+          [mesh.segments.length - 1, 0],
+          [prevSegmentIndex - 1, 1],
+          [mesh.segments.length - 2, 0],
         ])
       }
 

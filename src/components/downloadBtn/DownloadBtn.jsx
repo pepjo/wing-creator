@@ -49,14 +49,23 @@ class DownloadBtn extends React.Component {
 
     const zip = new JSZip()
 
-    const vertices = this.props.meshes.internalMesh.vertices.map((airfoil) => (
-      [airfoil.x, airfoil.y, airfoil.z]
+    const internalVertices = this.props.meshes.internalMesh.vertices.map((vertex) => (
+      [vertex.x, vertex.y, vertex.z]
+    ))
+
+    const externalVertices = this.props.meshes.externalMesh.vertices.map((vertex) => (
+      [vertex.x, vertex.y, vertex.z]
     ))
 
     const GITobj = new GIDobject([{
-      vertices,
+      vertices: internalVertices,
       segments: this.props.meshes.internalMesh.segments,
       faces: this.props.meshes.internalMesh.facesFromSegments,
+      volumes: [],
+    }, {
+      vertices: externalVertices,
+      segments: this.props.meshes.externalMesh.segments,
+      faces: this.props.meshes.externalMesh.facesFromSegments,
       volumes: [],
     }])
     const file = GITobj.generateFile()

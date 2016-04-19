@@ -29,8 +29,8 @@ function fix (x) {
 function pointsGenerator (airfoilFunction, n, distribution, imposedPoints) {
   let lastX = 1
   let impoToBeFound = [...imposedPoints]
-  const x = (math.range(0, 1, 1 / (n / 2 - imposePoints.length + 1))).toArray()
-  const data = [new THREE.Vector3(1, 0, 0)]
+  const x = (math.range(0, 1, 1 / (n / 2 - imposePoints.length + 2))).toArray()
+  const data = []
 
   // Extrados
   for (let i = x.length - 1; i >= 0; i--) {
@@ -39,7 +39,8 @@ function pointsGenerator (airfoilFunction, n, distribution, imposedPoints) {
     // Add imposed points
     for (let j = 0; j < impoToBeFound.length; j++) {
       if (xx < impoToBeFound[j] && lastX > impoToBeFound[j]) {
-        data.push(new THREE.Vector3(impoToBeFound[j], airfoilFunction(xx, 'extrados')))
+        data.push(new THREE.Vector3(impoToBeFound[j],
+          airfoilFunction(impoToBeFound[j], 'extrados')))
         impoToBeFound.splice(j, 1)
       }
     }
@@ -49,23 +50,42 @@ function pointsGenerator (airfoilFunction, n, distribution, imposedPoints) {
     lastX = xx
   }
 
+  // Maybe the point to be found is here
+  for (let j = 0; j < impoToBeFound.length; j++) {
+    if (lastX > impoToBeFound[j]) {
+      data.push(new THREE.Vector3(impoToBeFound[j],
+        airfoilFunction(impoToBeFound[j], 'extrados')))
+      impoToBeFound.splice(j, 1)
+    }
+  }
+
   // Reset
   impoToBeFound = [...imposedPoints]
 
   // Intrados
-  for (let i = 1, len = x.length; i < len; i++) {
+  for (let i = 1, len = x.length; i < len - 1; i++) { // The last is the same as the first
     const xx = distributionFunctions[distribution](fix(x[i]))
 
     // Add imposed points
     for (let j = 0; j < impoToBeFound.length; j++) {
       if (xx > impoToBeFound[j] && lastX < impoToBeFound[j]) {
-        data.push(new THREE.Vector3(impoToBeFound[j], airfoilFunction(xx, 'intrados')))
+        data.push(new THREE.Vector3(impoToBeFound[j],
+          airfoilFunction(impoToBeFound[j], 'intrados')))
         impoToBeFound.splice(j, 1)
       }
     }
 
     data.push(new THREE.Vector3(xx, airfoilFunction(xx, 'intrados'), 0))
     lastX = xx
+  }
+
+  // Maybe the point to be found is here
+  for (let j = 0; j < impoToBeFound.length; j++) {
+    if (lastX < impoToBeFound[j]) {
+      data.push(new THREE.Vector3(impoToBeFound[j],
+        airfoilFunction(impoToBeFound[j], 'intrados')))
+      impoToBeFound.splice(j, 1)
+    }
   }
 
   return data
@@ -79,13 +99,16 @@ export default function (airfoilFunction, nPoints, distribution, imposedPoints) 
 
   const vertices = data
 
-  const segments = []
-  const facesFromSegments = []
+  const segments = [[0, 1]] // This segment is not added in the loop afterwards
+  const facesFromSegments = [[[0, 0]]]
   const faces = []
   for (let i = 1, len = data.length - 1; i < len; i++) {
     segments.push([i, i + 1])
+    facesFromSegments[0].push([i, 0])
     faces.push(new THREE.Face3(0, i, i + 1))
   }
+  segments.push([data.length - 1, 0]) // This segment is not added on the previous loop
+  facesFromSegments[0].push([segments.length - 1, 0])
 
   return {
     vertices,
