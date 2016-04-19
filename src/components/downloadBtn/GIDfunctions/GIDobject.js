@@ -39,7 +39,7 @@ export default class {
   }
 
   generateVertex (n, iObj, jVer, vertex) {
-    return `1 ${n + 1} 0 ${iObj + 1} ${this.vertexDependencyCounter(iObj, jVer)} 0 0 ${iObj + 1} 0
+    return `1 ${n + 1} 0 0 ${this.vertexDependencyCounter(iObj, jVer)} 0 0 ${iObj + 1} 0
 ${vertex[0]} ${vertex[1]} ${vertex[2]}
 `
   }
@@ -55,19 +55,22 @@ ${vertex[0]} ${vertex[1]} ${vertex[2]}
   generateSegments () {
     let nSegments = -1 // So when we nVertices ++ first will become 0
 
-    return this.objects.reduce((segments, object, i) => (
-      segments.concat(
+    return this.objects.reduce((segments, object, i) => {
+      const objPrevV = this.objects
+        .filter((o, iO) => (iO < i))
+        .reduce((a, o) => (a + o.vertices.length), 0)
+      return segments.concat(
         object.segments.map((segment, j) => {
           nSegments++
-          return this.generateSegment(nSegments, i, j, segment)
+          return this.generateSegment(nSegments, objPrevV, i, j, segment)
         })
       )
-    ), []).join('')
+    }, []).join('')
   }
 
-  generateSegment (n, iObj, jSeg, segment) {
-    return `2 ${n + 1} 0 ${iObj + 1} ${this.segmentDependencyCounter(iObj, jSeg)} 0 0 ${iObj + 1} 0
-${segment[0] + 1} ${segment[1] + 1}
+  generateSegment (n, objPrevV, iObj, jSeg, segment) {
+    return `2 ${n + 1} 0 0 ${this.segmentDependencyCounter(iObj, jSeg)} 0 0 ${iObj + 1} 0
+${segment[0] + 1 + objPrevV} ${segment[1] + 1 + objPrevV}
 `
   }
 
@@ -86,6 +89,7 @@ ${segment[0] + 1} ${segment[1] + 1}
         points.push(seg[1])
       }
     })
+
     return points.reduce((all, point) => {
       const p = this.objects[iObj].vertices[point]
       return [all[0] + p[0], all[1] + p[1], all[2] + p[2]]
@@ -122,20 +126,23 @@ ${segment[0] + 1} ${segment[1] + 1}
   generateFaces () {
     let nFaces = -1 // So when we nVertices ++ first will become 0
 
-    return this.objects.reduce((faces, object, i) => (
-      faces.concat(
+    return this.objects.reduce((faces, object, i) => {
+      const objPrevS = this.objects
+        .filter((o, iO) => (iO < i))
+        .reduce((a, o) => (a + o.segments.length), 0)
+      return faces.concat(
         object.faces.map((face, j) => {
           nFaces++
-          return this.generateFace(nFaces, i, j, face)
+          return this.generateFace(nFaces, objPrevS, i, j, face)
         })
       )
-    ), []).join('')
+    }, []).join('')
   }
 
-  generateFace (n, iObj, jFac, face) {
-    return `5 ${n + 1} 0 ${iObj + 1} ${this.faceDependencyCounter(iObj, jFac)} 0 0 ${iObj + 1} 0
+  generateFace (n, objPrevS, iObj, jFac, face) {
+    return `5 ${n + 1} 0 0 ${this.faceDependencyCounter(iObj, jFac)} 0 0 ${iObj + 1} 0
 ${face.length}
-${face.map((f) => (`${f[0] + 1} `)).join('').trim()}
+${face.map((f) => (`${f[0] + 1 + objPrevS} `)).join('').trim()}
 ${face.map((f) => (`${f[1]} `)).join('').trim()}
 ${this.faceCenterCalculator(iObj, face)}
 ${this.faceNormalCalculator(iObj, face)}

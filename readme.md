@@ -7,10 +7,10 @@
 - [x] Centrar en les x
 - [x] Sweep angle
 - [x] Exportar a GID tota l'estructura interior
-- [ ] Exportar a GID tota l'estructura exterior
-- [ ] Add more non-naca airfoils
+- [x] Exportar a GID tota l'estructura exterior
+- [x] Add more non-naca airfoils
 - [x] Check, when exporting profile 50 points beam 0.3; strange point below
-- [ ] Check, the airfoil tip is wierd
+- [x] Check, the airfoil tip is wierd // Nothing to do, bad data
 - [ ] Finish spline
 - [ ] Add NACA
 - [ ] Add solids
