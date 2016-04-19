@@ -227,7 +227,6 @@ class Controls extends React.Component {
           <Foldable
             nom="Airfoil"
             onToggle={this.handleToggle}
-            obert
           >
             <AirfoilControls
               airfoil={airfoil}

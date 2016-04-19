@@ -93,6 +93,8 @@ function AirfoilControls ({
         onChange={handleAirfoilInterpolationChange}
         style={style.field}
         floatingLabelText="Point interpolation mechanism"
+        errorText={airfoil.type !== 'fromFile' &&
+          'Ignored for function generated airfoils (non .dat)'}
       >
         <MenuItem value="linear" primaryText="Lineal interpolation" />
         <MenuItem value="spline" primaryText="Cubic spline" />

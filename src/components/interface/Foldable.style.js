@@ -30,7 +30,7 @@ export const containerBoder = {
 }
 
 export const container = {
-  paddingBottom: 10,
+  paddingBottom: 20,
 }
 
 export const innerContainer = {

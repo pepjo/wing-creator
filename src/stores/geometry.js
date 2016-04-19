@@ -21,11 +21,11 @@ const defaultState = {
     thickness: 5,
   },
   airfoil: {
-    type: 'fromFile',
+    type: 'fromNACA4',
     filename: undefined,
-    uid: undefined,
-    data: undefined,
-    name: undefined,
+    uid: 'naca4-4412',
+    data: '4412',
+    name: 'NACA 4412',
     nPoints: 50,
     distribution: 'sin',
     interpolation: 'linear',
@@ -60,7 +60,7 @@ export default (state = defaultState, action) => {
           airfoil: Object.assign({}, state.airfoil, {
             uid: `naca4-${action.airfoil}`,
             data: action.airfoil,
-            name: `NACA${action.airfoil}`,
+            name: `NACA ${action.airfoil}`,
           }),
         })
       }

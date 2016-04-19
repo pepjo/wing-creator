@@ -12,7 +12,7 @@
 - [x] Check, when exporting profile 50 points beam 0.3; strange point below
 - [x] Check, the airfoil tip is wierd // Nothing to do, bad data
 - [ ] Finish spline
-- [ ] Add NACA
+- [x] Add NACA
 - [ ] Add solids
 
 ### More post TFG todos

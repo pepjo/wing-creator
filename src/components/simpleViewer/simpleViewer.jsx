@@ -73,6 +73,9 @@ class Viewer extends React.Component {
   componentDidMount () {
     // Start three.js object
     this.tobj = new ThreejsObject(this.getSize())
+
+    // Generate wing
+    this.generateAirfoilShell()
   }
 
   componentDidUpdate (prevProps) {
