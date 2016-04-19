@@ -72,7 +72,7 @@ export default (state = defaultState, action) => {
           type: `${action.airType}`,
           filename: undefined,
           uid: undefined,
-          data: undefined,
+          data: action.airType !== 'fromFile' && '',
           name: undefined,
         }),
       })
