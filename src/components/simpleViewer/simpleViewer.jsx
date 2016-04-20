@@ -103,7 +103,10 @@ class Viewer extends React.Component {
       this.generateExternalMesh()
     }
 
-    if (prevGeometry.structureParameters.ribs !== geometry.structureParameters.ribs) {
+    if (
+      prevGeometry.structureParameters.ribs !== geometry.structureParameters.ribs ||
+      prevGeometry.structureParameters.beamExtension !== geometry.structureParameters.beamExtension
+    ) {
       this.generateInternalMesh()
     }
 

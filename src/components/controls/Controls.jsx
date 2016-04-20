@@ -106,6 +106,7 @@ class Controls extends React.Component {
     this.handleFluidBoxLengthChange = this.handleFluidBoxLengthChange.bind(this)
     this.handleFluidBoxHeightChange = this.handleFluidBoxHeightChange.bind(this)
     this.handleFluidBoxXCoordChange = this.handleFluidBoxXCoordChange.bind(this)
+    this.handleBeamExtensionChange = this.handleBeamExtensionChange.bind(this)
   }
 
   handleLengthChange (e) {
@@ -131,6 +132,10 @@ class Controls extends React.Component {
   handleBeamCoordChange (e) {
     this.props.changeGeometryParameter('structureParameters.beamCoord',
       proccessInputVal(e.target.value, 0, 1))
+  }
+  handleBeamExtensionChange (e) {
+    this.props.changeGeometryParameter('structureParameters.beamExtension',
+      proccessInputVal(e.target.value, 0))
   }
   handleInternalTypeChange (e, index, value) {
     this.props.changeGeometryParameter('internal.type', value)
@@ -268,6 +273,7 @@ class Controls extends React.Component {
               structureParameters={structureParameters}
               handleRibsChange={this.handleRibsChange}
               handleBeamCoordChange={this.handleBeamCoordChange}
+              handleBeamExtensionChange={this.handleBeamExtensionChange}
             />
           </Foldable>
           <Foldable

@@ -11,6 +11,7 @@ const defaultState = {
   structureParameters: {
     ribs: 5,
     beamCoord: 0.3,
+    beamExtension: 2,
   },
   internal: {
     type: 'shell',

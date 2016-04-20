@@ -11,6 +11,7 @@ export const wingParametersShape = PropTypes.shape({
 export const structureParametersShape = PropTypes.shape({
   ribs: PropTypes.number.isRequired,
   beamCoord: PropTypes.number.isRequired,
+  beamExtension: PropTypes.number.isRequired,
 })
 
 export const meshPropsShape = PropTypes.shape({
