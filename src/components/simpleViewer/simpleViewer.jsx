@@ -5,14 +5,19 @@ import { bindActionCreators } from 'redux'
 import _ from 'lodash'
 import math from 'mathjs'
 
-import { generateInternalMesh, generateExternalMesh } from './mesh-from-rib'
+import { generateInternalMesh, generateExternalMesh, generateFluidBoxMesh } from './mesh-from-rib'
 import ThreejsObject from './threejsObject'
 import shellFromAirfoilGenerator from './shell-generator'
 import airfoilFrom from './airfoil'
 import generateRibFromPoints from './rib-from-shell'
 
 // Actions
-import { updateInternalMesh, updateExternalMesh, updateAirfoilPoints } from '../../actions/meshes'
+import {
+  updateInternalMesh,
+  updateExternalMesh,
+  updateAirfoilPoints,
+  updateFluidBoxMesh,
+} from '../../actions/meshes'
 
 // Styles
 import * as style from './simpleViewer.style'
@@ -30,8 +35,10 @@ const propTypes = {
   updateInternalMesh: React.PropTypes.func.isRequired,
   updateExternalMesh: React.PropTypes.func.isRequired,
   updateAirfoilPoints: React.PropTypes.func.isRequired,
+  updateFluidBoxMesh: React.PropTypes.func.isRequired,
   internalMesh: React.PropTypes.object,
   externalMesh: React.PropTypes.object,
+  fluidBoxMesh: React.PropTypes.object,
   airfoilShell: React.PropTypes.object,
 }
 
@@ -44,6 +51,7 @@ function mapStateToProps (state) {
     height: state.display.height,
     internalMesh: state.meshes.internalMesh,
     externalMesh: state.meshes.externalMesh,
+    fluidBoxMesh: state.meshes.fluidBoxMesh,
     airfoilShell: state.meshes.airfoilShell,
   }
 }
@@ -53,6 +61,7 @@ function mapDispatchToProps (dispatch) {
     updateInternalMesh: bindActionCreators(updateInternalMesh, dispatch),
     updateExternalMesh: bindActionCreators(updateExternalMesh, dispatch),
     updateAirfoilPoints: bindActionCreators(updateAirfoilPoints, dispatch),
+    updateFluidBoxMesh: bindActionCreators(updateFluidBoxMesh, dispatch),
   }
 }
 
@@ -64,6 +73,7 @@ class Viewer extends React.Component {
     this.getSize = this.getSize.bind(this)
     this.generateAirfoilShell = this.generateAirfoilShell.bind(this)
     this.generateInternalMesh = this.generateInternalMesh.bind(this)
+    this.generateFluidBoxMesh = this.generateFluidBoxMesh.bind(this)
     this.generateRib = this.generateRib.bind(this)
     this.getZcoord = this.getZcoord.bind(this)
     this.getXcoord = this.getXcoord.bind(this)
@@ -76,6 +86,7 @@ class Viewer extends React.Component {
 
     // Generate wing
     this.generateAirfoilShell()
+    this.generateFluidBoxMesh()
   }
 
   componentDidUpdate (prevProps) {
@@ -110,6 +121,23 @@ class Viewer extends React.Component {
       this.generateInternalMesh()
     }
 
+    if (
+      prevGeometry.fluidBox.width !== geometry.fluidBox.width ||
+      prevGeometry.fluidBox.height !== geometry.fluidBox.height ||
+      prevGeometry.fluidBox.length !== geometry.fluidBox.length ||
+      prevGeometry.fluidBox.x !== geometry.fluidBox.x
+    ) {
+      this.generateFluidBoxMesh()
+    }
+
+    if (prevProps.fluidBoxMesh.vertices !== this.props.fluidBoxMesh.vertices) {
+      const vertices = this.props.fluidBoxMesh.vertices
+      const faces = this.props.fluidBoxMesh.faces
+      const material = this.props.display.fluidBoxMesh.material
+      const visible = this.props.display.fluidBoxMesh.visible
+      this.tobj.renderMesh('fluidBoxMesh', vertices, faces, material, visible)
+    }
+
     if (prevProps.internalMesh.vertices !== this.props.internalMesh.vertices) {
       const vertices = this.props.internalMesh.vertices
       const faces = this.props.internalMesh.faces
@@ -134,12 +162,20 @@ class Viewer extends React.Component {
       this.tobj.changeMeshVisibility('externalMesh', this.props.display.externalMesh.visible)
     }
 
+    if (prevProps.display.fluidBoxMesh.visible !== this.props.display.fluidBoxMesh.visible) {
+      this.tobj.changeMeshVisibility('fluidBoxMesh', this.props.display.fluidBoxMesh.visible)
+    }
+
     if (prevProps.display.internalMesh.material !== this.props.display.internalMesh.material) {
       this.tobj.changeMeshMaterial('internalMesh', this.props.display.internalMesh.material)
     }
 
     if (prevProps.display.externalMesh.material !== this.props.display.externalMesh.material) {
       this.tobj.changeMeshMaterial('externalMesh', this.props.display.externalMesh.material)
+    }
+
+    if (prevProps.display.fluidBoxMesh.material !== this.props.display.fluidBoxMesh.material) {
+      this.tobj.changeMeshMaterial('fluidBoxMesh', this.props.display.fluidBoxMesh.material)
     }
   }
 
@@ -238,6 +274,15 @@ class Viewer extends React.Component {
     const mesh = generateExternalMesh(geometry, shell, this.generateRib)
     if (mesh) {
       this.props.updateExternalMesh(mesh)
+    }
+  }
+
+  generateFluidBoxMesh () {
+    const geometry = this.props.geometry
+
+    const mesh = generateFluidBoxMesh(geometry)
+    if (mesh) {
+      this.props.updateFluidBoxMesh(mesh)
     }
   }
 

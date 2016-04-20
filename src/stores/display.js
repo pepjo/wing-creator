@@ -19,6 +19,10 @@ const defaultState = {
     material: 'solid',
     visible: true,
   },
+  fluidBoxMesh: {
+    material: 'wireframe',
+    visible: false,
+  },
 }
 
 function newState (param, value, state) {

@@ -90,6 +90,23 @@ class DownloadBtn extends React.Component {
       })
     }
 
+    if (this.props.exportSettings.fluidBoxMesh) {
+      const fluidBoxVertices = this.props.meshes.fluidBoxMesh.vertices.map((vertex) => (
+        [vertex.x, vertex.y, vertex.z]
+      ))
+
+      exportMeshes.push({
+        layer: 'FluidBox 0 1 0 255 0',
+        vertices: fluidBoxVertices,
+        segments: this.props.meshes.fluidBoxMesh.segments,
+        faces: this.props.meshes.fluidBoxMesh.facesFromSegments,
+        groups: this.props.meshes.fluidBoxMesh.groups,
+        volumes: [],
+      })
+    }
+
+    console.log(exportMeshes)
+
     const GITobj = new GIDobject(exportMeshes, this.props.exportSettings.problemType)
     GITobj.generateProjectZip('GIDwing')
     .then((content) => {

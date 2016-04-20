@@ -18,6 +18,8 @@ const propTypes = {
   handleDisplayExternalMaterialChange: React.PropTypes.func,
   handleDisplayInternalMeshViewChange: React.PropTypes.func,
   handleDisplayExternalMeshViewChange: React.PropTypes.func,
+  handleDisplayFluidBoxMaterialChange: React.PropTypes.func,
+  handleDisplayFluidBoxMeshViewChange: React.PropTypes.func,
 }
 
 function AirfoilControls ({
@@ -26,6 +28,8 @@ function AirfoilControls ({
   handleDisplayExternalMaterialChange,
   handleDisplayInternalMeshViewChange,
   handleDisplayExternalMeshViewChange,
+  handleDisplayFluidBoxMeshViewChange,
+  handleDisplayFluidBoxMaterialChange,
 }) {
   return (
     <div>
@@ -53,6 +57,21 @@ function AirfoilControls ({
       <SelectField
         value={display.externalMesh.material}
         onChange={handleDisplayExternalMaterialChange}
+        style={style.field}
+        floatingLabelText="Visualitzation type"
+      >
+        <MenuItem value="solid" primaryText="Solid" />
+        <MenuItem value="wireframe" primaryText="Wireframe" />
+      </SelectField>
+      <h3>Fluid box</h3>
+      <Toggle
+        toggled={display.fluidBoxMesh.visible}
+        onToggle={handleDisplayFluidBoxMeshViewChange}
+        label="Visible"
+      />
+      <SelectField
+        value={display.fluidBoxMesh.material}
+        onChange={handleDisplayFluidBoxMaterialChange}
         style={style.field}
         floatingLabelText="Visualitzation type"
       >

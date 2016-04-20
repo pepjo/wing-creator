@@ -6,6 +6,7 @@ const defaultState = {
   differentVertices: false,
   externalMesh: true,
   internalMesh: true,
+  fluidBoxMesh: true,
 }
 
 function newState (param, value) {

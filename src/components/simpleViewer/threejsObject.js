@@ -105,6 +105,8 @@ export default class ThreejsObject {
     if (this[name]) {
       this[name].visible = visibility
       this.threeRender()
+    } else {
+      console.log('no mesh with this name', name, this)
     }
   }
 
@@ -112,6 +114,8 @@ export default class ThreejsObject {
     if (this[name]) {
       this[name].material = this.materials[material]
       this.threeRender()
+    } else {
+      console.log('no mesh with this name', name, this)
     }
   }
 

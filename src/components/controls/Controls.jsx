@@ -107,6 +107,9 @@ class Controls extends React.Component {
     this.handleFluidBoxHeightChange = this.handleFluidBoxHeightChange.bind(this)
     this.handleFluidBoxXCoordChange = this.handleFluidBoxXCoordChange.bind(this)
     this.handleBeamExtensionChange = this.handleBeamExtensionChange.bind(this)
+    this.handleDisplayFluidBoxMaterialChange = this.handleDisplayFluidBoxMaterialChange.bind(this)
+    this.handleDisplayFluidBoxMeshViewChange = this.handleDisplayFluidBoxMeshViewChange.bind(this)
+    this.handleExportFluidBoxMeshChange = this.handleExportFluidBoxMeshChange.bind(this)
   }
 
   handleLengthChange (e) {
@@ -173,6 +176,12 @@ class Controls extends React.Component {
   handleDisplayInternalMeshViewChange (e, val) {
     this.props.changeDisplayParameter('internalMesh.visible', val)
   }
+  handleDisplayFluidBoxMaterialChange (e, index, value) {
+    this.props.changeDisplayParameter('fluidBoxMesh.material', value)
+  }
+  handleDisplayFluidBoxMeshViewChange (e, val) {
+    this.props.changeDisplayParameter('fluidBoxMesh.visible', val)
+  }
   handleDisplayExternalMeshViewChange (e, val) {
     this.props.changeDisplayParameter('externalMesh.visible', val)
   }
@@ -187,6 +196,9 @@ class Controls extends React.Component {
   }
   handleExportInternalMeshChange (e, val) {
     this.props.updateExportSetting('internalMesh', val)
+  }
+  handleExportFluidBoxMeshChange (e, val) {
+    this.props.updateExportSetting('fluidBoxMesh', val)
   }
   handleFluidBoxWidthChange (e) {
     this.props.changeGeometryParameter('fluidBox.width',
@@ -299,6 +311,8 @@ class Controls extends React.Component {
               handleDisplayExternalMaterialChange={this.handleDisplayExternalMaterialChange}
               handleDisplayInternalMeshViewChange={this.handleDisplayInternalMeshViewChange}
               handleDisplayExternalMeshViewChange={this.handleDisplayExternalMeshViewChange}
+              handleDisplayFluidBoxMaterialChange={this.handleDisplayFluidBoxMaterialChange}
+              handleDisplayFluidBoxMeshViewChange={this.handleDisplayFluidBoxMeshViewChange}
             />
           </Foldable>
           <Foldable
@@ -339,6 +353,7 @@ class Controls extends React.Component {
               handleExportDifferentVerticesChange={this.handleExportDifferentVerticesChange}
               handleExportExternalMeshChange={this.handleExportExternalMeshChange}
               handleExportInternalMeshChange={this.handleExportInternalMeshChange}
+              handleExportFluidBoxMeshChange={this.handleExportFluidBoxMeshChange}
             />
           </Foldable>
         </Paper>

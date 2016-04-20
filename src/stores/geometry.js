@@ -33,9 +33,9 @@ const defaultState = {
   },
   fluidBox: {
     width: 1.5,
-    height: 1,
-    length: 4,
-    x: 0,
+    height: 0.5,
+    length: 2.5,
+    x: 5,
   },
 }
 

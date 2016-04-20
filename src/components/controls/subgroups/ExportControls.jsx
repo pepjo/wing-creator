@@ -18,6 +18,7 @@ const propTypes = {
   handleExportDifferentVerticesChange: React.PropTypes.func,
   handleExportExternalMeshChange: React.PropTypes.func,
   handleExportInternalMeshChange: React.PropTypes.func,
+  handleExportFluidBoxMeshChange: React.PropTypes.func,
 }
 
 function WingParametersControls ({
@@ -26,6 +27,7 @@ function WingParametersControls ({
   handleExportDifferentVerticesChange,
   handleExportExternalMeshChange,
   handleExportInternalMeshChange,
+  handleExportFluidBoxMeshChange,
 }) {
   return (
     <div>
@@ -57,6 +59,11 @@ function WingParametersControls ({
         toggled={exportSettings.internalMesh}
         onToggle={handleExportInternalMeshChange}
         label="Export internal mesh"
+      />
+      <Toggle
+        toggled={exportSettings.fluidBoxMesh}
+        onToggle={handleExportFluidBoxMeshChange}
+        label="Export fluid box"
       />
     </div>
   )

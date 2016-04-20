@@ -72,7 +72,9 @@ ${vertex[0]} ${vertex[1]} ${vertex[2]}
 
       const objPrevV = this.objects
         .filter((o, iO) => (iO < useVerticesFrom))
+        .filter((o) => (typeof o.useVerticesFrom === 'undefined'))
         .reduce((a, o) => (a + o.vertices.length), 0)
+
       return segments.concat(
         object.segments.map((segment, j) => {
           nSegments++
@@ -123,7 +125,7 @@ ${segment[0] + 1 + objPrevV} ${segment[1] + 1 + objPrevV}
       points.push(this.objects[iObj].vertices[seg[0]])
     }
 
-    if (face[1][1] === 1) {
+    if (face[1][1] === 0) {
       const seg = this.objects[iObj].segments[face[1][0]]
       points.push(this.objects[iObj].vertices[seg[1]])
     } else {
