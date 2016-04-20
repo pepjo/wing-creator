@@ -7,6 +7,7 @@ import bezier from 'cubic-bezier'
 // Components
 import AirfoilControls from './subgroups/AirfoilControls'
 import DisplayControls from './subgroups/DisplayControls'
+import ExportControls from './subgroups/ExportControls'
 import MeshControls from './subgroups/MeshControls'
 import StructuresParametersControls from './subgroups/StructuresParametersControls'
 import WingParametersControls from './subgroups/WingParametersControls'
@@ -17,6 +18,7 @@ import DownloadBtn from '../downloadBtn/DownloadBtn'
 // Actions
 import { changeGeometryParameter, changeAirfoil, changeAirfoilType } from '../../actions/geometry'
 import { changeDisplayParameter } from '../../actions/display'
+import { updateExportSetting } from '../../actions/exportSettings'
 
 // Styles
 import * as style from './Controls.style'
@@ -24,22 +26,26 @@ import * as style from './Controls.style'
 // Shapes
 import geometryShape from '../../shapes/geometry'
 import displayShape from '../../shapes/display'
+import exportSettingsShape from '../../shapes/exportSettings'
 
 const propTypes = {
   height: React.PropTypes.number,
   geometry: geometryShape,
   display: displayShape,
+  exportSettings: exportSettingsShape,
   airfoils: React.PropTypes.array,
   changeGeometryParameter: React.PropTypes.func,
   changeAirfoil: React.PropTypes.func,
   changeAirfoilType: React.PropTypes.func,
   changeDisplayParameter: React.PropTypes.func,
+  updateExportSetting: React.PropTypes.func,
 }
 
 function mapStateToProps (state) { // eslint-disable-line no-unused-vars
   return {
     height: state.display.height,
     geometry: state.geometry,
+    exportSettings: state.exportSettings,
     airfoils: state.data.airfoils,
     display: state.display,
   }
@@ -51,6 +57,7 @@ function mapDispatchToProps (dispatch) { // eslint-disable-line no-unused-vars
     changeDisplayParameter: bindActionCreators(changeDisplayParameter, dispatch),
     changeAirfoilType: bindActionCreators(changeAirfoilType, dispatch),
     changeAirfoil: bindActionCreators(changeAirfoil, dispatch),
+    updateExportSetting: bindActionCreators(updateExportSetting, dispatch),
   }
 }
 
@@ -90,6 +97,10 @@ class Controls extends React.Component {
     this.handleDisplayExternalMaterialChange = this.handleDisplayExternalMaterialChange.bind(this)
     this.handleDisplayInternalMeshViewChange = this.handleDisplayInternalMeshViewChange.bind(this)
     this.handleDisplayExternalMeshViewChange = this.handleDisplayExternalMeshViewChange.bind(this)
+    this.handleProblemTypeChange = this.handleProblemTypeChange.bind(this)
+    this.handleExportDifferentVerticesChange = this.handleExportDifferentVerticesChange.bind(this)
+    this.handleExportExternalMeshChange = this.handleExportExternalMeshChange.bind(this)
+    this.handleExportInternalMeshChange = this.handleExportInternalMeshChange.bind(this)
   }
 
   handleLengthChange (e) {
@@ -155,6 +166,18 @@ class Controls extends React.Component {
   handleDisplayExternalMeshViewChange (e, val) {
     this.props.changeDisplayParameter('externalMesh.visible', val)
   }
+  handleProblemTypeChange (e, index, value) {
+    this.props.updateExportSetting('problemType', value)
+  }
+  handleExportDifferentVerticesChange (e, val) {
+    this.props.updateExportSetting('differentVertices', val)
+  }
+  handleExportExternalMeshChange (e, val) {
+    this.props.updateExportSetting('externalMesh', val)
+  }
+  handleExportInternalMeshChange (e, val) {
+    this.props.updateExportSetting('internalMesh', val)
+  }
 
   handleAirfoilChange (e, index, value) {
     if (this.props.geometry.airfoil.type === 'fromFile') {
@@ -170,10 +193,10 @@ class Controls extends React.Component {
   handleToggle (el, open, height) {
     const top = el.getBoundingClientRect().top
     const displayHeight = this.props.display.height
-    if (top + height + 20 > displayHeight && open) {
+    if (top + height + 100 > displayHeight && open) {
       const containerScroll = this.refs.scrollContainer
       const initialTime = performance.now()
-      const goal = containerScroll.scrollTop + top + height + 55 - displayHeight
+      const goal = containerScroll.scrollTop + top + height + 150 - displayHeight
       const origin = containerScroll.scrollTop
       const totalTime = 200
       const easeIn = bezier(0, 0.02, 0.55, 1, 400)
@@ -193,7 +216,7 @@ class Controls extends React.Component {
   }
 
   render () {
-    const { airfoils, display } = this.props
+    const { airfoils, display, exportSettings } = this.props
     const { wingParameters, structureParameters, internal, external, airfoil } = this.props.geometry
 
     return (
@@ -265,6 +288,17 @@ class Controls extends React.Component {
             <MeshControls meshProps={external}
               handleTypeChange={this.handleExternalTypeChange}
               handleThicknessChange={this.handleExternalThicknessChange}
+            />
+          </Foldable>
+          <Foldable
+            nom="Export settings"
+            onToggle={this.handleToggle}
+          >
+            <ExportControls exportSettings={exportSettings}
+              handleProblemTypeChange={this.handleProblemTypeChange}
+              handleExportDifferentVerticesChange={this.handleExportDifferentVerticesChange}
+              handleExportExternalMeshChange={this.handleExportExternalMeshChange}
+              handleExportInternalMeshChange={this.handleExportInternalMeshChange}
             />
           </Foldable>
         </Paper>

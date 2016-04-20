@@ -11,7 +11,7 @@ export const scrollContainer = (height) => (
 )
 
 export const container = {
-  margin: '20px 20px 20px 0',
+  margin: '20px 20px 100px 0',
   padding: 20,
 }
 
