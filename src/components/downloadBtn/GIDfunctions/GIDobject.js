@@ -18,6 +18,7 @@ export default class {
     this.vertexDependencyCounter = this.vertexDependencyCounter.bind(this)
     this.segmentDependencyCounter = this.segmentDependencyCounter.bind(this)
     this.generateFile = this.generateFile.bind(this)
+    this.generateLayersString = this.generateLayersString.bind(this)
   }
 
   vertexDependencyCounter (iObj, jVer) {
@@ -29,14 +30,17 @@ export default class {
   generateVertices () {
     let nVertices = -1 // So when we nVertices ++ first will become 0
 
-    return this.objects.reduce((vertices, object, i) => (
-      vertices.concat(
-        object.vertices.map((vertex, j) => {
-          nVertices++
-          return this.generateVertex(nVertices, i, j, vertex)
-        })
-      )
-    ), []).join('')
+    return this.objects.reduce((vertices, object, i) => {
+      if (typeof object.useVerticesFrom === 'undefined') {
+        return vertices.concat(
+          object.vertices.map((vertex, j) => {
+            nVertices++
+            return this.generateVertex(nVertices, i, j, vertex)
+          })
+        )
+      }
+      return vertices
+    }, []).join('')
   }
 
   generateVertex (n, iObj, jVer, vertex) {
@@ -57,8 +61,11 @@ ${vertex[0]} ${vertex[1]} ${vertex[2]}
     let nSegments = -1 // So when we nVertices ++ first will become 0
 
     return this.objects.reduce((segments, object, i) => {
+      const useVerticesFrom = typeof object.useVerticesFrom === 'undefined'
+        ? i : object.useVerticesFrom
+
       const objPrevV = this.objects
-        .filter((o, iO) => (iO < i))
+        .filter((o, iO) => (iO < useVerticesFrom))
         .reduce((a, o) => (a + o.vertices.length), 0)
       return segments.concat(
         object.segments.map((segment, j) => {
@@ -150,14 +157,22 @@ ${this.faceNormalCalculator(iObj, face)}
 `
   }
 
+  generateLayersString () {
+    return this.objects.map((o, i) => (`${i + 1} ${o.layer}`)).join('\n')
+  }
+
   generateString () {
     let geo = ''
+    let header
 
     if (this.problemType === 'KRATOS_structural') {
-      geo += template.header.replace('UNKNOWN', 'kratos.gid\\Kratos\\kratos')
+      header = template.header
+        .replace('UNKNOWN', 'kratos.gid\\Kratos\\kratos')
     } else {
-      geo += template.header
+      header = template.header
     }
+
+    geo += header.replace('$LAYERS', this.generateLayersString())
     geo += this.generateVertices()
     geo += this.generateSegments()
     geo += this.generateFaces()

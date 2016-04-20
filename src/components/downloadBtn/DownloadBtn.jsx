@@ -62,6 +62,7 @@ class DownloadBtn extends React.Component {
       ))
 
       exportMeshes.push({
+        layer: 'Internal 0 1 0 0 0',
         vertices: internalVertices,
         segments: this.props.meshes.internalMesh.segments,
         faces: this.props.meshes.internalMesh.facesFromSegments,
@@ -69,16 +70,27 @@ class DownloadBtn extends React.Component {
       })
     }
 
-    if (this.props.exportSettings.internalMesh) {
+    if (this.props.exportSettings.externalMesh) {
+      let useVerticesFrom
       const externalVertices = this.props.meshes.externalMesh.vertices.map((vertex) => (
         [vertex.x, vertex.y, vertex.z]
       ))
 
+      if (
+        this.props.exportSettings.externalMesh &&
+        this.props.exportSettings.internalMesh &&
+        !this.props.exportSettings.differentVertices
+      ) {
+        useVerticesFrom = 0
+      }
+
       exportMeshes.push({
+        layer: 'External 0 1 255 0 0',
         vertices: externalVertices,
         segments: this.props.meshes.externalMesh.segments,
         faces: this.props.meshes.externalMesh.facesFromSegments,
         volumes: [],
+        useVerticesFrom,
       })
     }
 

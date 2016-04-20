@@ -1,5 +1,6 @@
 
 export const objectData = [{
+  layer: 'Test 0 1 255 0 0',
   vertices: [
     [0, 0, 0],
     [0, 1, 0],
@@ -99,8 +100,7 @@ export const facesText = `5 1 0 0 0 0 0 1 0
 export const noneheader = `RAMSAN-ASCII-gid-v9.5
 UNKNOWN 0
 0
-1 Internal 0 1 0 0 0
-2 External 0 1 255 0 0
+1 Test 0 1 255 0 0
 0
 0
 `
@@ -108,8 +108,7 @@ UNKNOWN 0
 export const KRATOSstructuralheader = `RAMSAN-ASCII-gid-v9.5
 kratos.gid\\Kratos\\kratos 0
 0
-1 Internal 0 1 0 0 0
-2 External 0 1 255 0 0
+1 Test 0 1 255 0 0
 0
 0
 `
