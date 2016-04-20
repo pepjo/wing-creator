@@ -4,6 +4,10 @@ import { connect } from 'react-redux'
 import JSZip from 'jszip'
 import saveAs from 'browser-saveas'
 
+// Files
+import kratoskmdb from './GIDfunctions/auxiliar-files/kratos.kmdb'
+import kratosspd from './GIDfunctions/auxiliar-files/kratos.spd'
+
 // Functions
 import GIDobject from './GIDfunctions/GIDobject'
 
@@ -83,6 +87,11 @@ class DownloadBtn extends React.Component {
 
     const gid = zip.folder('GIDwing.gid')
     gid.file('GIDwing.geo', file)
+
+    if (this.props.exportSettings.problemType === 'KRATOS_structural') {
+      gid.file('GIDwing.kmdb', kratoskmdb)
+      gid.file('GIDwing.spd', kratosspd)
+    }
 
     zip.generateAsync({ type: 'blob' })
     .then((content) => {
