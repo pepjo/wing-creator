@@ -5,6 +5,7 @@ import { bindActionCreators } from 'redux'
 import bezier from 'cubic-bezier'
 
 // Components
+import FluidBoxControls from './subgroups/FluidBoxControls'
 import AirfoilControls from './subgroups/AirfoilControls'
 import DisplayControls from './subgroups/DisplayControls'
 import ExportControls from './subgroups/ExportControls'
@@ -101,6 +102,10 @@ class Controls extends React.Component {
     this.handleExportDifferentVerticesChange = this.handleExportDifferentVerticesChange.bind(this)
     this.handleExportExternalMeshChange = this.handleExportExternalMeshChange.bind(this)
     this.handleExportInternalMeshChange = this.handleExportInternalMeshChange.bind(this)
+    this.handleFluidBoxWidthChange = this.handleFluidBoxWidthChange.bind(this)
+    this.handleFluidBoxLengthChange = this.handleFluidBoxLengthChange.bind(this)
+    this.handleFluidBoxHeightChange = this.handleFluidBoxHeightChange.bind(this)
+    this.handleFluidBoxXCoordChange = this.handleFluidBoxXCoordChange.bind(this)
   }
 
   handleLengthChange (e) {
@@ -178,6 +183,22 @@ class Controls extends React.Component {
   handleExportInternalMeshChange (e, val) {
     this.props.updateExportSetting('internalMesh', val)
   }
+  handleFluidBoxWidthChange (e) {
+    this.props.changeGeometryParameter('fluidBox.width',
+      proccessInputVal(e.target.value, 0))
+  }
+  handleFluidBoxLengthChange (e) {
+    this.props.changeGeometryParameter('fluidBox.length',
+      proccessInputVal(e.target.value, 0))
+  }
+  handleFluidBoxHeightChange (e) {
+    this.props.changeGeometryParameter('fluidBox.height',
+      proccessInputVal(e.target.value, 0))
+  }
+  handleFluidBoxXCoordChange (e) {
+    this.props.changeGeometryParameter('fluidBox.x',
+      proccessInputVal(e.target.value))
+  }
 
   handleAirfoilChange (e, index, value) {
     if (this.props.geometry.airfoil.type === 'fromFile') {
@@ -217,7 +238,9 @@ class Controls extends React.Component {
 
   render () {
     const { airfoils, display, exportSettings } = this.props
-    const { wingParameters, structureParameters, internal, external, airfoil } = this.props.geometry
+    const {
+      wingParameters, structureParameters, internal, external, fluidBox, airfoil,
+    } = this.props.geometry
 
     return (
       <div
@@ -288,6 +311,17 @@ class Controls extends React.Component {
             <MeshControls meshProps={external}
               handleTypeChange={this.handleExternalTypeChange}
               handleThicknessChange={this.handleExternalThicknessChange}
+            />
+          </Foldable>
+          <Foldable
+            nom="Fluid box"
+            onToggle={this.handleToggle}
+          >
+            <FluidBoxControls fluidBox={fluidBox}
+              handleFluidBoxWidthChange={this.handleFluidBoxWidthChange}
+              handleFluidBoxLengthChange={this.handleFluidBoxLengthChange}
+              handleFluidBoxHeightChange={this.handleFluidBoxHeightChange}
+              handleFluidBoxXCoordChange={this.handleFluidBoxXCoordChange}
             />
           </Foldable>
           <Foldable

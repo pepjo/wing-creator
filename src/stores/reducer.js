@@ -19,9 +19,11 @@ const reducer = combineReducers({
 export default function (state, action) {
   const newState = reducer(state, action)
 
-  localStorage.setItem('savedSettings', JSON.stringify(
-    Object.assign({}, state, { version: process.env.version })
-  ))
+  if (typeof localStorage !== 'undefined') {
+    localStorage.setItem('savedSettings', JSON.stringify(
+      Object.assign({}, state, { version: process.env.version })
+    ))
+  }
 
   return newState
 }

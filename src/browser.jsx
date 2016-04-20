@@ -14,8 +14,12 @@ import Root from './root'
 
 window.startApp = () => {
   // Our state
-  const savedSettings = JSON.parse(localStorage.getItem('savedSettings'))
+  let savedSettings
   let initialState = window.__INITIAL_STATE__
+
+  if (typeof localStorage !== 'undefined') {
+    savedSettings = JSON.parse(localStorage.getItem('savedSettings'))
+  }
 
   if (
     savedSettings &&

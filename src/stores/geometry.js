@@ -30,6 +30,12 @@ const defaultState = {
     distribution: 'sin',
     interpolation: 'linear',
   },
+  fluidBox: {
+    width: 1.5,
+    height: 1,
+    length: 4,
+    x: 0,
+  },
 }
 
 function newState (param, value, state) {

@@ -29,9 +29,17 @@ export const airfoilShape = PropTypes.shape({
   interpolation: PropTypes.string.isRequired,
 })
 
+export const fluidBoxShape = PropTypes.shape({
+  width: PropTypes.number,
+  height: PropTypes.number,
+  length: PropTypes.number,
+  x: PropTypes.number,
+})
+
 export default PropTypes.shape({
   wingParameters: wingParametersShape,
   internal: meshPropsShape,
   external: meshPropsShape,
   airfoil: airfoilShape,
+  fluidBox: fluidBoxShape,
 })
