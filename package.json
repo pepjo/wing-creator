@@ -36,6 +36,7 @@
     "material-ui": "^0.15.0-beta.1",
     "mathjs": "^3.1.4",
     "morgan": "^1.7.0",
+    "naca-four-digit-airfoil": "^1.0.4",
     "perfnow": "^0.2.0",
     "radium": "^0.17.1",
     "react": "^15.0.1",
