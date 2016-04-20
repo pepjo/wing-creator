@@ -2,6 +2,12 @@
 // import * as testData from './__test__/GIDobject.data'
 import * as template from './templateStrings'
 import math from 'mathjs'
+import JSZip from 'jszip'
+import xml from 'xmlbuilder'
+
+// Files
+import kratoskmdb from './auxiliar-files/kratos.kmdb'
+import kratosspd from './auxiliar-files/kratos.spd'
 
 export default class {
   constructor (objects, problemType) {
@@ -202,5 +208,102 @@ ${this.faceNormalCalculator(iObj, face)}
     }
 
     return new Blob([buf], { type: 'text/plain;charset=us-ascii' })
+  }
+
+  stringifyXMLGroup (group, id, iObj, groups, eGroups) {
+    const j = eGroups.children.length
+    const le = group.entities.reduce((total, ent) => (
+      total + (ent[1] - ent[0]) + 1
+    ), 0)
+    let offset = 0
+
+    if (group.type === 'points' && iObj !== 0) {
+      offset = this.objects
+        .filter((o, iO) => (iO < iObj))
+        .reduce((a, o) => (a + o.vertices.length), 0)
+    } else if (group.type === 'segments' && iObj !== 0) {
+      offset = this.objects
+        .filter((o, iO) => (iO < iObj))
+        .reduce((a, o) => (a + o.segments.length), 0)
+    } else if (group.type === 'faces' && iObj !== 0) {
+      offset = this.objects
+        .filter((o, iO) => (iO < iObj))
+        .reduce((a, o) => (a + o.faces.length), 0)
+    }
+
+    groups.ele('group', { id, name: group.name, color: group.color })
+    eGroups.ele('entities_group', { name: group.type })
+
+    eGroups.children[j].ele(
+      'vector',
+      { name: 'entity_ids', length: le, type: 'integer' },
+      group.entities.reduce((s, ent) => (
+        `${s} ${ent[0] + offset + 1}:${ent[1] + offset + 1}`
+      ), '').trim()
+    )
+    eGroups.children[j].ele(
+      'vector',
+      { name: 'entity_num_groups', length: le, type: 'ushort' },
+      `1x${le}`
+    )
+    eGroups.children[j].ele(
+      'vector',
+      { name: 'entity_groups', length: le, type: 'ushort' },
+      `1x${le}`
+    )
+  }
+
+  generateKratosPrjFile () {
+    const prj = xml.create('gid')
+    prj.att('version', '11.1')
+    const pre = prj.ele('pre')
+    const groups = pre.ele('groups')
+    const eGroups = pre.ele('entities_groups')
+    let nGroups = 0
+
+    this.objects.forEach((object, iObj) => {
+      if (typeof object.groups !== 'undefined') {
+        object.groups.forEach((group) => {
+          if (group.type === 'points') {
+            nGroups++
+            this.stringifyXMLGroup(
+              group,
+              nGroups,
+              object.useVerticesFrom || iObj,
+              groups,
+              eGroups,
+            )
+          } else {
+            throw new Error('not yet implemented')
+          }
+        })
+      }
+    })
+
+    if (groups.children.length > 0) {
+      return prj.end({ pretty: true })
+    }
+    return null
+  }
+
+  // Returns blob in a promise
+  generateProjectZip (filename) {
+    const zip = new JSZip()
+    const file = this.generateFile()
+
+    const gid = zip.folder(`${filename}.gid`)
+    gid.file(`${filename}.geo`, file)
+
+    if (this.problemType === 'KRATOS_structural') {
+      gid.file(`${filename}.kmdb`, kratoskmdb)
+      gid.file(`${filename}.spd`, kratosspd)
+
+      const prj = this.generateKratosPrjFile()
+      if (prj) {
+        gid.file(`${filename}.prj`, prj)
+      }
+    }
+
+    return zip.generateAsync({ type: 'blob' })
   }
 }

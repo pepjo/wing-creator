@@ -52,7 +52,8 @@
     "redux-thunk": "^2.0.1",
     "serve-favicon": "^2.3.0",
     "three": "^0.75.0",
-    "three-trackballcontrols": "0.0.5"
+    "three-trackballcontrols": "0.0.5",
+    "xmlbuilder": "^8.2.2"
   },
   "devDependencies": {
     "babel-cli": "^6.7.5",

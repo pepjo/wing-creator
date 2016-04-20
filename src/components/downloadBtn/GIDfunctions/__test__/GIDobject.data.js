@@ -31,6 +31,17 @@ export const objectData = [{
     [[0, 1], [9, 1], [4, 0], [8, 0]],
   ],
   volumes: [],
+  groups: [
+    {
+      name: 'group1',
+      type: 'points',
+      color: '#000000',
+      entities: [
+        [0, 1],
+        [3, 5],
+      ],
+    },
+  ],
 }]
 
 export const verticesText = `1 1 0 0 3 0 0 1 0
@@ -126,3 +137,19 @@ export const footer = `0
 0 0 1 1 0 2 0 0 0.3 1.8 0.3 0.3 500 1e-015 3 1.1 0 0 0 2 1 0.2 5 5 1 1.25 1 1 0.4 0 0 0 0 0 0 0 0 0 0 0
 0 0 0 150 10 0.4 `
 /* eslint-enable */
+
+export const groupsfile = `<?xml version="1.0"?>
+<gid version="11.1">
+  <pre>
+    <groups>
+      <group id="1" name="group1" color="#000000"/>
+    </groups>
+    <entities_groups>
+      <entities_group name="points">
+        <vector name="entity_ids" length="5" type="integer">1:2 4:6</vector>
+        <vector name="entity_num_groups" length="5" type="ushort">1x5</vector>
+        <vector name="entity_groups" length="5" type="ushort">1x5</vector>
+      </entities_group>
+    </entities_groups>
+  </pre>
+</gid>`

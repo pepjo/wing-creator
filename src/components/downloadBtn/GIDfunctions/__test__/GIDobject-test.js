@@ -81,5 +81,13 @@ describe('GIDobject', () => {
         )
       })
     })
+
+    describe('and when we call generateKratosPrjFile', () => {
+      const text = GITobj.generateKratosPrjFile()
+
+      it('should generate the file correctly', () => {
+        expect(text).to.equal(data.groupsfile)
+      })
+    })
   })
 })

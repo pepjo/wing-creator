@@ -13,7 +13,8 @@
 - [x] Check, the airfoil tip is wierd // Nothing to do, bad data
 - [ ] Finish spline
 - [ ] Add longer beam
-- [ ] Add kratos problem type and groups
+- [ ] Add fluid box
+- [x] Add kratos problem type and groups
       (over surface, under surface, root vertices)
 - [x] Add NACA
 - [ ] Add solids

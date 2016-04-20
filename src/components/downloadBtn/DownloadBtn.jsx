@@ -1,12 +1,7 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import JSZip from 'jszip'
 import saveAs from 'browser-saveas'
-
-// Files
-import kratoskmdb from './GIDfunctions/auxiliar-files/kratos.kmdb'
-import kratosspd from './GIDfunctions/auxiliar-files/kratos.spd'
 
 // Functions
 import GIDobject from './GIDfunctions/GIDobject'
@@ -54,7 +49,6 @@ class DownloadBtn extends React.Component {
     this.setState({ open: true })
 
     const exportMeshes = []
-    const zip = new JSZip()
 
     if (this.props.exportSettings.internalMesh) {
       const internalVertices = this.props.meshes.internalMesh.vertices.map((vertex) => (
@@ -66,6 +60,7 @@ class DownloadBtn extends React.Component {
         vertices: internalVertices,
         segments: this.props.meshes.internalMesh.segments,
         faces: this.props.meshes.internalMesh.facesFromSegments,
+        groups: this.props.meshes.internalMesh.groups,
         volumes: [],
       })
     }
@@ -89,23 +84,14 @@ class DownloadBtn extends React.Component {
         vertices: externalVertices,
         segments: this.props.meshes.externalMesh.segments,
         faces: this.props.meshes.externalMesh.facesFromSegments,
+        groups: this.props.meshes.externalMesh.groups,
         volumes: [],
         useVerticesFrom,
       })
     }
 
     const GITobj = new GIDobject(exportMeshes, this.props.exportSettings.problemType)
-    const file = GITobj.generateFile()
-
-    const gid = zip.folder('GIDwing.gid')
-    gid.file('GIDwing.geo', file)
-
-    if (this.props.exportSettings.problemType === 'KRATOS_structural') {
-      gid.file('GIDwing.kmdb', kratoskmdb)
-      gid.file('GIDwing.spd', kratosspd)
-    }
-
-    zip.generateAsync({ type: 'blob' })
+    GITobj.generateProjectZip('GIDwing')
     .then((content) => {
       saveAs(content, 'GIDwing.zip')
     })

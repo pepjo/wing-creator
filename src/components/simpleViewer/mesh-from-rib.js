@@ -7,6 +7,7 @@ export function generateInternalMesh (geometry, shell, ribGen) {
     faces: [],
     segments: [],
     facesFromSegments: [],
+    groups: [],
   }
 
   if (shell.vertices) {
@@ -52,6 +53,18 @@ export function generateInternalMesh (geometry, shell, ribGen) {
         [beamVertices[0], beamVertices[1]]
       )
 
+      // Add root group
+      if (i === 0) {
+        mesh.groups.push({
+          name: 'internalRoot',
+          type: 'points',
+          color: '#999999ff',
+          entities: [
+            [0, rib.vertices.length - 1],
+          ],
+        })
+      }
+
       prevSegmentIndex = mesh.segments.length
       prevBeamVertices = beamVertices
     }
@@ -67,6 +80,7 @@ export function generateExternalMesh (geometry, shell, ribGen) {
     faces: [],
     segments: [],
     facesFromSegments: [],
+    groups: [],
   }
 
   if (shell.vertices) {
@@ -109,6 +123,18 @@ export function generateExternalMesh (geometry, shell, ribGen) {
 
         faces.push(new THREE.Face3(le + rib.vertices.length - 1, le, le - 1))
         faces.push(new THREE.Face3(le - 1, le, le - rib.vertices.length))
+      }
+
+      // Add root group
+      if (i === 0) {
+        mesh.groups.push({
+          name: 'externalRoot',
+          type: 'points',
+          color: '#999999ff',
+          entities: [
+            [0, rib.vertices.length - 1],
+          ],
+        })
       }
 
       mesh.faces = mesh.faces.concat(faces)
