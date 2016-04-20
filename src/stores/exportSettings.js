@@ -2,7 +2,7 @@
 import { UPDATE_EXPORT_SETTING } from '../actions/exportSettings'
 
 const defaultState = {
-  problemType: 'KRATOS',
+  problemType: 'KRATOS_structural',
   differentVertices: false,
   externalMesh: true,
   internalMesh: true,

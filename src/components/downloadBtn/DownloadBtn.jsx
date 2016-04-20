@@ -20,11 +20,13 @@ import * as style from './DownloadBtn.style.js'
 const propTypes = {
   circle: React.PropTypes.bool,
   meshes: React.PropTypes.object,
+  exportSettings: React.PropTypes.object,
 }
 
 function mapStateToProps (state) {
   return {
     meshes: state.meshes,
+    exportSettings: state.exportSettings,
   }
 }
 
@@ -47,27 +49,36 @@ class DownloadBtn extends React.Component {
   downloadGid () {
     this.setState({ open: true })
 
+    const exportMeshes = []
     const zip = new JSZip()
 
-    const internalVertices = this.props.meshes.internalMesh.vertices.map((vertex) => (
-      [vertex.x, vertex.y, vertex.z]
-    ))
+    if (this.props.exportSettings.internalMesh) {
+      const internalVertices = this.props.meshes.internalMesh.vertices.map((vertex) => (
+        [vertex.x, vertex.y, vertex.z]
+      ))
 
-    const externalVertices = this.props.meshes.externalMesh.vertices.map((vertex) => (
-      [vertex.x, vertex.y, vertex.z]
-    ))
+      exportMeshes.push({
+        vertices: internalVertices,
+        segments: this.props.meshes.internalMesh.segments,
+        faces: this.props.meshes.internalMesh.facesFromSegments,
+        volumes: [],
+      })
+    }
 
-    const GITobj = new GIDobject([{
-      vertices: internalVertices,
-      segments: this.props.meshes.internalMesh.segments,
-      faces: this.props.meshes.internalMesh.facesFromSegments,
-      volumes: [],
-    }, {
-      vertices: externalVertices,
-      segments: this.props.meshes.externalMesh.segments,
-      faces: this.props.meshes.externalMesh.facesFromSegments,
-      volumes: [],
-    }])
+    if (this.props.exportSettings.internalMesh) {
+      const externalVertices = this.props.meshes.externalMesh.vertices.map((vertex) => (
+        [vertex.x, vertex.y, vertex.z]
+      ))
+
+      exportMeshes.push({
+        vertices: externalVertices,
+        segments: this.props.meshes.externalMesh.segments,
+        faces: this.props.meshes.externalMesh.facesFromSegments,
+        volumes: [],
+      })
+    }
+
+    const GITobj = new GIDobject(exportMeshes, this.props.exportSettings.problemType)
     const file = GITobj.generateFile()
 
     const gid = zip.folder('GIDwing.gid')

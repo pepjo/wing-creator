@@ -35,7 +35,7 @@ function WingParametersControls ({
         floatingLabelText="GID project problem type"
       >
         <MenuItem
-          value="KRATOS"
+          value="KRATOS_structural"
           primaryText="KRATOS structural"
         />
         <MenuItem

@@ -32,63 +32,63 @@ export const objectData = [{
   volumes: [],
 }]
 
-export const verticesText = `1 1 0 1 3 0 0 1 0
+export const verticesText = `1 1 0 0 3 0 0 1 0
 0 0 0
-1 2 0 1 3 0 0 1 0
+1 2 0 0 3 0 0 1 0
 0 1 0
-1 3 0 1 3 0 0 1 0
+1 3 0 0 3 0 0 1 0
 1 1 0
-1 4 0 1 3 0 0 1 0
+1 4 0 0 3 0 0 1 0
 1 0 0
-1 5 0 1 3 0 0 1 0
+1 5 0 0 3 0 0 1 0
 0 0 1
-1 6 0 1 3 0 0 1 0
+1 6 0 0 3 0 0 1 0
 0 1 1
-1 7 0 1 3 0 0 1 0
+1 7 0 0 3 0 0 1 0
 1 1 1
-1 8 0 1 3 0 0 1 0
+1 8 0 0 3 0 0 1 0
 1 0 1
 `
 
-export const segmentsText = `2 1 0 1 2 0 0 1 0
+export const segmentsText = `2 1 0 0 2 0 0 1 0
 1 2
-2 2 0 1 1 0 0 1 0
+2 2 0 0 1 0 0 1 0
 2 3
-2 3 0 1 1 0 0 1 0
+2 3 0 0 1 0 0 1 0
 3 4
-2 4 0 1 1 0 0 1 0
+2 4 0 0 1 0 0 1 0
 4 1
-2 5 0 1 2 0 0 1 0
+2 5 0 0 2 0 0 1 0
 5 6
-2 6 0 1 1 0 0 1 0
+2 6 0 0 1 0 0 1 0
 6 7
-2 7 0 1 1 0 0 1 0
+2 7 0 0 1 0 0 1 0
 7 8
-2 8 0 1 1 0 0 1 0
+2 8 0 0 1 0 0 1 0
 8 5
-2 9 0 1 1 0 0 1 0
+2 9 0 0 1 0 0 1 0
 1 5
-2 10 0 1 1 0 0 1 0
+2 10 0 0 1 0 0 1 0
 2 6
-2 11 0 1 0 0 0 1 0
+2 11 0 0 0 0 0 1 0
 3 7
-2 12 0 1 0 0 0 1 0
+2 12 0 0 0 0 0 1 0
 4 8
 `
 
-export const facesText = `5 1 0 1 0 0 0 1 0
+export const facesText = `5 1 0 0 0 0 0 1 0
 4
 1 2 3 4
 1 1 1 1
 0.5 0.5 0
 0 0 -1
-5 2 0 1 0 0 0 1 0
+5 2 0 0 0 0 0 1 0
 4
 5 6 7 8
 1 1 1 1
 0.5 0.5 1
 0 0 -1
-5 3 0 1 0 0 0 1 0
+5 3 0 0 0 0 0 1 0
 4
 1 10 5 9
 1 1 0 0
@@ -96,8 +96,17 @@ export const facesText = `5 1 0 1 0 0 0 1 0
 1 0 0
 `
 
-export const header = `RAMSAN-ASCII-gid-v9.5
+export const noneheader = `RAMSAN-ASCII-gid-v9.5
 UNKNOWN 0
+0
+1 Internal 0 1 0 0 0
+2 External 0 1 255 0 0
+0
+0
+`
+
+export const KRATOSstructuralheader = `RAMSAN-ASCII-gid-v9.5
+kratos.gid\\Kratos\\kratos 0
 0
 1 Internal 0 1 0 0 0
 2 External 0 1 255 0 0

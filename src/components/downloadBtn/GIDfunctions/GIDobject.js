@@ -4,8 +4,9 @@ import * as template from './templateStrings'
 import math from 'mathjs'
 
 export default class {
-  constructor (objects) {
+  constructor (objects, problemType) {
     this.objects = objects || {}
+    this.problemType = problemType || 'NONE'
 
     this.generateFile = this.generateFile.bind(this)
     this.generateVertices = this.generateVertices.bind(this)
@@ -152,7 +153,11 @@ ${this.faceNormalCalculator(iObj, face)}
   generateString () {
     let geo = ''
 
-    geo += template.header
+    if (this.problemType === 'KRATOS_structural') {
+      geo += template.header.replace('UNKNOWN', 'kratos.gid\\Kratos\\kratos')
+    } else {
+      geo += template.header
+    }
     geo += this.generateVertices()
     geo += this.generateSegments()
     geo += this.generateFaces()
