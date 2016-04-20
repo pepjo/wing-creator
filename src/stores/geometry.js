@@ -4,9 +4,9 @@ import { UPDATE_GEOMETRY_PARAM, UPDATE_AIRFOIL, CHANGE_AIRFOIL_TYPE } from '../a
 const defaultState = {
   wingParameters: {
     length: 10,
-    root: 1.5,
+    root: 3,
     tip: 1.5,
-    sweep: 0,
+    sweep: 30,
   },
   structureParameters: {
     ribs: 5,

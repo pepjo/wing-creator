@@ -14,7 +14,17 @@ import Root from './root'
 
 window.startApp = () => {
   // Our state
-  const store = configureStore(window.__INITIAL_STATE__)
+  const savedSettings = JSON.parse(localStorage.getItem('savedSettings'))
+  let initialState = window.__INITIAL_STATE__
+
+  if (
+    savedSettings &&
+    savedSettings.version === process.env.version &&
+    process.env.NODE_ENV !== 'development'
+  ) {
+    initialState = savedSettings
+  }
+  const store = configureStore(initialState)
 
   ReactDom.render(
     <Root store={store} userAgent={navigator.userAgent} />,

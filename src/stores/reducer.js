@@ -8,10 +8,20 @@ import geometry from './geometry'
 import meshes from './meshes'
 import exportSettings from './exportSettings'
 
-export default combineReducers({
+const reducer = combineReducers({
   data,
   display,
   geometry,
   meshes,
   exportSettings,
 })
+
+export default function (state, action) {
+  const newState = reducer(state, action)
+
+  localStorage.setItem('savedSettings', JSON.stringify(
+    Object.assign({}, state, { version: process.env.version })
+  ))
+
+  return newState
+}

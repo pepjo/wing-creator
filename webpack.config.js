@@ -3,6 +3,7 @@
 
 const path = require('path')
 const webpack = require('webpack')
+const packge = require('./package.json')
 
 // https://github.com/halt-hammerzeit/webpack-isomorphic-tools
 const WebpackIsomorphicToolsPlugin = require('webpack-isomorphic-tools/plugin')
@@ -35,6 +36,7 @@ const configurations = [
       new webpack.DefinePlugin({
         'process.env': {
           NODE_ENV: '"production"',
+          version: `'${packge.version}'`,
         },
       }),
       new webpack.optimize.UglifyJsPlugin({
@@ -72,6 +74,7 @@ const configurations = [
       new webpack.DefinePlugin({
         'process.env': {
           NODE_ENV: '"development"',
+          version: `'${packge.version}'`,
         },
       }),
       // new webpack.HotModuleReplacementPlugin(),
