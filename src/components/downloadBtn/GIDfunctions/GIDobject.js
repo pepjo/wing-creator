@@ -9,7 +9,7 @@ import xml from 'xmlbuilder'
 import kratoskmdb from './auxiliar-files/kratos.kmdb'
 import kratosspd from './auxiliar-files/kratos.spd'
 
-export default class {
+export default class gidObject {
   constructor (objects, problemType) {
     this.objects = objects || {}
     this.problemType = problemType || 'NONE'
@@ -28,9 +28,15 @@ export default class {
   }
 
   vertexDependencyCounter (iObj, jVer) {
-    return this.objects[iObj].segments.filter((segment) => (
-      segment.findIndex((vertex) => (vertex === jVer)) !== -1
-    )).length
+    const objs = [this.objects[iObj]].concat(this.objects.reduce((all, obj) => (
+      obj.useVerticesFrom === iObj ? [...all, obj] : all
+    ), []))
+
+    return objs.map((obj) => (
+      obj.segments.filter((segment) => (
+        segment.findIndex((vertex) => (vertex === jVer)) !== -1
+      )).length
+    )).reduce((all, o) => (all + o))
   }
 
   generateVertices () {
@@ -51,7 +57,7 @@ export default class {
 
   generateVertex (n, iObj, jVer, vertex) {
     return `1 ${n + 1} 0 0 ${this.vertexDependencyCounter(iObj, jVer)} 0 0 ${iObj + 1} 0
-${vertex[0]} ${vertex[1]} ${vertex[2]}
+${vertex[0].toFixed(6)} ${vertex[1].toFixed(6)} ${vertex[2].toFixed(6)}
 `
   }
 
@@ -115,7 +121,7 @@ ${segment[0] + 1 + objPrevV} ${segment[1] + 1 + objPrevV}
   faceNormalCalculator (iObj, face) {
     const points = []
 
-    if (face[0][1] === 1) {
+    if (face[0][1] === 0) {
       const seg = this.objects[iObj].segments[face[0][0]]
       points.push(this.objects[iObj].vertices[seg[0]])
       points.push(this.objects[iObj].vertices[seg[1]])
@@ -136,7 +142,9 @@ ${segment[0] + 1 + objPrevV} ${segment[1] + 1 + objPrevV}
     const v1 = math.add(points[1], math.multiply(points[0], -1))
     const v2 = math.add(points[2], math.multiply(points[1], -1))
 
-    return math.cross(v1, v2).map((x) => `${x} `).join('').trim()
+    const normal = math.cross(v1, v2)
+
+    return math.divide(normal, math.norm(normal)).map((x) => `${x} `).join('').trim()
   }
 
   generateFaces () {

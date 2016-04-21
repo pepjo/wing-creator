@@ -12,11 +12,14 @@
 - [x] Check, when exporting profile 50 points beam 0.3; strange point below
 - [x] Check, the airfoil tip is wierd // Nothing to do, bad data
 - [ ] Finish spline
-- [ ] Add longer beam
-- [ ] Add fluid box
+- [x] Add longer beam
+- [x] Add fluid box
 - [x] Add kratos problem type and groups
       (over surface, under surface, root vertices)
 - [x] Add NACA
+- [x] When using the export option "useVerticesFrom", update the vertex dependecy counter
+- [x] Fix normal generator
+- [x] Fix box sentits
 - [ ] Add solids
 
 ### More post TFG todos
