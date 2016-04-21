@@ -20,6 +20,11 @@
 - [x] When using the export option "useVerticesFrom", update the vertex dependecy counter
 - [x] Fix normal generator
 - [x] Fix box sentits
+- [x] Add volumes
+- [ ] Export real fluid volume
+- [ ] Use new model (shared vertices and segments), more layers
+- [ ] Pre-apply conditions
+- [ ] Import result and apply boundary conditions to new simulation
 - [ ] Add solids
 
 ### More post TFG todos

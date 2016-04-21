@@ -101,11 +101,9 @@ class DownloadBtn extends React.Component {
         segments: this.props.meshes.fluidBoxMesh.segments,
         faces: this.props.meshes.fluidBoxMesh.facesFromSegments,
         groups: this.props.meshes.fluidBoxMesh.groups,
-        volumes: [],
+        volumes: this.props.meshes.fluidBoxMesh.volumes,
       })
     }
-
-    console.log(exportMeshes)
 
     const GITobj = new GIDobject(exportMeshes, this.props.exportSettings.problemType)
     GITobj.generateProjectZip('GIDwing')

@@ -41,6 +41,14 @@ describe('GIDobject', () => {
       })
     })
 
+    describe('and when we call generateVolumes', () => {
+      const text = GITobj.generateVolumes()
+
+      it('should generate the volumes correctly', () => {
+        expect(text).to.equal(data.volumesText)
+      })
+    })
+
     describe('and when we call generateString', () => {
       const text = GITobj.generateString()
 
@@ -50,6 +58,7 @@ describe('GIDobject', () => {
           data.verticesText +
           data.segmentsText +
           data.facesText +
+          data.volumesText +
           data.footer
         )
       })
@@ -77,6 +86,7 @@ describe('GIDobject', () => {
           data.verticesText +
           data.segmentsText +
           data.facesText +
+          data.volumesText +
           data.footer
         )
       })

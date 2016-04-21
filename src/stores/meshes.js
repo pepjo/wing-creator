@@ -34,6 +34,7 @@ const defaultState = {
     segments: undefined,
     facesFromSegments: undefined,
     groups: undefined,
+    volumes: undefined,
   },
 }
 

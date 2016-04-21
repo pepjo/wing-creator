@@ -25,6 +25,8 @@ export default class gidObject {
     this.segmentDependencyCounter = this.segmentDependencyCounter.bind(this)
     this.generateFile = this.generateFile.bind(this)
     this.generateLayersString = this.generateLayersString.bind(this)
+    this.generateVolumes = this.generateVolumes.bind(this)
+    this.generateVolume = this.generateVolume.bind(this)
   }
 
   vertexDependencyCounter (iObj, jVer) {
@@ -97,10 +99,14 @@ ${segment[0] + 1 + objPrevV} ${segment[1] + 1 + objPrevV}
   }
 
   faceDependencyCounter (iObj, jFac) {
-    return 0
+    return this.objects[iObj].volumes.filter((volume) => (
+      volume.findIndex((face) => (
+        face[0] === jFac
+      )) !== -1
+    )).length
   }
 
-  faceCenterCalculator (iObj, face) {
+  faceCenterCalculator (iObj, face, returnVector) {
     const points = []
     face.forEach((segment) => {
       const seg = this.objects[iObj].segments[segment[0]]
@@ -112,10 +118,17 @@ ${segment[0] + 1 + objPrevV} ${segment[1] + 1 + objPrevV}
       }
     })
 
-    return points.reduce((all, point) => {
+    const vector = points.reduce((all, point) => {
       const p = this.objects[iObj].vertices[point]
       return [all[0] + p[0], all[1] + p[1], all[2] + p[2]]
-    }, [0, 0, 0]).map((x) => (`${x / points.length} `)).join('').trim()
+    }, [0, 0, 0])
+    .map((x) => (x / points.length))
+
+    if (returnVector) {
+      return vector
+    }
+
+    return vector.map((x) => (`${x} `)).join('').trim()
   }
 
   faceNormalCalculator (iObj, face) {
@@ -143,8 +156,9 @@ ${segment[0] + 1 + objPrevV} ${segment[1] + 1 + objPrevV}
     const v2 = math.add(points[2], math.multiply(points[1], -1))
 
     const normal = math.cross(v1, v2)
+    const normalized = math.divide(normal, math.norm(normal))
 
-    return math.divide(normal, math.norm(normal)).map((x) => `${x} `).join('').trim()
+    return normalized.map((x) => `${x} `).join('').trim()
   }
 
   generateFaces () {
@@ -173,6 +187,38 @@ ${this.faceNormalCalculator(iObj, face)}
 `
   }
 
+  volumeCenterCalculator (iObj, volume) {
+    return volume.map((face) => (
+      this.faceCenterCalculator(iObj, this.objects[iObj].faces[face[0]], true)
+    )).reduce((prev, current) => (math.add(prev, current)))
+    .map((coord) => (`${coord / volume.length} `)).join('').trim()
+  }
+
+  generateVolumes () {
+    let nVolumes = -1 // So when we nVertices ++ first will become 0
+
+    return this.objects.reduce((volumes, object, i) => {
+      const objPrevF = this.objects
+        .filter((o, iO) => (iO < i))
+        .reduce((a, o) => (a + o.faces.length), 0)
+      return volumes.concat(
+        object.volumes.map((volume, j) => {
+          nVolumes++
+          return this.generateVolume(nVolumes, objPrevF, i, j, volume)
+        })
+      )
+    }, []).join('')
+  }
+
+  generateVolume (n, objPrevF, iObj, jVol, volume) {
+    return `9 ${n + 1} 0 0 0 0 0 ${iObj + 1} 0
+${volume.length}
+${volume.map((f) => (`${f[0] + 1 + objPrevF} `)).join('').trim()}
+${volume.map((f) => (`${f[1]} `)).join('').trim()}
+${this.volumeCenterCalculator(iObj, volume)}
+`
+  }
+
   generateLayersString () {
     return this.objects.map((o, i) => (`${i + 1} ${o.layer}`)).join('\n')
   }
@@ -192,11 +238,13 @@ ${this.faceNormalCalculator(iObj, face)}
     geo += this.generateVertices()
     geo += this.generateSegments()
     geo += this.generateFaces()
+    geo += this.generateVolumes()
     geo += template.footer
     // geo += testData.header
     // geo += testData.verticesText
     // geo += testData.segmentsText
     // geo += testData.facesText
+    // geo += testData.volumesText
     // geo += testData.footer
 
     return geo
