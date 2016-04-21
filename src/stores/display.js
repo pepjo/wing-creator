@@ -1,5 +1,5 @@
 
-import { PUSH_WINDOW_SIZE, UPDATE_DISPLAY_PARAM } from '../actions/display'
+import { PUSH_WINDOW_SIZE, UPDATE_DISPLAY_PARAM, CHANGE_TUTORIAL_STATE } from '../actions/display'
 
 // Set default state
 let height = 700
@@ -11,6 +11,7 @@ if (typeof window !== 'undefined') {
 const defaultState = {
   width,
   height,
+  tutorial: false,
   internalMesh: {
     material: 'solid',
     visible: true,
@@ -35,6 +36,9 @@ function newState (param, value, state) {
 
 export default (state = defaultState, action) => {
   switch (action.type) {
+    case CHANGE_TUTORIAL_STATE:
+      return Object.assign({}, state, { tutorial: action.state })
+
     case UPDATE_DISPLAY_PARAM:
       return Object.assign({}, state, newState(action.param, action.value, state))
 

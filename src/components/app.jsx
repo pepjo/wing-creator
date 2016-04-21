@@ -11,15 +11,18 @@ import AppBar from './interface/AppBar'
 import Viewer from './simpleViewer/simpleViewer'
 import Controls from './controls/Controls'
 import Container from './container'
+import Tutorial from './tutorial/Tutorial'
 
 // Actions
 import { replaceAirfoils } from '../actions/data'
+import { changeTutorialState } from '../actions/display'
 
 // Sytles
 import * as style from './app.style.js'
 
 const propTypes = {
   replaceAirfoils: React.PropTypes.func,
+  changeTutorialState: React.PropTypes.func,
 }
 
 function mapStateToProps () {
@@ -29,6 +32,7 @@ function mapStateToProps () {
 function mapDispatchToProps (dispatch) {
   return {
     replaceAirfoils: bindActionCreators(replaceAirfoils, dispatch),
+    changeTutorialState: bindActionCreators(changeTutorialState, dispatch),
   }
 }
 
@@ -61,9 +65,12 @@ class App extends React.Component {
   render () {
     return (
       <Container>
-        <AppBar />
+        <AppBar
+          changeTutorialState={this.props.changeTutorialState.bind(undefined, true)} // eslint-disable-line
+        />
         <Viewer />
         <Controls />
+        <Tutorial />
         <footer style={style.footer}>
           Built by <em>Pep Rodeja Ferrer</em><br />
           for my <em>UPC BarcelonaTech</em> final degree project

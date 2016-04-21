@@ -27,7 +27,10 @@ window.startApp = () => {
     process.env.NODE_ENV !== 'development'
   ) {
     initialState = savedSettings
+  } else if (window.location.hostname !== 'localhost') {
+    initialState.display.tutorial = true
   }
+
   const store = configureStore(initialState)
 
   ReactDom.render(
