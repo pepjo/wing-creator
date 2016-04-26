@@ -219,21 +219,55 @@ class Controls extends React.Component {
   }
   handleFileDrop (listFile, e) {
     const directory = e.dataTransfer.items[0].webkitGetAsEntry()
-    window.fs = directory
     if (directory.isDirectory && directory.name.split('.').pop() === 'gid') {
-      const reader = directory.createReader()
-      let files = []
+      const dReader = directory.createReader()
+      let allFiles = []
+      const parsedFiles = []
 
-      const cb = (file) => {
-        if (file.length !== 0) {
-          files = files.concat(file)
-          this.props.updateExportSetting('fluidSimulation', files)
+      const readFiles = () => {
+        const finish = () => {
+          if (allFiles.length === parsedFiles.length) {
+            this.props.updateExportSetting('fluidSimulation', parsedFiles)
+          }
+        }
+
+        const parseFile = (file) => {
+          const fReader = new FileReader()
+
+          fReader.onload = (ev) => {
+            parsedFiles.push({
+              isError: false,
+              data: ev.target.result,
+              fileName: file.name,
+            })
+            finish()
+          }
+
+          fReader.readAsText(file)
+        }
+
+        const parseErrorFile = () => {
+          parsedFiles.push({
+            isError: true,
+          })
+          finish()
+        }
+
+        allFiles.forEach((file) => {
+          file.file(parseFile, parseErrorFile)
+        })
+      }
+
+      const cb = (files) => {
+        if (files.length !== 0) {
+          allFiles = allFiles.concat(files)
+          dReader.readEntries(cb)
         } else {
-          reader.readEntries(cb)
+          readFiles()
         }
       }
 
-      reader.readEntries(cb)
+      dReader.readEntries(cb)
     } else {
       this.props.updateExportSetting('fluidSimulation', false)
     }
