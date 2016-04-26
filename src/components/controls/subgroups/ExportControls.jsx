@@ -41,6 +41,10 @@ function WingParametersControls ({
           primaryText="KRATOS structural"
         />
         <MenuItem
+          value="KRATOS_fluid"
+          primaryText="KRATOS fluid"
+        />
+        <MenuItem
           value="NONE"
           primaryText="No problem type defined"
         />

@@ -44,6 +44,7 @@ export default class ThreejsObject {
 
     const renderer = new THREE.WebGLRenderer({
       alpha: true,
+      antialias: true,
     })
     renderer.setPixelRatio(window.devicePixelRatio)
     renderer.setSize(size.width, size.height)
