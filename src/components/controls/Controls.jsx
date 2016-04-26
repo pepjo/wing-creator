@@ -110,6 +110,7 @@ class Controls extends React.Component {
     this.handleDisplayFluidBoxMaterialChange = this.handleDisplayFluidBoxMaterialChange.bind(this)
     this.handleDisplayFluidBoxMeshViewChange = this.handleDisplayFluidBoxMeshViewChange.bind(this)
     this.handleExportFluidBoxMeshChange = this.handleExportFluidBoxMeshChange.bind(this)
+    this.handleFileDrop = this.handleFileDrop.bind(this)
   }
 
   handleLengthChange (e) {
@@ -215,6 +216,27 @@ class Controls extends React.Component {
   handleFluidBoxXCoordChange (e) {
     this.props.changeGeometryParameter('fluidBox.x',
       proccessInputVal(e.target.value))
+  }
+  handleFileDrop (listFile, e) {
+    const directory = e.dataTransfer.items[0].webkitGetAsEntry()
+    window.fs = directory
+    if (directory.isDirectory && directory.name.split('.').pop() === 'gid') {
+      const reader = directory.createReader()
+      let files = []
+
+      const cb = (file) => {
+        if (file.length !== 0) {
+          files = files.concat(file)
+          this.props.updateExportSetting('fluidSimulation', files)
+        } else {
+          reader.readEntries(cb)
+        }
+      }
+
+      reader.readEntries(cb)
+    } else {
+      this.props.updateExportSetting('fluidSimulation', false)
+    }
   }
 
   handleAirfoilChange (e, index, value) {
@@ -354,6 +376,7 @@ class Controls extends React.Component {
               handleExportExternalMeshChange={this.handleExportExternalMeshChange}
               handleExportInternalMeshChange={this.handleExportInternalMeshChange}
               handleExportFluidBoxMeshChange={this.handleExportFluidBoxMeshChange}
+              handleFileDrop={this.handleFileDrop}
             />
           </Foldable>
         </Paper>

@@ -2,6 +2,7 @@
 import React from 'react'
 
 // Components
+import DropFile from 'react-dropzone'
 import SelectField from 'material-ui/SelectField'
 import MenuItem from 'material-ui/MenuItem'
 import Toggle from 'material-ui/Toggle'
@@ -19,6 +20,7 @@ const propTypes = {
   handleExportExternalMeshChange: React.PropTypes.func,
   handleExportInternalMeshChange: React.PropTypes.func,
   handleExportFluidBoxMeshChange: React.PropTypes.func,
+  handleFileDrop: React.PropTypes.func.isRequired,
 }
 
 function WingParametersControls ({
@@ -28,6 +30,7 @@ function WingParametersControls ({
   handleExportExternalMeshChange,
   handleExportInternalMeshChange,
   handleExportFluidBoxMeshChange,
+  handleFileDrop,
 }) {
   return (
     <div>
@@ -49,6 +52,30 @@ function WingParametersControls ({
           primaryText="No problem type defined"
         />
       </SelectField>
+      <DropFile
+        onDrop={handleFileDrop} dropEffect="copy"
+        style={{
+          width: 365, margin: '10px 0', padding: 5, border: '1px dashed #999', textAlign: 'center',
+        }}
+        activeStyle={{
+          border: '1px dashed #333', backgroundColor: '#ddd',
+        }}
+      >
+        {(() => {
+          if (exportSettings.fluidSimulation) {
+            return (
+              <span>File correctly uploaded (drag to replace)</span>
+            )
+          } else if (exportSettings.fluidSimulation === false) {
+            return (
+              <span>That was not a directory or your browser is not supported</span>
+            )
+          }
+          return (
+            <span>Drag here the .gid folder after the fluid simulation (only works on Chrome)</span>
+          )
+        })()}
+      </DropFile>
       <Toggle
         toggled={exportSettings.differentVertices}
         onToggle={handleExportDifferentVerticesChange}

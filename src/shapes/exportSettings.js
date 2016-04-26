@@ -6,4 +6,5 @@ export default PropTypes.shape({
   differentVertices: PropTypes.bool,
   externalMesh: PropTypes.bool,
   internalMesh: PropTypes.bool,
+  fluidSimulation: PropTypes.any, // File blob
 })

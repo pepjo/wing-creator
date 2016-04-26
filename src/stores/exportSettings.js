@@ -7,6 +7,7 @@ const defaultState = {
   externalMesh: true,
   internalMesh: true,
   fluidBoxMesh: true,
+  fluidSimulation: null,
 }
 
 function newState (param, value) {
