@@ -154,7 +154,7 @@ class DownloadBtn extends React.Component {
           actions={actions}
           modal={false}
           open={this.state.open}
-          onRequestClose={this.handleClose}
+          onRequestClose={this.handleCloseDialog}
         >
           If you have an airfoil selected the download should start any moment.<br /><br />
           You will need GID 12 or newer; grab your free copy here:

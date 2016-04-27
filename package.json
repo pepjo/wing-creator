@@ -1,7 +1,7 @@
 {
-  "name": "factures",
+  "name": "wing-creator",
   "version": "0.0.3",
-  "description": "Software per organitzar factures",
+  "description": "Design and export wings to GID",
   "main": "index.js",
   "scripts": {
     "start": "nf start",
@@ -17,7 +17,7 @@
     "watch": "parallelshell \"npm run watch-react-server\" \"npm run watch-react-client\""
   },
   "author": "Pep Rodeja",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "dependencies": {
     "axios": "^0.9.1",
     "babel-polyfill": "^6.7.4",
