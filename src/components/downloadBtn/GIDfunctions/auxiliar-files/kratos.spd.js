@@ -125,7 +125,9 @@ export default `<?xml version='1.0' encoding='utf-8'?>
                 <Container id="AxisymLinePressureLoad" pid="Over Axisym Lines" nDim="2D" axiSym="Yes" class="Groups" idTemplate="LinePressure" GiDEntity="line" GiDValidMesh="Triangle,Quadrilateral" strucType="Solid,Generic" icon="groupsTreeNew.gif" help="Axisymmetric Line Face Pressure" open="0"/>
                 <Container id="BeamPressure3D" pid="Over Lines" nDim="3D" class="Groups" idTemplate="LinePressure" GiDEntity="line" GiDValidMesh="Linear" strucType="Beam" icon="groupsTreeNew.gif" help="Line Pressure in 3D" open="0"/>
                 <Container id="SurfacePressureLoad2D" pid="Over Surfaces" nDim="2D" axiSym="No" class="Groups" idTemplate="FacePressure" GiDEntity="surface" GiDValidMesh="Triangle,Quadrilateral" strucType="Plate" icon="groupsTreeNew.gif" help="Define Surface Pressure" open="0"/>
-                <Container id="SurfacePressureLoad3D" pid="Over Surfaces" nDim="3D" class="Groups" idTemplate="FacePressure" GiDEntity="surface" GiDValidMesh="Triangle,Quadrilateral,Tetrahedra,Hexahedra" strucType="Shell,Membrane,Solid,Generic" icon="groupsTreeNew.gif" help="Define Surface Load" open="0"/>
+                <Container id="SurfacePressureLoad3D" pid="Over Surfaces" nDim="3D" class="Groups" idTemplate="FacePressure" GiDEntity="surface" GiDValidMesh="Triangle,Quadrilateral,Tetrahedra,Hexahedra" strucType="Shell,Membrane,Solid,Generic" icon="groupsTreeNew.gif" help="Define Surface Load" open="0">
+                  {{pressureContent}}
+                </Container>
             </Container>
             <Item id="IncrementalLoad" pid="Incremental" soluType="Dynamic,Quasi-Static,Pseudo-Dynamic" dv="No" ivalues="Yes,No" values="Yes,No" help="Incremental Loads"/>
         </Container>

@@ -27,6 +27,10 @@ export default class gidObject {
     this.generateLayersString = this.generateLayersString.bind(this)
     this.generateVolumes = this.generateVolumes.bind(this)
     this.generateVolume = this.generateVolume.bind(this)
+    this.generareSurfaceLoad = this.generareSurfaceLoad.bind(this)
+    this.parseGroupEntities = this.parseGroupEntities.bind(this)
+    this.fillXmlEntitiesGroup = this.fillXmlEntitiesGroup.bind(this)
+    this.convertToKratosGroup = this.convertToKratosGroup.bind(this)
   }
 
   vertexDependencyCounter (iObj, jVer) {
@@ -268,47 +272,84 @@ ${this.volumeCenterCalculator(iObj, volume)}
     return new Blob([buf], { type: 'text/plain;charset=us-ascii' })
   }
 
-  stringifyXMLGroup (group, id, iObj, groups, eGroups) {
-    const j = eGroups.children.length
-    const le = group.entities.reduce((total, ent) => (
-      total + (ent[1] - ent[0]) + 1
-    ), 0)
+  parseGroupEntities (type, entities, iObj) {
     let offset = 0
 
-    if (group.type === 'points' && iObj !== 0) {
+    if (type === 'points' && iObj !== 0) {
       offset = this.objects
         .filter((o, iO) => (iO < iObj))
         .reduce((a, o) => (a + o.vertices.length), 0)
-    } else if (group.type === 'segments' && iObj !== 0) {
+    } else if (type === 'segments' && iObj !== 0) {
       offset = this.objects
         .filter((o, iO) => (iO < iObj))
         .reduce((a, o) => (a + o.segments.length), 0)
-    } else if (group.type === 'faces' && iObj !== 0) {
+    } else if (type === 'surfaces' && iObj !== 0) {
       offset = this.objects
         .filter((o, iO) => (iO < iObj))
         .reduce((a, o) => (a + o.faces.length), 0)
     }
 
-    groups.ele('group', { id, name: group.name, color: group.color })
-    eGroups.ele('entities_group', { name: group.type })
+    return [].concat.apply([], entities.map((ent) => {
+      if (ent instanceof Array) {
+        return math.range(ent[0] + offset, ent[1] + offset, true)._data
+      }
+      return ent + offset
+    }))
+  }
 
-    eGroups.children[j].ele(
+  fillXmlEntitiesGroup (xmlTag) {
+    xmlTag.ele(
       'vector',
-      { name: 'entity_ids', length: le, type: 'integer' },
-      group.entities.reduce((s, ent) => (
-        `${s} ${ent[0] + offset + 1}:${ent[1] + offset + 1}`
-      ), '').trim()
+      { name: 'entity_ids', length: 0, type: 'integer' }
     )
-    eGroups.children[j].ele(
+    xmlTag.ele(
       'vector',
-      { name: 'entity_num_groups', length: le, type: 'ushort' },
-      `1x${le}`
+      { name: 'entity_num_groups', length: 0, type: 'ushort' }
     )
-    eGroups.children[j].ele(
+    xmlTag.ele(
       'vector',
-      { name: 'entity_groups', length: le, type: 'ushort' },
-      `1x${le}`
+      { name: 'entity_groups', length: 0, type: 'ushort' }
     )
+  }
+
+  convertToKratosGroup (entities) {
+    return entities.reduce((unique, group, i) => {
+      if (group) {
+        // For each entity
+        for (const ent of group) {
+          // If its not in ids
+          const index = unique.ids.findIndex((uE) => (ent === uE))
+          if (index === -1) {
+            unique.ids.push(ent)
+            unique.num.push(1)
+            unique.groups.push([i])
+          } else {
+            unique.num[index] += 1 // eslint-disable-line
+            unique.groups[index].push(i) // eslint-disable-line
+          }
+        }
+      }
+      return unique
+    }, { ids: [], num: [], groups: [] })
+  }
+
+  populateXmlEntitiesGroup (xmleGroup, kratos) {
+    xmleGroup.children[0].att('length', kratos.ids.length)
+    xmleGroup.children[0].txt(kratos.ids.map((i) => (i + 1)).join(' '))
+
+    xmleGroup.children[1].att('length', kratos.num.length)
+    xmleGroup.children[1].txt(kratos.num.join(' '))
+
+    let groups = []
+    for (const group of kratos.groups) {
+      if (group instanceof Array) {
+        groups = groups.concat(group)
+      } else {
+        groups.push(group)
+      }
+    }
+    xmleGroup.children[2].att('length', groups.length)
+    xmleGroup.children[2].txt(groups.join(' '))
   }
 
   generateKratosPrjFile () {
@@ -316,7 +357,16 @@ ${this.volumeCenterCalculator(iObj, volume)}
     prj.att('version', '11.1')
     const pre = prj.ele('pre')
     const groups = pre.ele('groups')
+    const xmlgroup = []
     const eGroups = pre.ele('entities_groups')
+    const xmleGroup = {}
+
+    const data = {
+      points: [],
+      segments: [],
+      surfaces: [],
+    }
+
     let nGroups = 0
 
     this.objects.forEach((object, iObj) => {
@@ -324,24 +374,64 @@ ${this.volumeCenterCalculator(iObj, volume)}
         object.groups.forEach((group) => {
           if (group.type === 'points') {
             nGroups++
-            this.stringifyXMLGroup(
-              group,
-              nGroups,
-              object.useVerticesFrom || iObj,
-              groups,
-              eGroups,
+            data.points[nGroups] = this.parseGroupEntities(
+              'vertices',
+              group.entities,
+              object.useVerticesFrom || iObj
             )
+            if (typeof xmleGroup.points === 'undefined') {
+              xmleGroup.points = eGroups.ele('entities_group', { name: 'points' })
+              this.fillXmlEntitiesGroup(xmleGroup.points)
+            }
+          } else if (group.type === 'surfaces') {
+            nGroups++
+            data.surfaces[nGroups] = this.parseGroupEntities(
+              'surfaces',
+              group.entities,
+              iObj
+            )
+            if (typeof xmleGroup.surfaces === 'undefined') {
+              xmleGroup.surfaces = eGroups.ele('entities_group', { name: 'surfaces' })
+              this.fillXmlEntitiesGroup(xmleGroup.surfaces)
+            }
           } else {
             throw new Error('not yet implemented')
           }
+          xmlgroup.push(groups.ele('group', { id: nGroups, name: group.name, color: group.color }))
         })
       }
     })
+
+    if (xmleGroup.points) {
+      const kratos = this.convertToKratosGroup(data.points)
+      this.populateXmlEntitiesGroup(xmleGroup.points, kratos)
+    }
+
+    if (xmleGroup.surfaces) {
+      const kratos = this.convertToKratosGroup(data.surfaces)
+      this.populateXmlEntitiesGroup(xmleGroup.surfaces, kratos)
+    }
 
     if (groups.children.length > 0) {
       return prj.end({ pretty: true })
     }
     return null
+  }
+
+  // Returns a string with the xml surface
+  generareSurfaceLoad () {
+    /* eslint-disable */
+    
+    return `<Container id="PresLoadOverSurf1" pid="PresLoadOverSurf1" class="Group" icon="groupsTree.gif" help="Define the positive or negative face pressure" open="1" active="1">
+      <Container id="MainProperties" pid="New property" state="hidden" help="Values">
+        <Item id="FixPressure" pid="Fix pressure" dv="1" ivalues="1,0" values="1,0" help="Fix pressure"/>
+        <Item id="PressureType" pid="Face type" dv="Positive" ivalues="Positive,Negative" values="Positive,Negative" help="Defines which side of the face that matches the direction of the normal to the surface, positive or negative"/>
+        <Item id="PressureValue" pid="Pressure value" dv="11" help="Pressure value"/>
+      </Container>
+    </Container>
+    `
+    
+    /* eslint-enable */
   }
 
   // Returns blob in a promise
@@ -354,7 +444,9 @@ ${this.volumeCenterCalculator(iObj, volume)}
 
     if (this.problemType === 'KRATOS_structural') {
       gid.file(`${filename}.kmdb`, kratoskmdb)
-      gid.file(`${filename}.spd`, kratosspd)
+
+      const kratosspdfile = kratosspd.replace('{{pressureContent}}', this.generareSurfaceLoad())
+      gid.file(`${filename}.spd`, kratosspdfile)
 
       const prj = this.generateKratosPrjFile()
       if (prj) {

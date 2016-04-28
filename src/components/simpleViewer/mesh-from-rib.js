@@ -2,76 +2,6 @@
 import THREE from 'three'
 import math from 'mathjs'
 
-export function generateFluidBoxMesh (geometry) {
-  const fb = geometry.fluidBox
-  const wl = geometry.wingParameters.length
-  const z0 = wl / 2
-  const x0 = - fb.x
-
-  const mesh = {
-    vertices: [
-      new THREE.Vector3(x0, fb.height * wl / 2, z0), // 0
-      new THREE.Vector3(x0, fb.height * wl / 2, z0 - fb.width * wl),
-      new THREE.Vector3(x0, - fb.height * wl / 2, z0 - fb.width * wl),
-      new THREE.Vector3(x0, - fb.height * wl / 2, z0),
-
-      new THREE.Vector3(x0 + fb.length * wl, fb.height * wl / 2, z0), // 4
-      new THREE.Vector3(x0 + fb.length * wl, fb.height * wl / 2, z0 - fb.width * wl),
-      new THREE.Vector3(x0 + fb.length * wl, - fb.height * wl / 2, z0 - fb.width * wl),
-      new THREE.Vector3(x0 + fb.length * wl, - fb.height * wl / 2, z0),
-    ],
-    faces: [
-      new THREE.Face3(0, 1, 2), // 0
-      new THREE.Face3(0, 2, 3),
-
-      new THREE.Face3(4, 6, 5), // 2
-      new THREE.Face3(4, 7, 6),
-
-      new THREE.Face3(0, 7, 4), // 4
-      new THREE.Face3(0, 3, 7),
-
-      new THREE.Face3(0, 5, 1), // 6
-      new THREE.Face3(0, 4, 5),
-
-      new THREE.Face3(1, 5, 6), // 8
-      new THREE.Face3(1, 6, 2),
-
-      new THREE.Face3(3, 2, 6), // 10
-      new THREE.Face3(3, 6, 7),
-    ],
-    segments: [
-      [0, 1], // 0
-      [1, 2],
-      [2, 3], // 2
-      [3, 0],
-
-      [4, 5], // 4
-      [5, 6],
-      [6, 7], // 6
-      [7, 4],
-
-      [0, 4], // 8
-      [1, 5],
-      [2, 6], // 10
-      [3, 7],
-    ],
-    facesFromSegments: [
-      [[0, 0], [1, 0], [2, 0], [3, 0]],
-      [[7, 1], [6, 1], [5, 1], [4, 1]],
-      [[8, 0], [4, 0], [9, 1], [0, 1]],
-      [[9, 0], [5, 0], [10, 1], [1, 1]],
-      [[10, 0], [6, 0], [11, 1], [2, 1]],
-      [[11, 0], [7, 0], [8, 1], [3, 1]],
-    ],
-    volumes: [
-      [[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0]],
-    ],
-    groups: [],
-  }
-
-  return mesh
-}
-
 export function generateInternalMesh (geometry, shell, ribGen) {
   const mesh = {
     vertices: [],
@@ -231,6 +161,14 @@ export function generateExternalMesh (geometry, shell, ribGen) {
             [prevASeg + j, 1], // In prev rib segment
             [cASeg + l + j, 1], // Rib to rib segment
           ])
+          mesh.groups.push({
+            name: `extSurface_${mesh.facesFromSegments.length}`,
+            type: 'surfaces',
+            color: '#999999ff',
+            entities: [
+              mesh.facesFromSegments.length - 1,
+            ],
+          })
         }
 
         mesh.segments.push([le + (l - 1), le - 1])
@@ -241,6 +179,14 @@ export function generateExternalMesh (geometry, shell, ribGen) {
           [prevASeg + (l - 1), 1], // In prev rib segment
           [cASeg + l + (l - 1), 1], // Rib to rib segment
         ])
+        mesh.groups.push({
+          name: `extSurface_${mesh.facesFromSegments.length}`,
+          type: 'surfaces',
+          color: '#999999ff',
+          entities: [
+            mesh.facesFromSegments.length - 1,
+          ],
+        })
 
         faces.push(new THREE.Face3(le + rib.vertices.length - 1, le, le - 1))
         faces.push(new THREE.Face3(le - 1, le, le - rib.vertices.length))
@@ -266,4 +212,74 @@ export function generateExternalMesh (geometry, shell, ribGen) {
     return mesh
   }
   return null
+}
+
+export function generateFluidBoxMesh (geometry) {
+  const fb = geometry.fluidBox
+  const wl = geometry.wingParameters.length
+  const z0 = wl / 2
+  const x0 = - fb.x
+
+  const mesh = {
+    vertices: [
+      new THREE.Vector3(x0, fb.height * wl / 2, z0), // 0
+      new THREE.Vector3(x0, fb.height * wl / 2, z0 - fb.width * wl),
+      new THREE.Vector3(x0, - fb.height * wl / 2, z0 - fb.width * wl),
+      new THREE.Vector3(x0, - fb.height * wl / 2, z0),
+
+      new THREE.Vector3(x0 + fb.length * wl, fb.height * wl / 2, z0), // 4
+      new THREE.Vector3(x0 + fb.length * wl, fb.height * wl / 2, z0 - fb.width * wl),
+      new THREE.Vector3(x0 + fb.length * wl, - fb.height * wl / 2, z0 - fb.width * wl),
+      new THREE.Vector3(x0 + fb.length * wl, - fb.height * wl / 2, z0),
+    ],
+    faces: [
+      new THREE.Face3(0, 1, 2), // 0
+      new THREE.Face3(0, 2, 3),
+
+      new THREE.Face3(4, 6, 5), // 2
+      new THREE.Face3(4, 7, 6),
+
+      new THREE.Face3(0, 7, 4), // 4
+      new THREE.Face3(0, 3, 7),
+
+      new THREE.Face3(0, 5, 1), // 6
+      new THREE.Face3(0, 4, 5),
+
+      new THREE.Face3(1, 5, 6), // 8
+      new THREE.Face3(1, 6, 2),
+
+      new THREE.Face3(3, 2, 6), // 10
+      new THREE.Face3(3, 6, 7),
+    ],
+    segments: [
+      [0, 1], // 0
+      [1, 2],
+      [2, 3], // 2
+      [3, 0],
+
+      [4, 5], // 4
+      [5, 6],
+      [6, 7], // 6
+      [7, 4],
+
+      [0, 4], // 8
+      [1, 5],
+      [2, 6], // 10
+      [3, 7],
+    ],
+    facesFromSegments: [
+      [[0, 0], [1, 0], [2, 0], [3, 0]],
+      [[7, 1], [6, 1], [5, 1], [4, 1]],
+      [[8, 0], [4, 0], [9, 1], [0, 1]],
+      [[9, 0], [5, 0], [10, 1], [1, 1]],
+      [[10, 0], [6, 0], [11, 1], [2, 1]],
+      [[11, 0], [7, 0], [8, 1], [3, 1]],
+    ],
+    volumes: [
+      [[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0]],
+    ],
+    groups: [],
+  }
+
+  return mesh
 }

@@ -48,6 +48,22 @@ export const objectData = [{
         [3, 5],
       ],
     },
+    {
+      name: 'group2',
+      type: 'points',
+      color: '#000000',
+      entities: [
+        [1, 4],
+      ],
+    },
+    {
+      name: 'surf1',
+      type: 'surfaces',
+      color: '#000000',
+      entities: [
+        2,
+      ],
+    },
   ],
 }]
 
@@ -175,12 +191,19 @@ export const groupsfile = `<?xml version="1.0"?>
   <pre>
     <groups>
       <group id="1" name="group1" color="#000000"/>
+      <group id="2" name="group2" color="#000000"/>
+      <group id="3" name="surf1" color="#000000"/>
     </groups>
     <entities_groups>
       <entities_group name="points">
-        <vector name="entity_ids" length="5" type="integer">1:2 4:6</vector>
-        <vector name="entity_num_groups" length="5" type="ushort">1x5</vector>
-        <vector name="entity_groups" length="5" type="ushort">1x5</vector>
+        <vector name="entity_ids" length="6" type="integer">1 2 4 5 6 3</vector>
+        <vector name="entity_num_groups" length="6" type="ushort">1 2 2 2 1 1</vector>
+        <vector name="entity_groups" length="9" type="ushort">1 1 2 1 2 1 2 1 2</vector>
+      </entities_group>
+      <entities_group name="surfaces">
+        <vector name="entity_ids" length="1" type="integer">3</vector>
+        <vector name="entity_num_groups" length="1" type="ushort">1</vector>
+        <vector name="entity_groups" length="1" type="ushort">3</vector>
       </entities_group>
     </entities_groups>
   </pre>
