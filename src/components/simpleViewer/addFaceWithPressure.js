@@ -19,11 +19,13 @@ export default function (mesh, segments, loads) {
   })
 
   // Add loads to the face
-  mesh.loads.push({
-    goupName: `extSurface_${mesh.facesFromSegments.length}`,
-    type: 'SurfacePressureLoad3D',
-    fixPressure: 1,
-    pressureType: 'Positive',
-    pressureValue: (loads[0] + loads[1] + loads[2] + loads[3]) / 4,
-  })
+  if (!isNaN(loads[0])) {
+    mesh.loads.push({
+      goupName: `extSurface_${mesh.facesFromSegments.length}`,
+      type: 'SurfacePressureLoad3D',
+      fixPressure: 1,
+      pressureType: 'Positive',
+      pressureValue: (loads[0] + loads[1] + loads[2] + loads[3]) / 4,
+    })
+  }
 }
