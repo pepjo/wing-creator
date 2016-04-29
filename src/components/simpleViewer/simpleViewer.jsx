@@ -40,6 +40,7 @@ const propTypes = {
   externalMesh: React.PropTypes.object,
   fluidBoxMesh: React.PropTypes.object,
   airfoilShell: React.PropTypes.object,
+  fluidSimulation: React.PropTypes.array,
 }
 
 function mapStateToProps (state) {
@@ -53,6 +54,7 @@ function mapStateToProps (state) {
     externalMesh: state.meshes.externalMesh,
     fluidBoxMesh: state.meshes.fluidBoxMesh,
     airfoilShell: state.meshes.airfoilShell,
+    fluidSimulation: state.exportSettings.fluidSimulation,
   }
 }
 
@@ -111,6 +113,10 @@ class Viewer extends React.Component {
         prevGeometry.wingParameters.tip !== geometry.wingParameters.tip ||
         prevGeometry.wingParameters.sweep !== geometry.wingParameters.sweep) {
       this.generateInternalMesh()
+      this.generateExternalMesh()
+    }
+
+    if (prevProps.fluidSimulation !== this.props.fluidSimulation) {
       this.generateExternalMesh()
     }
 
@@ -271,7 +277,7 @@ class Viewer extends React.Component {
     const geometry = this.props.geometry
     const shell = this.props.airfoilShell
 
-    const mesh = generateExternalMesh(geometry, shell, this.generateRib)
+    const mesh = generateExternalMesh(geometry, shell, this.generateRib, this.props.fluidSimulation)
     if (mesh) {
       this.props.updateExternalMesh(mesh)
     }

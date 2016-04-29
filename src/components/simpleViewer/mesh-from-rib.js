@@ -2,6 +2,9 @@
 import THREE from 'three'
 import math from 'mathjs'
 
+import addFacesWithPressure from './addFaceWithPressure'
+import getPressureFromVertices from './getPressureFromVertices'
+
 export function generateInternalMesh (geometry, shell, ribGen) {
   const mesh = {
     vertices: [],
@@ -125,7 +128,7 @@ export function generateInternalMesh (geometry, shell, ribGen) {
   return null
 }
 
-export function generateExternalMesh (geometry, shell, ribGen) {
+export function generateExternalMesh (geometry, shell, ribGen, fluidSimulation) {
   const mesh = {
     vertices: [],
     faces: [],
@@ -134,6 +137,10 @@ export function generateExternalMesh (geometry, shell, ribGen) {
     groups: [],
     loads: [],
   }
+
+  // Each time we add a vertice, we add the corresponding pressure here.
+  // If we did this when we add a face it would take longer since each vertice is in 4 faces
+  let verticesPressure = []
 
   if (shell.vertices) {
     let prevASeg = 0 // prevSegmentIndexAirfoilStart
@@ -145,6 +152,9 @@ export function generateExternalMesh (geometry, shell, ribGen) {
       const cASeg = mesh.segments.length // currentSegmentIndexAirfoilStart
 
       mesh.vertices = mesh.vertices.concat(rib.vertices)
+      verticesPressure = verticesPressure.concat(
+        getPressureFromVertices(rib.vertices, fluidSimulation)
+      )
       mesh.segments = mesh.segments.concat(rib.segments)
       const faces = []
 
@@ -156,52 +166,40 @@ export function generateExternalMesh (geometry, shell, ribGen) {
 
           mesh.segments.push([le + j, le - l + j])
 
-          mesh.facesFromSegments.push([
-            [cASeg + j, 0], // In rib segment
-            [cASeg + l + j + 1, 0], // Rib to rib segment
-            [prevASeg + j, 1], // In prev rib segment
-            [cASeg + l + j, 1], // Rib to rib segment
-          ])
-          mesh.groups.push({
-            name: `extSurface_${mesh.facesFromSegments.length}`,
-            type: 'surfaces',
-            color: '#999999ff',
-            entities: [
-              mesh.facesFromSegments.length - 1,
+          addFacesWithPressure(
+            mesh,
+            [
+              cASeg + j, // In rib segment
+              cASeg + l + j + 1, // Rib to rib segment
+              prevASeg + j, // In prev rib segment
+              cASeg + l + j, // Rib to rib segment
             ],
-          })
-          mesh.loads.push({
-            goupName: `extSurface_${mesh.facesFromSegments.length}`,
-            type: 'SurfacePressureLoad3D',
-            fixPressure: 1,
-            pressureType: 'Positive',
-            pressureValue: 12,
-          })
+            [
+              verticesPressure[le + j],
+              verticesPressure[le + j + 1],
+              verticesPressure[le + j - l],
+              verticesPressure[le + j + 1 - l],
+            ]
+          )
         }
 
         mesh.segments.push([le + (l - 1), le - 1])
 
-        mesh.facesFromSegments.push([
-          [cASeg + (l - 1), 0], // In rib segment
-          [cASeg + l, 0], // Rib to rib segment
-          [prevASeg + (l - 1), 1], // In prev rib segment
-          [cASeg + l + (l - 1), 1], // Rib to rib segment
-        ])
-        mesh.groups.push({
-          name: `extSurface_${mesh.facesFromSegments.length}`,
-          type: 'surfaces',
-          color: '#999999ff',
-          entities: [
-            mesh.facesFromSegments.length - 1,
+        addFacesWithPressure(
+          mesh,
+          [
+            cASeg + (l - 1), // In rib segment
+            cASeg + l, // Rib to rib segment
+            prevASeg + (l - 1), // In prev rib segment
+            cASeg + l + (l - 1), // Rib to rib segment
           ],
-        })
-        mesh.loads.push({
-          goupName: `extSurface_${mesh.facesFromSegments.length}`,
-          type: 'SurfacePressureLoad3D',
-          fixPressure: 1,
-          pressureType: 'Positive',
-          pressureValue: 12,
-        })
+          [
+            verticesPressure[le + rib.vertices.length - 1],
+            verticesPressure[le],
+            verticesPressure[le - 1],
+            verticesPressure[le - rib.vertices.length],
+          ]
+        )
 
         faces.push(new THREE.Face3(le + rib.vertices.length - 1, le, le - 1))
         faces.push(new THREE.Face3(le - 1, le, le - rib.vertices.length))
