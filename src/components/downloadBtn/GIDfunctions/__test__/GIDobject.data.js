@@ -183,7 +183,7 @@ kratos.gid\\Kratos\\kratos 0
 /* eslint-disable */
 export const footer = `0
 0
-0.085
+0.1
 0
 12.0.8
 1 0 0 1 2 0 0.6 0 0 0
@@ -226,6 +226,11 @@ export const conditionsFile = `<Container id="surf1" pid="surf1" class="Group" i
     <Item id="PressureValue" pid="Pressure value" dv="12" help="Pressure value"/>
   </Container>
 </Container>
+`
+
+export const conditionsFileGroups = `<Group id="group1" color="{#000000}" state="1" type="Generic"/>
+<Group id="group2" color="{#000000}" state="1" type="Generic"/>
+<Group id="surf1" color="{#000000}" state="1" type="Generic"/>
 `
 
 /* eslint-enable */

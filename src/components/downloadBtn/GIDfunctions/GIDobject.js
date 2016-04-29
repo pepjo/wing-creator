@@ -443,7 +443,18 @@ ${this.volumeCenterCalculator(iObj, volume)}
       }
     }
 
-    return kratosspd.replace('{{pressureContent}}', content)
+    const groups = this.objects.reduce((string, object) => {
+      let s = string
+      if (typeof object.groups !== 'undefined') {
+        object.groups.forEach((group) => {
+          s += `<Group id="${group.name}" color="{${group.color}}" state="1" type="Generic"/>
+`
+        })
+      }
+      return s
+    }, '')
+
+    return kratosspd.replace('{{pressureContent}}', content).replace('{{GroupsContent}}', groups)
   }
 
   // Returns blob in a promise

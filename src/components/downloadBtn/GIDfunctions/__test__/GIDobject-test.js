@@ -106,7 +106,11 @@ describe('GIDobject', () => {
       const text = GITobj.generareSpdFile()
 
       it('should generate the file correctly', () => {
-        expect(text).to.equal(spdFile.replace('{{pressureContent}}', data.conditionsFile))
+        expect(text).to.equal(
+          spdFile
+          .replace('{{pressureContent}}', data.conditionsFile)
+          .replace('{{GroupsContent}}', data.conditionsFileGroups)
+        )
       })
     })
   })
