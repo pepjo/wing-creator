@@ -65,6 +65,15 @@ export const objectData = [{
       ],
     },
   ],
+  loads: [
+    {
+      type: 'SurfacePressureLoad3D',
+      goupName: 'surf1',
+      fixPressure: 1,
+      pressureType: 'Positive',
+      pressureValue: 12,
+    },
+  ],
 }]
 
 export const verticesText = `1 1 0 0 3 0 0 1 0
@@ -208,3 +217,15 @@ export const groupsfile = `<?xml version="1.0"?>
     </entities_groups>
   </pre>
 </gid>`
+
+/* eslint-disable */
+export const conditionsFile = `<Container id="surf1" pid="surf1" class="Group" icon="groupsTree.gif" help="Define the positive or negative face pressure" open="0" active="1">
+  <Container id="MainProperties" pid="New property" state="hidden" help="Values">
+    <Item id="FixPressure" pid="Fix pressure" dv="1" ivalues="1,0" values="1,0" help="Fix pressure"/>
+    <Item id="PressureType" pid="Face type" dv="Positive" ivalues="Positive,Negative" values="Positive,Negative" help="Defines which side of the face that matches the direction of the normal to the surface, positive or negative"/>
+    <Item id="PressureValue" pid="Pressure value" dv="12" help="Pressure value"/>
+  </Container>
+</Container>
+`
+
+/* eslint-enable */

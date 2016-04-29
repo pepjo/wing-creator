@@ -62,6 +62,7 @@ class DownloadBtn extends React.Component {
         faces: this.props.meshes.internalMesh.facesFromSegments,
         groups: this.props.meshes.internalMesh.groups,
         volumes: [],
+        loads: this.props.meshes.internalMesh.loads,
       })
     }
 
@@ -86,6 +87,7 @@ class DownloadBtn extends React.Component {
         faces: this.props.meshes.externalMesh.facesFromSegments,
         groups: this.props.meshes.externalMesh.groups,
         volumes: [],
+        loads: this.props.meshes.externalMesh.loads,
         useVerticesFrom,
       })
     }

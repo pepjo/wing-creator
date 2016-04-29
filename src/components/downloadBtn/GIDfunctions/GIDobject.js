@@ -27,7 +27,7 @@ export default class gidObject {
     this.generateLayersString = this.generateLayersString.bind(this)
     this.generateVolumes = this.generateVolumes.bind(this)
     this.generateVolume = this.generateVolume.bind(this)
-    this.generareSurfaceLoad = this.generareSurfaceLoad.bind(this)
+    this.generareSpdFile = this.generareSpdFile.bind(this)
     this.parseGroupEntities = this.parseGroupEntities.bind(this)
     this.fillXmlEntitiesGroup = this.fillXmlEntitiesGroup.bind(this)
     this.convertToKratosGroup = this.convertToKratosGroup.bind(this)
@@ -418,20 +418,32 @@ ${this.volumeCenterCalculator(iObj, volume)}
     return null
   }
 
-  // Returns a string with the xml surface
-  generareSurfaceLoad () {
-    /* eslint-disable */
-    
-    return `<Container id="PresLoadOverSurf1" pid="PresLoadOverSurf1" class="Group" icon="groupsTree.gif" help="Define the positive or negative face pressure" open="1" active="1">
-      <Container id="MainProperties" pid="New property" state="hidden" help="Values">
-        <Item id="FixPressure" pid="Fix pressure" dv="1" ivalues="1,0" values="1,0" help="Fix pressure"/>
-        <Item id="PressureType" pid="Face type" dv="Positive" ivalues="Positive,Negative" values="Positive,Negative" help="Defines which side of the face that matches the direction of the normal to the surface, positive or negative"/>
-        <Item id="PressureValue" pid="Pressure value" dv="11" help="Pressure value"/>
-      </Container>
-    </Container>
-    `
-    
-    /* eslint-enable */
+  // Returns a string with the xml spd file
+  generareSpdFile () {
+    let content = ''
+
+    for (const object of this.objects) {
+      if (object.loads instanceof Array) {
+        for (const load of object.loads) {
+          if (load.type === 'SurfacePressureLoad3D') {
+            /* eslint-disable */
+            content += `<Container id="${load.goupName}" pid="${load.goupName}" class="Group" icon="groupsTree.gif" help="Define the positive or negative face pressure" open="0" active="1">
+  <Container id="MainProperties" pid="New property" state="hidden" help="Values">
+    <Item id="FixPressure" pid="Fix pressure" dv="${load.fixPressure}" ivalues="1,0" values="1,0" help="Fix pressure"/>
+    <Item id="PressureType" pid="Face type" dv="${load.pressureType}" ivalues="Positive,Negative" values="Positive,Negative" help="Defines which side of the face that matches the direction of the normal to the surface, positive or negative"/>
+    <Item id="PressureValue" pid="Pressure value" dv="${load.pressureValue}" help="Pressure value"/>
+  </Container>
+</Container>
+`
+            /* eslint-enable */
+          } else {
+            throw new Error('Load type not yet implemented')
+          }
+        }
+      }
+    }
+
+    return kratosspd.replace('{{pressureContent}}', content)
   }
 
   // Returns blob in a promise
@@ -445,8 +457,10 @@ ${this.volumeCenterCalculator(iObj, volume)}
     if (this.problemType === 'KRATOS_structural') {
       gid.file(`${filename}.kmdb`, kratoskmdb)
 
-      const kratosspdfile = kratosspd.replace('{{pressureContent}}', this.generareSurfaceLoad())
-      gid.file(`${filename}.spd`, kratosspdfile)
+      const kratosspdfile = this.generareSpdFile()
+      if (kratosspdfile) {
+        gid.file(`${filename}.spd`, kratosspdfile)
+      }
 
       const prj = this.generateKratosPrjFile()
       if (prj) {

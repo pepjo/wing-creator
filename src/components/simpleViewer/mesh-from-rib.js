@@ -132,6 +132,7 @@ export function generateExternalMesh (geometry, shell, ribGen) {
     segments: [],
     facesFromSegments: [],
     groups: [],
+    loads: [],
   }
 
   if (shell.vertices) {
@@ -169,6 +170,13 @@ export function generateExternalMesh (geometry, shell, ribGen) {
               mesh.facesFromSegments.length - 1,
             ],
           })
+          mesh.loads.push({
+            goupName: `extSurface_${mesh.facesFromSegments.length}`,
+            type: 'SurfacePressureLoad3D',
+            fixPressure: 1,
+            pressureType: 'Positive',
+            pressureValue: 12,
+          })
         }
 
         mesh.segments.push([le + (l - 1), le - 1])
@@ -186,6 +194,13 @@ export function generateExternalMesh (geometry, shell, ribGen) {
           entities: [
             mesh.facesFromSegments.length - 1,
           ],
+        })
+        mesh.loads.push({
+          goupName: `extSurface_${mesh.facesFromSegments.length}`,
+          type: 'SurfacePressureLoad3D',
+          fixPressure: 1,
+          pressureType: 'Positive',
+          pressureValue: 12,
         })
 
         faces.push(new THREE.Face3(le + rib.vertices.length - 1, le, le - 1))

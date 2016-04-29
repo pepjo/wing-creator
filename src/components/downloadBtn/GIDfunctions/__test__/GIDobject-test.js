@@ -3,6 +3,8 @@ import chai from 'chai'
 import GIDobject from '../GIDobject'
 import * as data from './GIDobject.data'
 
+import spdFile from '../auxiliar-files/kratos.spd'
+
 const expect = chai.expect
 
 describe('GIDobject', () => {
@@ -97,6 +99,14 @@ describe('GIDobject', () => {
 
       it('should generate the file correctly', () => {
         expect(text).to.equal(data.groupsfile)
+      })
+    })
+
+    describe('and when we call generateKratosSpdFile', () => {
+      const text = GITobj.generareSpdFile()
+
+      it('should generate the file correctly', () => {
+        expect(text).to.equal(spdFile.replace('{{pressureContent}}', data.conditionsFile))
       })
     })
   })
