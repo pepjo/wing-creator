@@ -7,7 +7,8 @@ import xml from 'xmlbuilder'
 
 // Files
 import kratoskmdb from './auxiliar-files/kratos.kmdb'
-import kratosspd from './auxiliar-files/kratos.spd'
+import kratosspdstr from './auxiliar-files/kratos-str.spd'
+import kratosspdflu from './auxiliar-files/kratos-flu.spd'
 
 export default class gidObject {
   constructor (objects, problemType) {
@@ -231,7 +232,7 @@ ${this.volumeCenterCalculator(iObj, volume)}
     let geo = ''
     let header
 
-    if (this.problemType === 'KRATOS_structural') {
+    if (this.problemType === 'KRATOS_structural' || this.problemType === 'KRATOS_fluid') {
       header = template.header
         .replace('UNKNOWN', 'kratos.gid\\Kratos\\kratos')
     } else {
@@ -454,7 +455,13 @@ ${this.volumeCenterCalculator(iObj, volume)}
       return s
     }, '')
 
-    return kratosspd.replace('{{pressureContent}}', content).replace('{{GroupsContent}}', groups)
+    if (this.problemType === 'KRATOS_structural') {
+      return kratosspdstr.replace('{{pressureContent}}', content)
+        .replace('{{GroupsContent}}', groups)
+    } else if (this.problemType === 'KRATOS_fluid') {
+      return kratosspdflu.replace('{{GroupsContent}}', groups)
+    }
+    throw new Error('Problem type not implemented')
   }
 
   // Returns blob in a promise
@@ -465,7 +472,7 @@ ${this.volumeCenterCalculator(iObj, volume)}
     const gid = zip.folder(`${filename}.gid`)
     gid.file(`${filename}.geo`, file)
 
-    if (this.problemType === 'KRATOS_structural') {
+    if (this.problemType === 'KRATOS_structural' || this.problemType === 'KRATOS_fluid') {
       gid.file(`${filename}.kmdb`, kratoskmdb)
 
       const kratosspdfile = this.generareSpdFile()
