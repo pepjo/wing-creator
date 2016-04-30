@@ -131,7 +131,8 @@ class Viewer extends React.Component {
       prevGeometry.fluidBox.width !== geometry.fluidBox.width ||
       prevGeometry.fluidBox.height !== geometry.fluidBox.height ||
       prevGeometry.fluidBox.length !== geometry.fluidBox.length ||
-      prevGeometry.fluidBox.x !== geometry.fluidBox.x
+      prevGeometry.fluidBox.x !== geometry.fluidBox.x ||
+      prevGeometry.fluidBox.angle !== geometry.fluidBox.angle
     ) {
       this.generateFluidBoxMesh()
     }

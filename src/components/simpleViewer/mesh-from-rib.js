@@ -228,22 +228,45 @@ export function generateExternalMesh (geometry, shell, ribGen, fluidSimulation) 
 }
 
 export function generateFluidBoxMesh (geometry) {
+  const angle = - geometry.fluidBox.angle / 180 * math.pi
   const fb = geometry.fluidBox
   const wl = geometry.wingParameters.length
   const z0 = wl / 2
   const x0 = - fb.x
 
+  let vertices = [
+    [x0, fb.height * wl / 2, z0],
+    [x0, fb.height * wl / 2, z0 - fb.width * wl],
+    [x0, - fb.height * wl / 2, z0 - fb.width * wl],
+    [x0, - fb.height * wl / 2, z0],
+
+    [x0 + fb.length * wl, fb.height * wl / 2, z0],
+    [x0 + fb.length * wl, fb.height * wl / 2, z0 - fb.width * wl],
+    [x0 + fb.length * wl, - fb.height * wl / 2, z0 - fb.width * wl],
+    [x0 + fb.length * wl, - fb.height * wl / 2, z0],
+  ]
+
+  const rotation = [
+    [math.cos(angle), -math.sin(angle), 0],
+    [math.sin(angle), math.cos(angle), 0],
+    [0, 0, 1],
+  ]
+
+  vertices = vertices.map((vertex) => (
+    math.multiply(vertex, rotation)
+  ))
+
   const mesh = {
     vertices: [
-      new THREE.Vector3(x0, fb.height * wl / 2, z0), // 0
-      new THREE.Vector3(x0, fb.height * wl / 2, z0 - fb.width * wl),
-      new THREE.Vector3(x0, - fb.height * wl / 2, z0 - fb.width * wl),
-      new THREE.Vector3(x0, - fb.height * wl / 2, z0),
+      new THREE.Vector3(vertices[0][0], vertices[0][1], vertices[0][2]), // 0
+      new THREE.Vector3(vertices[1][0], vertices[1][1], vertices[1][2]),
+      new THREE.Vector3(vertices[2][0], vertices[2][1], vertices[2][2]),
+      new THREE.Vector3(vertices[3][0], vertices[3][1], vertices[3][2]),
 
-      new THREE.Vector3(x0 + fb.length * wl, fb.height * wl / 2, z0), // 4
-      new THREE.Vector3(x0 + fb.length * wl, fb.height * wl / 2, z0 - fb.width * wl),
-      new THREE.Vector3(x0 + fb.length * wl, - fb.height * wl / 2, z0 - fb.width * wl),
-      new THREE.Vector3(x0 + fb.length * wl, - fb.height * wl / 2, z0),
+      new THREE.Vector3(vertices[4][0], vertices[4][1], vertices[4][2]), // 4
+      new THREE.Vector3(vertices[5][0], vertices[5][1], vertices[5][2]),
+      new THREE.Vector3(vertices[6][0], vertices[6][1], vertices[6][2]),
+      new THREE.Vector3(vertices[7][0], vertices[7][1], vertices[7][2]),
     ],
     faces: [
       new THREE.Face3(0, 1, 2), // 0

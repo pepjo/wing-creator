@@ -35,6 +35,7 @@ export const fluidBoxShape = PropTypes.shape({
   height: PropTypes.number,
   length: PropTypes.number,
   x: PropTypes.number,
+  angle: PropTypes.number,
 })
 
 export default PropTypes.shape({

@@ -111,6 +111,7 @@ class Controls extends React.Component {
     this.handleDisplayFluidBoxMeshViewChange = this.handleDisplayFluidBoxMeshViewChange.bind(this)
     this.handleExportFluidBoxMeshChange = this.handleExportFluidBoxMeshChange.bind(this)
     this.handleFileDrop = this.handleFileDrop.bind(this)
+    this.handleFluidBoxAngleChange = this.handleFluidBoxAngleChange.bind(this)
   }
 
   handleLengthChange (e) {
@@ -215,6 +216,10 @@ class Controls extends React.Component {
   }
   handleFluidBoxXCoordChange (e) {
     this.props.changeGeometryParameter('fluidBox.x',
+      proccessInputVal(e.target.value))
+  }
+  handleFluidBoxAngleChange (e) {
+    this.props.changeGeometryParameter('fluidBox.angle',
       proccessInputVal(e.target.value))
   }
   handleFileDrop (val) {
@@ -346,6 +351,7 @@ class Controls extends React.Component {
               handleFluidBoxLengthChange={this.handleFluidBoxLengthChange}
               handleFluidBoxHeightChange={this.handleFluidBoxHeightChange}
               handleFluidBoxXCoordChange={this.handleFluidBoxXCoordChange}
+              handleFluidBoxAngleChange={this.handleFluidBoxAngleChange}
             />
           </Foldable>
           <Foldable

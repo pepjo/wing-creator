@@ -26,7 +26,7 @@
   - [x] Add a pressure value for each surface (for test)
   - [x] Estimate the pressure value from the results and apply it
 - [x] Import result
-- [ ] Add angular attack as a parameter
+- [x] Add angle of attack as a parameter
 - [ ] Add solids
 - [ ] Export real fluid volume
 - [ ] Use new model (shared vertices and segments), more layers

@@ -16,6 +16,7 @@ const propTypes = {
   handleFluidBoxLengthChange: React.PropTypes.func.isRequired,
   handleFluidBoxHeightChange: React.PropTypes.func.isRequired,
   handleFluidBoxXCoordChange: React.PropTypes.func.isRequired,
+  handleFluidBoxAngleChange: React.PropTypes.func.isRequired,
 }
 
 function AirfoilControls ({
@@ -24,6 +25,7 @@ function AirfoilControls ({
   handleFluidBoxLengthChange,
   handleFluidBoxHeightChange,
   handleFluidBoxXCoordChange,
+  handleFluidBoxAngleChange,
 }) {
   return (
     <div>
@@ -50,6 +52,12 @@ function AirfoilControls ({
         onChange={handleFluidBoxXCoordChange}
         style={style.field} inputStyle={style.input}
         floatingLabelText="x [m]" type="number"
+      />
+      <TextField
+        value={fluidBox.angle}
+        onChange={handleFluidBoxAngleChange}
+        style={style.field} inputStyle={style.input}
+        floatingLabelText="Angle of attack [º]" type="number"
       />
     </div>
   )

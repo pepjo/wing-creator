@@ -36,6 +36,7 @@ const defaultState = {
     height: 0.5,
     length: 2.5,
     x: 5,
+    angle: 3,
   },
 }
 
