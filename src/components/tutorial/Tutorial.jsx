@@ -125,8 +125,14 @@ class ComponentName extends React.Component {
           onRequestClose={this.handleClose}
           bodyStyle={{ overflowY: 'auto' }}
         >
-          You mau just use it to generate some wing geometry, but this app has been designed to
-          work with the following workflow:
+          <p>
+            This software has been designed as a tool for my final degree tesis. It is not concieved
+            as a final product and thus it may have errors especially on edge cases.
+          </p>
+          <p>
+            You may just use it to generate some wing geometry, but this app has been designed to
+            work with the following workflow:
+          </p>
           <div style={{ position: 'relative' }}>
             <Stepper activeStep={stepIndex} orientation="vertical">
               <Step>
