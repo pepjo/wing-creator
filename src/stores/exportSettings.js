@@ -8,6 +8,7 @@ const defaultState = {
   internalMesh: true,
   fluidBoxMesh: true,
   fluidSimulation: null,
+  meshFile: null,
 }
 
 function newState (param, value) {

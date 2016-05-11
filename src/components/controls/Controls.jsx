@@ -110,7 +110,8 @@ class Controls extends React.Component {
     this.handleDisplayFluidBoxMaterialChange = this.handleDisplayFluidBoxMaterialChange.bind(this)
     this.handleDisplayFluidBoxMeshViewChange = this.handleDisplayFluidBoxMeshViewChange.bind(this)
     this.handleExportFluidBoxMeshChange = this.handleExportFluidBoxMeshChange.bind(this)
-    this.handleFileDrop = this.handleFileDrop.bind(this)
+    this.handleFluidFileDrop = this.handleFluidFileDrop.bind(this)
+    this.handleMeshFileDrop = this.handleMeshFileDrop.bind(this)
     this.handleFluidBoxAngleChange = this.handleFluidBoxAngleChange.bind(this)
   }
 
@@ -222,8 +223,14 @@ class Controls extends React.Component {
     this.props.changeGeometryParameter('fluidBox.angle',
       proccessInputVal(e.target.value))
   }
-  handleFileDrop (val) {
+  handleFluidFileDrop (val) {
     this.props.updateExportSetting('fluidSimulation', val)
+  }
+  handleMeshFileDrop (msh, prj) {
+    this.props.updateExportSetting('meshFile', {
+      msh,
+      prj,
+    })
   }
 
   handleAirfoilChange (e, index, value) {
@@ -364,7 +371,8 @@ class Controls extends React.Component {
               handleExportExternalMeshChange={this.handleExportExternalMeshChange}
               handleExportInternalMeshChange={this.handleExportInternalMeshChange}
               handleExportFluidBoxMeshChange={this.handleExportFluidBoxMeshChange}
-              handleFileDrop={this.handleFileDrop}
+              handleFluidFileDrop={this.handleFluidFileDrop}
+              handleMeshFileDrop={this.handleMeshFileDrop}
             />
           </Foldable>
         </Paper>

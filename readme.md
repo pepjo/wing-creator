@@ -31,8 +31,8 @@
 - [ ] Export real fluid volume
 - [ ] Use new model (shared vertices and segments), more layers
 - [x] Correct root section
-- [ ] Export root non displacement
-- [ ] Upload gid file with mesh and conditions
+- [x] Export root non displacement
+- [x] Upload gid file with mesh and conditions
 - [ ] Export mesh file and nodes and elements and materials (take them from the file before)
 
 ### More post TFG todos

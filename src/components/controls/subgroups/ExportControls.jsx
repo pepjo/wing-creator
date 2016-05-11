@@ -22,7 +22,8 @@ const propTypes = {
   handleExportExternalMeshChange: React.PropTypes.func,
   handleExportInternalMeshChange: React.PropTypes.func,
   handleExportFluidBoxMeshChange: React.PropTypes.func,
-  handleFileDrop: React.PropTypes.func.isRequired,
+  handleFluidFileDrop: React.PropTypes.func.isRequired,
+  handleMeshFileDrop: React.PropTypes.func.isRequired,
 }
 
 class WingParametersControls extends React.Component {
@@ -30,7 +31,8 @@ class WingParametersControls extends React.Component {
     super(props)
 
     this.handleCloseDialog = this.handleCloseDialog.bind(this)
-    this.handleFileDrop = this.handleFileDrop.bind(this)
+    this.handleFluidFileDrop = this.handleFluidFileDrop.bind(this)
+    this.handleMeshFileDrop = this.handleMeshFileDrop.bind(this)
     this.choseMesh = this.choseMesh.bind(this)
     this.selectMeshFile = this.selectMeshFile.bind(this)
     this.selectMesh = this.selectMesh.bind(this)
@@ -177,14 +179,14 @@ class WingParametersControls extends React.Component {
         }
       })
 
-      this.props.handleFileDrop(finalData)
+      this.props.handleFluidFileDrop(finalData)
       this.handleCloseDialog()
     } else {
       alert('No surface mesh selected')
     }
   }
 
-  handleFileDrop (listFile, e) {
+  handleFluidFileDrop (listFile, e) {
     const directory = e.dataTransfer.items[0].webkitGetAsEntry()
     if (directory.isDirectory && directory.name.split('.').pop() === 'gid') {
       const dReader = directory.createReader()
@@ -240,7 +242,78 @@ class WingParametersControls extends React.Component {
 
       dReader.readEntries(cb)
     } else {
-      this.props.handleFileDrop(false)
+      this.props.handleFluidFileDrop(false)
+    }
+  }
+
+  handleMeshFileDrop (listFile, e) {
+    const directory = e.dataTransfer.items[0].webkitGetAsEntry()
+    if (directory.isDirectory && directory.name.split('.').pop() === 'gid') {
+      const dReader = directory.createReader()
+      let allFiles = []
+      const parsedFiles = []
+
+      const readFiles = () => {
+        const finish = () => {
+          if (allFiles.length === parsedFiles.length) {
+            let name = directory.name.split('.')
+            name.pop()
+            name = name.join('.')
+
+            const msh = parsedFiles.find((file) => (
+              file.fileName === `${name}.msh`
+            ))
+            const prj = parsedFiles.find((file) => (
+              file.fileName === `${name}.prj`
+            ))
+
+            this.props.handleMeshFileDrop(msh, prj)
+          }
+        }
+
+        const parseFile = (file) => {
+          const fReader = new FileReader()
+
+          fReader.onload = (ev) => {
+            parsedFiles.push({
+              isError: false,
+              data: ev.target.result,
+              fileName: file.name,
+              extension: file.name.split('.').pop(),
+            })
+            finish()
+          }
+
+          fReader.readAsText(file)
+        }
+
+        const parseErrorFile = () => {
+          parsedFiles.push({
+            isError: true,
+          })
+          finish()
+        }
+
+        allFiles = allFiles.filter((file) => {
+          if (file.isFile) {
+            file.file(parseFile, parseErrorFile)
+          }
+          return file.isFile
+        })
+      }
+
+      const cb = (files) => {
+        if (files.length !== 0) {
+          allFiles = allFiles.concat(files)
+          dReader.readEntries(cb)
+        } else {
+          readFiles()
+        }
+      }
+
+      dReader.readEntries(cb)
+    } else {
+      this.props.handleMeshFileDrop(false)
     }
   }
 
@@ -293,7 +366,7 @@ class WingParametersControls extends React.Component {
           />
         </SelectField>
         <DropFile
-          onDrop={this.handleFileDrop} dropEffect="copy"
+          onDrop={this.handleFluidFileDrop} dropEffect="copy"
           style={{
             width: 365, margin: '10px 0', padding: 5, border: '1px dashed #999',
             textAlign: 'center',
@@ -315,6 +388,33 @@ class WingParametersControls extends React.Component {
             return (
               <span>
                 Drag here the .gid folder after the fluid simulation (only works on Chrome)
+              </span>
+            )
+          })()}
+        </DropFile>
+        <DropFile
+          onDrop={this.handleMeshFileDrop} dropEffect="copy"
+          style={{
+            width: 365, margin: '10px 0', padding: 5, border: '1px dashed #999',
+            textAlign: 'center',
+          }}
+          activeStyle={{
+            border: '1px dashed #333', backgroundColor: '#ddd',
+          }}
+        >
+          {(() => {
+            if (exportSettings.meshFile) {
+              return (
+                <span>File correctly uploaded (drag to replace)</span>
+              )
+            } else if (exportSettings.meshFile === false) {
+              return (
+                <span>That was not a directory or your browser is not supported</span>
+              )
+            }
+            return (
+              <span>
+                Drag here the .gid folder after the mesh generation (only works on Chrome)
               </span>
             )
           })()}
