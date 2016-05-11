@@ -12,6 +12,7 @@ export function generateInternalMesh (geometry, shell, ribGen) {
     segments: [],
     facesFromSegments: [],
     groups: [],
+    boundaryConditions: [],
   }
 
   if (shell.vertices) {
@@ -19,6 +20,7 @@ export function generateInternalMesh (geometry, shell, ribGen) {
     let rootBeamVertices = []
     let rootBeamSegment = 0
     let prevSegmentIndex = 0
+    let rootGroupIndex = 0
 
     for (let i = 0; i < geometry.structureParameters.ribs; i++) {
       const rib = ribGen(i, mesh.segments.length)
@@ -63,6 +65,7 @@ export function generateInternalMesh (geometry, shell, ribGen) {
         // Save vertices for beam extension
         rootBeamVertices = beamVertices
         rootBeamSegment = mesh.segments.length - 1
+        rootGroupIndex = mesh.groups.length
 
         // Add root group
         mesh.groups.push({
@@ -72,6 +75,17 @@ export function generateInternalMesh (geometry, shell, ribGen) {
           entities: [
             [0, rib.vertices.length - 1],
           ],
+        })
+
+        mesh.boundaryConditions.push({
+          type: 'Displacements',
+          goupName: 'surf1',
+          x: 0,
+          y: 0,
+          z: 0,
+          fx: 1,
+          fy: 1,
+          fz: 1,
         })
       }
 
@@ -97,7 +111,9 @@ export function generateInternalMesh (geometry, shell, ribGen) {
       ))
 
       // Add this to vertices to the intern route group
-      mesh.groups[0].entities.push([mesh.vertices.length - 2, mesh.vertices.length - 1])
+      mesh.groups[rootGroupIndex].entities.push(
+        [mesh.vertices.length - 2, mesh.vertices.length - 1]
+      )
 
       // Add beam extension threes faces
       const l = mesh.vertices.length

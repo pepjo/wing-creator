@@ -54,6 +54,11 @@ class DownloadBtn extends React.Component {
       const internalVertices = this.props.meshes.internalMesh.vertices.map((vertex) => (
         [vertex.x, vertex.y, vertex.z]
       ))
+      let bc
+
+      if (this.props.exportSettings.problemType === 'KRATOS_structural') {
+        bc = this.props.meshes.internalMesh.boundaryConditions
+      }
 
       exportMeshes.push({
         layer: 'Internal 0 1 0 0 0',
@@ -63,6 +68,7 @@ class DownloadBtn extends React.Component {
         groups: this.props.meshes.internalMesh.groups,
         volumes: [],
         loads: this.props.meshes.internalMesh.loads,
+        boundaryConditions: bc,
       })
     }
 
@@ -88,6 +94,7 @@ class DownloadBtn extends React.Component {
         groups: this.props.meshes.externalMesh.groups,
         volumes: [],
         loads: this.props.meshes.externalMesh.loads,
+        boundaryConditions: this.props.meshes.externalMesh.boundaryConditions,
         useVerticesFrom,
       })
     }

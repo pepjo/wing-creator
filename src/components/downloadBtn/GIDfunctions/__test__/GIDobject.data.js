@@ -74,6 +74,18 @@ export const objectData = [{
       pressureValue: 12,
     },
   ],
+  boundaryConditions: [
+    {
+      type: 'Displacements',
+      goupName: 'surf1',
+      x: 0,
+      y: 0,
+      z: 0,
+      fx: 1,
+      fy: 1,
+      fz: 1,
+    },
+  ],
 }]
 
 export const verticesText = `1 1 0 0 3 0 0 1 0
@@ -225,6 +237,20 @@ export const conditionsFile = `<Container id="surf1" pid="surf1" class="Group" i
     <Item id="PressureType" pid="Face type" dv="Positive" ivalues="Positive,Negative" values="Positive,Negative" help="Defines which side of the face that matches the direction of the normal to the surface, positive or negative"/>
     <Item id="PressureValue" pid="Pressure value" dv="12" help="Pressure value"/>
   </Container>
+</Container>
+`
+
+export const conditionsFileBoundary = `<Container id="internalRoot" pid="internalRoot" class="Group" icon="groupsTree.gif" help="Activation" open="1" active="1">
+    <Container id="Values" pid="Values" help="Set the values" open="0">
+        <Item id="Vx" pid="X" dv="0" help="X coordinate" state="normal"/>
+        <Item id="Vy" pid="Y" dv="0" help="Y coordinate" state="normal"/>
+        <Item id="Vz" pid="Z" dv="0" nDim="3D" help="Z coordinate" state="disabled"/>
+    </Container>
+    <Container id="Activation" pid="Fixed" help="Fix/release some degree of freedom" open="0">
+        <Item id="Ax" pid="X active" dv="1" ivalues="1,0" values="1,0" help="Fix X degree of freedom"/>
+        <Item id="Ay" pid="Y active" dv="1" ivalues="1,0" values="1,0" help="Fix Y degree of freedom"/>
+        <Item id="Az" pid="Z active" dv="1" nDim="3D" ivalues="1,0" values="1,0" help="Fix Z degree of freedom"/>
+    </Container>
 </Container>
 `
 

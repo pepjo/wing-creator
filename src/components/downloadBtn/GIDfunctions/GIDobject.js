@@ -455,9 +455,37 @@ ${this.volumeCenterCalculator(iObj, volume)}
       return s
     }, '')
 
+    const displacementsBC = this.objects.reduce((string, object) => {
+      let s = string
+      if (typeof object.boundaryConditions !== 'undefined') {
+        object.boundaryConditions.forEach((bc) => {
+          if (bc.type === 'Displacements') {
+            /* eslint-disable */
+            s += `<Container id="internalRoot" pid="internalRoot" class="Group" icon="groupsTree.gif" help="Activation" open="1" active="1">
+    <Container id="Values" pid="Values" help="Set the values" open="0">
+        <Item id="Vx" pid="X" dv="${bc.x}" help="X coordinate" state="normal"/>
+        <Item id="Vy" pid="Y" dv="${bc.y}" help="Y coordinate" state="normal"/>
+        <Item id="Vz" pid="Z" dv="${bc.z}" nDim="3D" help="Z coordinate" state="disabled"/>
+    </Container>
+    <Container id="Activation" pid="Fixed" help="Fix/release some degree of freedom" open="0">
+        <Item id="Ax" pid="X active" dv="${bc.fx}" ivalues="1,0" values="1,0" help="Fix X degree of freedom"/>
+        <Item id="Ay" pid="Y active" dv="${bc.fy}" ivalues="1,0" values="1,0" help="Fix Y degree of freedom"/>
+        <Item id="Az" pid="Z active" dv="${bc.fz}" nDim="3D" ivalues="1,0" values="1,0" help="Fix Z degree of freedom"/>
+    </Container>
+</Container>
+`
+          /* eslint-enable */
+          }
+        })
+      }
+      return s
+    }, '')
+
     if (this.problemType === 'KRATOS_structural') {
-      return kratosspdstr.replace('{{pressureContent}}', content)
+      return kratosspdstr
+        .replace('{{pressureContent}}', content)
         .replace('{{GroupsContent}}', groups)
+        .replace('{{DisplacementsBCcontent}}', displacementsBC)
     } else if (this.problemType === 'KRATOS_fluid') {
       return kratosspdflu.replace('{{GroupsContent}}', groups)
     }

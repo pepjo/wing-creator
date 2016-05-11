@@ -3,7 +3,7 @@ import chai from 'chai'
 import GIDobject from '../GIDobject'
 import * as data from './GIDobject.data'
 
-import spdFile from '../auxiliar-files/kratos.spd'
+import spdFile from '../auxiliar-files/kratos-str.spd'
 
 const expect = chai.expect
 
@@ -110,6 +110,7 @@ describe('GIDobject', () => {
           spdFile
           .replace('{{pressureContent}}', data.conditionsFile)
           .replace('{{GroupsContent}}', data.conditionsFileGroups)
+          .replace('{{DisplacementsBCcontent}}', data.conditionsFileBoundary)
         )
       })
     })
