@@ -111,6 +111,8 @@ describe('GIDobject', () => {
           .replace('{{pressureContent}}', data.conditionsFile)
           .replace('{{GroupsContent}}', data.conditionsFileGroups)
           .replace('{{DisplacementsBCcontent}}', data.conditionsFileBoundary)
+          .replace('{{propertiesContent}}', data.properties)
+          .replace('{{shellElements}}', data.shellElements)
         )
       })
     })

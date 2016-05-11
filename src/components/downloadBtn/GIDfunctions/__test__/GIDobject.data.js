@@ -86,6 +86,20 @@ export const objectData = [{
       fz: 1,
     },
   ],
+  properties: [
+    {
+      name: 'Aluminium',
+      material: 'Steel_AISI1059',
+      element: 'Shell',
+    },
+  ],
+  elements: [
+    {
+      group: 'AllSurfaces',
+      property: 'Property1',
+      element: 'Quadrilateral',
+    },
+  ],
 }]
 
 export const verticesText = `1 1 0 0 3 0 0 1 0
@@ -214,6 +228,7 @@ export const groupsfile = `<?xml version="1.0"?>
       <group id="1" name="group1" color="#000000"/>
       <group id="2" name="group2" color="#000000"/>
       <group id="3" name="surf1" color="#000000"/>
+      <group id="4" name="AllSurfaces" color="#000000"/>
     </groups>
     <entities_groups>
       <entities_group name="points">
@@ -222,9 +237,9 @@ export const groupsfile = `<?xml version="1.0"?>
         <vector name="entity_groups" length="9" type="ushort">1 1 2 1 2 1 2 1 2</vector>
       </entities_group>
       <entities_group name="surfaces">
-        <vector name="entity_ids" length="1" type="integer">3</vector>
-        <vector name="entity_num_groups" length="1" type="ushort">1</vector>
-        <vector name="entity_groups" length="1" type="ushort">3</vector>
+        <vector name="entity_ids" length="6" type="integer">3 1 2 4 5 6</vector>
+        <vector name="entity_num_groups" length="6" type="ushort">2 1 1 1 1 1</vector>
+        <vector name="entity_groups" length="7" type="ushort">3 4 4 4 4 4 4</vector>
       </entities_group>
     </entities_groups>
   </pre>
@@ -254,9 +269,36 @@ export const conditionsFileBoundary = `<Container id="internalRoot" pid="interna
 </Container>
 `
 
+export const properties = `<Container id="Property1" pid="Property1" class="Property" icon="propsTree.gif" help="Property" open="0">
+    <Container id="MainProperties" pid="Aluminium" state="hidden" help="Values">
+        <Item id="ElemType" pid="Property type" dv="Shell" state="normal" ivalues="Beam,Shell,Membrane,Solid" values="Beam,Shell,Membrane,Solid" help="Element type"/>
+        <Item id="MatModel" pid="Constitutive law" state="normal" dv="Elastic-Isotropic" GCV="MatModel" help="Material model"/>
+        <Item id="Material" pid="Material" dv="Steel_AISI1059" state="normal" GCV="Materials" help="Material"/>
+        <Item id="Thickness" pid="Thickness" state="normal" dv="1.0" help="Thickness"/>
+        <Item id="SectionType" pid="Section type" state="normal" dv="UserDefined" GCV="SectType" help="Select the section type"/>
+        <Item id="ProfileDB" pid="Profile list" state="normal" dv="" GCV="ProfileType" help="Select the profile from the list"/>
+        <Item id="Area" pid="Area" dv="1.0" state="normal" help="Cross section area"/>
+        <Item id="InertiaIx" pid="Inertia Ix" state="normal" dv="1.0" help="Moment of inertia Ix"/>
+        <Item id="InertiaIy" pid="Inertia Iy" state="normal" dv="1.0" help="Moment of inertia Iy"/>
+        <Item id="RectangularHeight" pid="Height" state="normal" dv="1.0" help="Height value"/>
+        <Item id="RectangularWidth" pid="Width" state="normal" dv="1.0" help="Width value"/>
+        <Item id="CircularDiameter" pid="Diameter" state="normal" dv="1.0" help="Diameter value"/>
+    </Container>
+</Container>
+`
+
+export const shellElements = `<Container id="AllSurfaces" pid="AllSurfaces" class="Group" icon="groupsTree.gif" help="Thick shell formulation" open="1" active="1">
+    <Container id="Properties" pid="Element Properties" state="hidden" help="Properties">
+        <Item id="ElementType" pid="Element type" dv="Quadrilateral" ivalues="Quadrilateral" values="Quadrilateral" help="Element Type"/>
+        <Item id="Property" pid="Property" dv="Property1" GCV="Properties" help="Property"/>
+    </Container>
+</Container>
+`
+
 export const conditionsFileGroups = `<Group id="group1" color="{#000000}" state="1" type="Generic"/>
 <Group id="group2" color="{#000000}" state="1" type="Generic"/>
 <Group id="surf1" color="{#000000}" state="1" type="Generic"/>
+<Group id="AllSurfaces" color="{#000000}" state="1" type="Generic"/>
 `
 
 /* eslint-enable */

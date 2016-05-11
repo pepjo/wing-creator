@@ -81,7 +81,9 @@ export default `<?xml version='1.0' encoding='utf-8'?>
                 <Item id="MaximumIterations" pid="Maximum iterations" dv="30" help="Newton-Raphson iterations stop when the maximum is reached"/>
             </Container>
         </Container>
-        <Container id="Properties" pid="Properties" class="Properties" idTemplate="PropertiesStruct" icon="propsTreeNew.gif" help="Add a new Property" open="0"/>
+        <Container id="Properties" pid="Properties" class="Properties" idTemplate="PropertiesStruct" icon="propsTreeNew.gif" help="Add a new Property" open="0"
+          {{propertiesContent}}
+        </Container>
         <Container id="Elements" pid="Elements" help="Elements" open="0" icon="femelements.gif">
             <Container id="PlaneStress2D" pid="Plane Stress" class="Groups" nDim="2D" axiSym="No" kinemType="SmallDisplacements" GiDEntity="surface" GiDValidMesh="Triangle,Quadrilateral" strucType="Solid,Generic" idTemplate="Solid2DElement" icon="femelements.gif" help="Small Displacement 2D Plane Stress" open="0"/>
             <Container id="PlaneStrain2D" pid="Plane Strain" class="Groups" nDim="2D" axiSym="No" kinemType="SmallDisplacements" GiDEntity="surface" GiDValidMesh="Triangle,Quadrilateral" strucType="Solid" idTemplate="Solid2DElement" icon="femelements.gif" help="Small Displacement 2D Plane Strain" open="0"/>
@@ -89,7 +91,9 @@ export default `<?xml version='1.0' encoding='utf-8'?>
             <Container id="SolidElement3D" pid="Solid Element" class="Groups" nDim="3D" kinemType="SmallDisplacements" GiDEntity="volume" GiDValidMesh="Tetrahedra,Hexahedra" strucType="Solid,Generic" idTemplate="Solid3DElement" icon="femelements.gif" help="Small Displacement 3D" open="0"/>
             <Container id="BeamElement" pid="Beam Element" class="Groups" nDim="3D" kinemType="SmallDisplacements" strucType="Beam" idTemplate="BeamElement" GiDEntity="line" icon="femelements.gif" help="Beam Element type" open="0"/>
             <Container id="CrisfieldTrussElement" pid="Crisfield truss element" state="hidden" class="Groups" strucType="Truss" idTemplate="TrussElement" GiDEntity="line" nDim="3D" icon="femelements.gif" help="Crisfield truss element" open="0"/>
-            <Container id="ShellThick" pid="Shell thick" class="Groups" nDim="3D" kinemType="SmallDisplacements" GiDEntity="surface" GiDValidMesh="Quadrilateral" strucType="Shell" idTemplate="ShellElementQ" icon="femelements.gif" help="Shell thick" open="0"/>
+            <Container id="ShellThick" pid="Shell thick" class="Groups" nDim="3D" kinemType="SmallDisplacements" GiDEntity="surface" GiDValidMesh="Quadrilateral" strucType="Shell" idTemplate="ShellElementQ" icon="femelements.gif" help="Shell thick" open="0">
+              {{shellElements}}
+            </Container>
             <Container id="ShellThickCR" pid="Shell thick LD" class="Groups" nDim="3D" kinemType="LargeDisplacements" GiDEntity="surface" GiDValidMesh="Quadrilateral" strucType="Shell" idTemplate="ShellElementQ" icon="femelements.gif" help="Shell thick" open="0"/>
             <Container id="ShellThin" pid="Shell thin" class="Groups" nDim="3D" kinemType="SmallDisplacements" GiDEntity="surface" GiDValidMesh="Triangle" strucType="Shell" idTemplate="ShellElementT" icon="femelements.gif" help="Shell thin" open="0"/>
             <Container id="ShellThinCR" pid="Shell thin LD" class="Groups" nDim="3D" kinemType="LargeDisplacements" GiDEntity="surface" GiDValidMesh="Triangle" strucType="Shell" idTemplate="ShellElementT" icon="femelements.gif" help="Shell thin" open="0"/>

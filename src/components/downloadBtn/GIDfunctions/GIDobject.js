@@ -403,6 +403,16 @@ ${this.volumeCenterCalculator(iObj, volume)}
       }
     })
 
+    // Add AllSurfaces group
+    nGroups++
+    xmlgroup.push(groups.ele('group', { id: nGroups, name: 'AllSurfaces', color: '#000000' }))
+    data.surfaces[nGroups] = math.range(
+      0,
+      this.objects.reduce((sum, obj) => (
+        sum + obj.faces.length
+      ), 0)
+    )._data
+
     if (xmleGroup.points) {
       const kratos = this.convertToKratosGroup(data.points)
       this.populateXmlEntitiesGroup(xmleGroup.points, kratos)
@@ -444,7 +454,7 @@ ${this.volumeCenterCalculator(iObj, volume)}
       }
     }
 
-    const groups = this.objects.reduce((string, object) => {
+    const groups = `${this.objects.reduce((string, object) => {
       let s = string
       if (typeof object.groups !== 'undefined') {
         object.groups.forEach((group) => {
@@ -453,7 +463,8 @@ ${this.volumeCenterCalculator(iObj, volume)}
         })
       }
       return s
-    }, '')
+    }, '')}<Group id="AllSurfaces" color="{#000000}" state="1" type="Generic"/>
+`
 
     const displacementsBC = this.objects.reduce((string, object) => {
       let s = string
@@ -481,11 +492,59 @@ ${this.volumeCenterCalculator(iObj, volume)}
       return s
     }, '')
 
+    const properties = this.objects.reduce((string, object) => {
+      let s = string
+      if (typeof object.properties !== 'undefined') {
+        object.properties.forEach((property) => {
+          /* eslint-disable */
+          s += `<Container id="Property1" pid="Property1" class="Property" icon="propsTree.gif" help="Property" open="0">
+    <Container id="MainProperties" pid="${property.name}" state="hidden" help="Values">
+        <Item id="ElemType" pid="Property type" dv="${property.element}" state="normal" ivalues="Beam,Shell,Membrane,Solid" values="Beam,Shell,Membrane,Solid" help="Element type"/>
+        <Item id="MatModel" pid="Constitutive law" state="normal" dv="Elastic-Isotropic" GCV="MatModel" help="Material model"/>
+        <Item id="Material" pid="Material" dv="${property.material}" state="normal" GCV="Materials" help="Material"/>
+        <Item id="Thickness" pid="Thickness" state="normal" dv="1.0" help="Thickness"/>
+        <Item id="SectionType" pid="Section type" state="normal" dv="UserDefined" GCV="SectType" help="Select the section type"/>
+        <Item id="ProfileDB" pid="Profile list" state="normal" dv="" GCV="ProfileType" help="Select the profile from the list"/>
+        <Item id="Area" pid="Area" dv="1.0" state="normal" help="Cross section area"/>
+        <Item id="InertiaIx" pid="Inertia Ix" state="normal" dv="1.0" help="Moment of inertia Ix"/>
+        <Item id="InertiaIy" pid="Inertia Iy" state="normal" dv="1.0" help="Moment of inertia Iy"/>
+        <Item id="RectangularHeight" pid="Height" state="normal" dv="1.0" help="Height value"/>
+        <Item id="RectangularWidth" pid="Width" state="normal" dv="1.0" help="Width value"/>
+        <Item id="CircularDiameter" pid="Diameter" state="normal" dv="1.0" help="Diameter value"/>
+    </Container>
+</Container>
+`
+        /* eslint-enable */
+        })
+      }
+      return s
+    }, '')
+
+    const elements = this.objects.reduce((string, object) => {
+      let s = string
+      if (typeof object.elements !== 'undefined') {
+        object.elements.forEach((element) => {
+          /* eslint-disable */
+          s += `<Container id="${element.group}" pid="${element.group}" class="Group" icon="groupsTree.gif" help="Thick shell formulation" open="1" active="1">
+    <Container id="Properties" pid="Element Properties" state="hidden" help="Properties">
+        <Item id="ElementType" pid="Element type" dv="${element.element}" ivalues="Quadrilateral" values="Quadrilateral" help="Element Type"/>
+        <Item id="Property" pid="Property" dv="${element.property}" GCV="Properties" help="Property"/>
+    </Container>
+</Container>
+`
+        /* eslint-enable */
+        })
+      }
+      return s
+    }, '')
+
     if (this.problemType === 'KRATOS_structural') {
       return kratosspdstr
         .replace('{{pressureContent}}', content)
         .replace('{{GroupsContent}}', groups)
         .replace('{{DisplacementsBCcontent}}', displacementsBC)
+        .replace('{{propertiesContent}}', properties)
+        .replace('{{shellElements}}', elements)
     } else if (this.problemType === 'KRATOS_fluid') {
       return kratosspdflu.replace('{{GroupsContent}}', groups)
     }
