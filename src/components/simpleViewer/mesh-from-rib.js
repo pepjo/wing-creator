@@ -115,7 +115,12 @@ export function generateInternalMesh (geometry, shell, ribGen) {
         const v2 = numberOfBeams * 2 - 1 - i
 
         const x = math.tan(geometry.wingParameters.sweep / 180 * math.pi) *
-          geometry.structureParameters.beamExtension
+          geometry.structureParameters.beamExtension -
+          // Afegir factor de correcio per la mida
+          (geometry.wingParameters.root - geometry.wingParameters.tip) /
+          geometry.wingParameters.length * geometry.structureParameters.beamExtension * (
+          i === 0 ? geometry.structureParameters.beamCoord : geometry.structureParameters.beam2Coord
+          )
 
         // Add beam extension vertices
         mesh.vertices.push(new THREE.Vector3(

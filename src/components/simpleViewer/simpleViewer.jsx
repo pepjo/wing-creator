@@ -232,7 +232,7 @@ class Viewer extends React.Component {
     return i * l / (geometry.structureParameters.ribs - 1) - centerZOffset
   }
 
-  getXcoord (i, z) {
+  getXcoord (z) {
     const geometry = this.props.geometry
     const root = geometry.wingParameters.root / 2
     const l = geometry.wingParameters.length
@@ -241,7 +241,7 @@ class Viewer extends React.Component {
     return ((z + l / 2) / l) * (tip - root) + root
   }
 
-  getChord (i, z) {
+  getChord (z) {
     const geometry = this.props.geometry
     const root = geometry.wingParameters.root === 0 ? 0.1 : geometry.wingParameters.root
     const tip = geometry.wingParameters.tip === 0 ? 0.1 : geometry.wingParameters.tip
@@ -253,8 +253,8 @@ class Viewer extends React.Component {
   generateRib (i, segmentOffset) {
     const shell = this.props.airfoilShell
     const z = this.getZcoord(i)
-    const x = this.getXcoord(i, z)
-    const chord = this.getChord(i, z)
+    const x = this.getXcoord(z)
+    const chord = this.getChord(z)
 
     return generateRibFromPoints(
       _.cloneDeep(shell),
