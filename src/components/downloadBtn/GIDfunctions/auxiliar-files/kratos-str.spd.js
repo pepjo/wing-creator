@@ -746,7 +746,7 @@ export default `<?xml version='1.0' encoding='utf-8'?>
                 <Item id="ElemType" pid="Property type" dv="" state="normal" ivalues="Beam,Shell,Membrane,Solid" values="Beam,Shell,Membrane,Solid" help="Element type"/>
                 <Item id="MatModel" pid="Constitutive law" state="normal" dv="Elastic-Isotropic" GCV="MatModel" help="Material model"/>
                 <Item id="Material" pid="Material" dv="" state="normal" GCV="Materials" help="Material"/>
-                <Item id="Thickness" pid="Thickness" state="normal" dv="1.0" help="Thickness"/>
+                <Item id="Thickness" pid="Thickness" state="normal" dv="0.01" help="Thickness"/>
                 <Item id="SectionType" pid="Section type" state="normal" dv="UserDefined" GCV="SectType" help="Select the section type"/>
                 <Item id="ProfileDB" pid="Profile list" state="normal" dv="" GCV="ProfileType" help="Select the profile from the list"/>
                 <Item id="Area" pid="Area" dv="1.0" state="normal" help="Cross section area"/>
@@ -762,7 +762,7 @@ export default `<?xml version='1.0' encoding='utf-8'?>
                 <Item id="ElemType" pid="Property type" dv="" GCV="ElemType" help="Element type" state="hidden"/>
                 <Item id="MatModel" pid="Material model" dv="" GCV="MatModel" help="Material model" state="hidden"/>
                 <Item id="Material" pid="Material" dv="" GCV="Materials" help="Material"/>
-                <Item id="Thickness" pid="Thickness" dv="1.0" help="Thickness" state="hidden"/>
+                <Item id="Thickness" pid="Thickness" dv="0.01" help="Thickness" state="hidden"/>
             </Container>
         </Template>
         <Template id="PropertiesDEM" icon="propsTree.gif" help="Property">
