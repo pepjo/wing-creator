@@ -12,7 +12,7 @@ export default function (mesh, segments, loads) {
   mesh.groups.push({
     name: `extSurface_${mesh.facesFromSegments.length}`,
     type: 'surfaces',
-    color: '#999999ff',
+    color: '#999999',
     entities: [
       mesh.facesFromSegments.length - 1,
     ],

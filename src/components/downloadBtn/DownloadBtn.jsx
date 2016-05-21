@@ -48,6 +48,7 @@ class DownloadBtn extends React.Component {
   downloadGid () {
     this.setState({ open: true })
 
+    const files = this.props.exportSettings.meshFile
     const exportMeshes = []
 
     if (this.props.exportSettings.internalMesh) {
@@ -69,6 +70,20 @@ class DownloadBtn extends React.Component {
         volumes: [],
         loads: this.props.meshes.internalMesh.loads,
         boundaryConditions: bc,
+        properties: [
+          {
+            name: 'Aluminium',
+            material: 'Aluminium_7021',
+            element: 'Shell',
+          },
+        ],
+        elements: [
+          {
+            group: 'AllSurfaces',
+            property: 'Aluminium',
+            element: 'Triangle',
+          },
+        ],
       })
     }
 
@@ -114,7 +129,7 @@ class DownloadBtn extends React.Component {
       })
     }
 
-    const GITobj = new GIDobject(exportMeshes, this.props.exportSettings.problemType)
+    const GITobj = new GIDobject(exportMeshes, this.props.exportSettings.problemType, files)
     GITobj.generateProjectZip('GIDwing')
     .then((content) => {
       saveAs(content, 'GIDwing.zip')

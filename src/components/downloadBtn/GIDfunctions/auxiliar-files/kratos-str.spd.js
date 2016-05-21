@@ -53,8 +53,8 @@ export default `<?xml version='1.0' encoding='utf-8'?>
         <Container id="SolutionStrategy" pid="Solution strategy" help="Solution Strategy" open="0" icon="solstrategy.gif">
             <Container id="ParallelType" pid="Parallel type" class="Tab" open="0" icon="groupsTreeNew.gif">
                 <Item id="ParallelSolutionType" pid="Parallel type" dv="OpenMP" class="PSolutionType" ivalues="OpenMP,MPI" values="OpenMP,MPI" help=""/>
-                <Item id="MPINumberOfProcessors" pid="Number of processors" dv="2" PSolutionType="MPI" help="Number of processors"/>
-                <Item id="OpenMPNumberOfThreads" pid="Number of threads" dv="2" PSolutionType="OpenMP" help="Number of threads"/>
+                <Item id="MPINumberOfProcessors" pid="Number of processors" dv="8" PSolutionType="MPI" help="Number of processors"/>
+                <Item id="OpenMPNumberOfThreads" pid="Number of threads" dv="8" PSolutionType="OpenMP" help="Number of threads"/>
             </Container>
             <Container id="LinearSolver" pid="Linear solver" class="Tab" open="0" icon="groupsTreeNew.gif">
                 <Item id="LinearSolverType" pid="Linear solver type" class="solverType" dv="Direct" ivalues="Direct,Iterative" values="Direct,Iterative" help=""/>
@@ -81,7 +81,7 @@ export default `<?xml version='1.0' encoding='utf-8'?>
                 <Item id="MaximumIterations" pid="Maximum iterations" dv="30" help="Newton-Raphson iterations stop when the maximum is reached"/>
             </Container>
         </Container>
-        <Container id="Properties" pid="Properties" class="Properties" idTemplate="PropertiesStruct" icon="propsTreeNew.gif" help="Add a new Property" open="0"
+        <Container id="Properties" pid="Properties" class="Properties" idTemplate="PropertiesStruct" icon="propsTreeNew.gif" help="Add a new Property" open="0">
           {{propertiesContent}}
         </Container>
         <Container id="Elements" pid="Elements" help="Elements" open="0" icon="femelements.gif">
@@ -91,11 +91,11 @@ export default `<?xml version='1.0' encoding='utf-8'?>
             <Container id="SolidElement3D" pid="Solid Element" class="Groups" nDim="3D" kinemType="SmallDisplacements" GiDEntity="volume" GiDValidMesh="Tetrahedra,Hexahedra" strucType="Solid,Generic" idTemplate="Solid3DElement" icon="femelements.gif" help="Small Displacement 3D" open="0"/>
             <Container id="BeamElement" pid="Beam Element" class="Groups" nDim="3D" kinemType="SmallDisplacements" strucType="Beam" idTemplate="BeamElement" GiDEntity="line" icon="femelements.gif" help="Beam Element type" open="0"/>
             <Container id="CrisfieldTrussElement" pid="Crisfield truss element" state="hidden" class="Groups" strucType="Truss" idTemplate="TrussElement" GiDEntity="line" nDim="3D" icon="femelements.gif" help="Crisfield truss element" open="0"/>
-            <Container id="ShellThick" pid="Shell thick" class="Groups" nDim="3D" kinemType="SmallDisplacements" GiDEntity="surface" GiDValidMesh="Quadrilateral" strucType="Shell" idTemplate="ShellElementQ" icon="femelements.gif" help="Shell thick" open="0">
+            <Container id="ShellThick" pid="Shell thick" class="Groups" nDim="3D" kinemType="SmallDisplacements" GiDEntity="surface" GiDValidMesh="Quadrilateral" strucType="Shell" idTemplate="ShellElementQ" icon="femelements.gif" help="Shell thick" open="0"/>
+            <Container id="ShellThickCR" pid="Shell thick LD" class="Groups" nDim="3D" kinemType="LargeDisplacements" GiDEntity="surface" GiDValidMesh="Quadrilateral" strucType="Shell" idTemplate="ShellElementQ" icon="femelements.gif" help="Shell thick" open="0"/>
+            <Container id="ShellThin" pid="Shell thin" class="Groups" nDim="3D" kinemType="SmallDisplacements" GiDEntity="surface" GiDValidMesh="Triangle" strucType="Shell" idTemplate="ShellElementT" icon="femelements.gif" help="Shell thin" open="0">
               {{shellElements}}
             </Container>
-            <Container id="ShellThickCR" pid="Shell thick LD" class="Groups" nDim="3D" kinemType="LargeDisplacements" GiDEntity="surface" GiDValidMesh="Quadrilateral" strucType="Shell" idTemplate="ShellElementQ" icon="femelements.gif" help="Shell thick" open="0"/>
-            <Container id="ShellThin" pid="Shell thin" class="Groups" nDim="3D" kinemType="SmallDisplacements" GiDEntity="surface" GiDValidMesh="Triangle" strucType="Shell" idTemplate="ShellElementT" icon="femelements.gif" help="Shell thin" open="0"/>
             <Container id="ShellThinCR" pid="Shell thin LD" class="Groups" nDim="3D" kinemType="LargeDisplacements" GiDEntity="surface" GiDValidMesh="Triangle" strucType="Shell" idTemplate="ShellElementT" icon="femelements.gif" help="Shell thin" open="0"/>
             <Container id="EBST" pid="EBST (formulation)" state="hidden" class="Groups" nDim="3D" GiDEntity="surface" strucType="Shell" idTemplate="ShellElementT" icon="femelements.gif" help="Total Lagrangian" open="0"/>
             <Container id="Membrane" pid="Membrane" class="Groups" nDim="3D" kinemType="SmallDisplacements" GiDEntity="surface" strucType="Membrane" idTemplate="MembraneElement" icon="femelements.gif" help="Membrane element type" open="0"/>

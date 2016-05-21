@@ -114,6 +114,7 @@ class Viewer extends React.Component {
         prevGeometry.wingParameters.sweep !== geometry.wingParameters.sweep) {
       this.generateInternalMesh()
       this.generateExternalMesh()
+      this.generateFluidBoxMesh()
     }
 
     if (prevProps.fluidSimulation !== this.props.fluidSimulation) {

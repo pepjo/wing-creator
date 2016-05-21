@@ -11,9 +11,10 @@ import kratosspdstr from './auxiliar-files/kratos-str.spd'
 import kratosspdflu from './auxiliar-files/kratos-flu.spd'
 
 export default class gidObject {
-  constructor (objects, problemType) {
+  constructor (objects, problemType, files) {
     this.objects = objects || {}
     this.problemType = problemType || 'NONE'
+    this.files = files
 
     this.generateFile = this.generateFile.bind(this)
     this.generateVertices = this.generateVertices.bind(this)
@@ -29,6 +30,7 @@ export default class gidObject {
     this.generateVolumes = this.generateVolumes.bind(this)
     this.generateVolume = this.generateVolume.bind(this)
     this.generareSpdFile = this.generareSpdFile.bind(this)
+    this.generateKratosPrjFile = this.generateKratosPrjFile.bind(this)
     this.parseGroupEntities = this.parseGroupEntities.bind(this)
     this.fillXmlEntitiesGroup = this.fillXmlEntitiesGroup.bind(this)
     this.convertToKratosGroup = this.convertToKratosGroup.bind(this)
@@ -398,14 +400,16 @@ ${this.volumeCenterCalculator(iObj, volume)}
           } else {
             throw new Error('not yet implemented')
           }
-          xmlgroup.push(groups.ele('group', { id: nGroups, name: group.name, color: group.color }))
+          xmlgroup.push(groups.ele('group', {
+            id: nGroups, name: group.name, color: `${group.color}ff`,
+          }))
         })
       }
     })
 
     // Add AllSurfaces group
     nGroups++
-    xmlgroup.push(groups.ele('group', { id: nGroups, name: 'AllSurfaces', color: '#000000' }))
+    xmlgroup.push(groups.ele('group', { id: nGroups, name: 'AllSurfaces', color: '#999999ff' }))
     data.surfaces[nGroups] = math.range(
       0,
       this.objects.reduce((sum, obj) => (
@@ -421,6 +425,18 @@ ${this.volumeCenterCalculator(iObj, volume)}
     if (xmleGroup.surfaces) {
       const kratos = this.convertToKratosGroup(data.surfaces)
       this.populateXmlEntitiesGroup(xmleGroup.surfaces, kratos)
+    }
+
+    if (this.files) {
+      const nodes = this.files.prj.data.match(
+        /<entities_group name="nodes">([\S\s]*?)<\/entities_group>/
+      )[1]
+      eGroups.r(`<entities_group name="nodes">${nodes}</entities_group>`)
+
+      const elements = this.files.prj.data.match(
+        /<entities_group name="elements">([\S\s]*?)<\/entities_group>/
+      )[1]
+      eGroups.r(`<entities_group name="elements">${elements}</entities_group>`)
     }
 
     if (groups.children.length > 0) {
@@ -463,7 +479,7 @@ ${this.volumeCenterCalculator(iObj, volume)}
         })
       }
       return s
-    }, '')}<Group id="AllSurfaces" color="{#000000}" state="1" type="Generic"/>
+    }, '')}<Group id="AllSurfaces" color="{#999999}" state="1" type="Generic"/>
 `
 
     const displacementsBC = this.objects.reduce((string, object) => {
@@ -497,8 +513,8 @@ ${this.volumeCenterCalculator(iObj, volume)}
       if (typeof object.properties !== 'undefined') {
         object.properties.forEach((property) => {
           /* eslint-disable */
-          s += `<Container id="Property1" pid="Property1" class="Property" icon="propsTree.gif" help="Property" open="0">
-    <Container id="MainProperties" pid="${property.name}" state="hidden" help="Values">
+          s += `<Container id="${property.name}" pid="${property.name}" class="Property" icon="propsTree.gif" help="Property" open="0">
+    <Container id="MainProperties" pid="New property" state="hidden" help="Values">
         <Item id="ElemType" pid="Property type" dv="${property.element}" state="normal" ivalues="Beam,Shell,Membrane,Solid" values="Beam,Shell,Membrane,Solid" help="Element type"/>
         <Item id="MatModel" pid="Constitutive law" state="normal" dv="Elastic-Isotropic" GCV="MatModel" help="Material model"/>
         <Item id="Material" pid="Material" dv="${property.material}" state="normal" GCV="Materials" help="Material"/>
@@ -525,9 +541,9 @@ ${this.volumeCenterCalculator(iObj, volume)}
       if (typeof object.elements !== 'undefined') {
         object.elements.forEach((element) => {
           /* eslint-disable */
-          s += `<Container id="${element.group}" pid="${element.group}" class="Group" icon="groupsTree.gif" help="Thick shell formulation" open="1" active="1">
+          s += `<Container id="${element.group}" pid="${element.group}" class="Group" icon="groupsTree.gif" help="Thin shell formulation" open="1" active="1">
     <Container id="Properties" pid="Element Properties" state="hidden" help="Properties">
-        <Item id="ElementType" pid="Element type" dv="${element.element}" ivalues="Quadrilateral" values="Quadrilateral" help="Element Type"/>
+        <Item id="ElementType" pid="Element type" dv="${element.element}" ivalues="Triangle" values="Triangle" help="Element Type"/>
         <Item id="Property" pid="Property" dv="${element.property}" GCV="Properties" help="Property"/>
     </Container>
 </Container>
@@ -571,6 +587,10 @@ ${this.volumeCenterCalculator(iObj, volume)}
       if (prj) {
         gid.file(`${filename}.prj`, prj)
       }
+    }
+
+    if (this.files) {
+      gid.file(`${filename}.msh`, this.files.msh.data)
     }
 
     return zip.generateAsync({ type: 'blob' })

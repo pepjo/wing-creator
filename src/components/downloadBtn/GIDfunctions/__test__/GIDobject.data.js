@@ -89,15 +89,15 @@ export const objectData = [{
   properties: [
     {
       name: 'Aluminium',
-      material: 'Steel_AISI1059',
+      material: 'Aluminium_7021',
       element: 'Shell',
     },
   ],
   elements: [
     {
       group: 'AllSurfaces',
-      property: 'Property1',
-      element: 'Quadrilateral',
+      property: 'Aluminium',
+      element: 'Triangle',
     },
   ],
 }]
@@ -225,10 +225,10 @@ export const groupsfile = `<?xml version="1.0"?>
 <gid version="11.1">
   <pre>
     <groups>
-      <group id="1" name="group1" color="#000000"/>
-      <group id="2" name="group2" color="#000000"/>
-      <group id="3" name="surf1" color="#000000"/>
-      <group id="4" name="AllSurfaces" color="#000000"/>
+      <group id="1" name="group1" color="#000000ff"/>
+      <group id="2" name="group2" color="#000000ff"/>
+      <group id="3" name="surf1" color="#000000ff"/>
+      <group id="4" name="AllSurfaces" color="#999999ff"/>
     </groups>
     <entities_groups>
       <entities_group name="points">
@@ -269,11 +269,11 @@ export const conditionsFileBoundary = `<Container id="internalRoot" pid="interna
 </Container>
 `
 
-export const properties = `<Container id="Property1" pid="Property1" class="Property" icon="propsTree.gif" help="Property" open="0">
-    <Container id="MainProperties" pid="Aluminium" state="hidden" help="Values">
+export const properties = `<Container id="Aluminium" pid="Aluminium" class="Property" icon="propsTree.gif" help="Property" open="0">
+    <Container id="MainProperties" pid="New property" state="hidden" help="Values">
         <Item id="ElemType" pid="Property type" dv="Shell" state="normal" ivalues="Beam,Shell,Membrane,Solid" values="Beam,Shell,Membrane,Solid" help="Element type"/>
         <Item id="MatModel" pid="Constitutive law" state="normal" dv="Elastic-Isotropic" GCV="MatModel" help="Material model"/>
-        <Item id="Material" pid="Material" dv="Steel_AISI1059" state="normal" GCV="Materials" help="Material"/>
+        <Item id="Material" pid="Material" dv="Aluminium_7021" state="normal" GCV="Materials" help="Material"/>
         <Item id="Thickness" pid="Thickness" state="normal" dv="1.0" help="Thickness"/>
         <Item id="SectionType" pid="Section type" state="normal" dv="UserDefined" GCV="SectType" help="Select the section type"/>
         <Item id="ProfileDB" pid="Profile list" state="normal" dv="" GCV="ProfileType" help="Select the profile from the list"/>
@@ -287,10 +287,10 @@ export const properties = `<Container id="Property1" pid="Property1" class="Prop
 </Container>
 `
 
-export const shellElements = `<Container id="AllSurfaces" pid="AllSurfaces" class="Group" icon="groupsTree.gif" help="Thick shell formulation" open="1" active="1">
+export const shellElements = `<Container id="AllSurfaces" pid="AllSurfaces" class="Group" icon="groupsTree.gif" help="Thin shell formulation" open="1" active="1">
     <Container id="Properties" pid="Element Properties" state="hidden" help="Properties">
-        <Item id="ElementType" pid="Element type" dv="Quadrilateral" ivalues="Quadrilateral" values="Quadrilateral" help="Element Type"/>
-        <Item id="Property" pid="Property" dv="Property1" GCV="Properties" help="Property"/>
+        <Item id="ElementType" pid="Element type" dv="Triangle" ivalues="Triangle" values="Triangle" help="Element Type"/>
+        <Item id="Property" pid="Property" dv="Aluminium" GCV="Properties" help="Property"/>
     </Container>
 </Container>
 `
@@ -298,7 +298,7 @@ export const shellElements = `<Container id="AllSurfaces" pid="AllSurfaces" clas
 export const conditionsFileGroups = `<Group id="group1" color="{#000000}" state="1" type="Generic"/>
 <Group id="group2" color="{#000000}" state="1" type="Generic"/>
 <Group id="surf1" color="{#000000}" state="1" type="Generic"/>
-<Group id="AllSurfaces" color="{#000000}" state="1" type="Generic"/>
+<Group id="AllSurfaces" color="{#999999}" state="1" type="Generic"/>
 `
 
 /* eslint-enable */

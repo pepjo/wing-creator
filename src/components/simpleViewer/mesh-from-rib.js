@@ -71,7 +71,7 @@ export function generateInternalMesh (geometry, shell, ribGen) {
         mesh.groups.push({
           name: 'internalRoot',
           type: 'points',
-          color: '#999999ff',
+          color: '#999999',
           entities: [
             [0, rib.vertices.length - 1],
           ],
@@ -226,7 +226,7 @@ export function generateExternalMesh (geometry, shell, ribGen, fluidSimulation) 
         mesh.groups.push({
           name: 'externalRoot',
           type: 'points',
-          color: '#999999ff',
+          color: '#999999',
           entities: [
             [0, rib.vertices.length - 1],
           ],
