@@ -40,6 +40,9 @@ export function generateInternalMesh (geometry, shell, ribGen) {
           const v1 = j
           const v2 = numberOfBeams * 2 - 1 - j
 
+          const verticalSegment = mesh.segments.length + 2 * (numberOfBeams - j) + j
+          const prevVerticalSegment = prevSegmentIndex + j
+
           mesh.faces.push(
             new THREE.Face3(beamVertices[v1], beamVertices[v2], prevBeamVertices[v1])
           )
@@ -47,7 +50,7 @@ export function generateInternalMesh (geometry, shell, ribGen) {
             new THREE.Face3(beamVertices[v2], prevBeamVertices[v2], prevBeamVertices[v1])
           )
 
-          // Add segments for GID
+          // Add horizontal segments for GID
           mesh.segments.push(
             [prevBeamVertices[v1], beamVertices[v1]]
           )
@@ -57,14 +60,15 @@ export function generateInternalMesh (geometry, shell, ribGen) {
 
           // Add facesFromSegments (notice the last segment is yet to be added)
           mesh.facesFromSegments.push([
-            [mesh.segments.length, 0],
+            [verticalSegment, 0],
             [mesh.segments.length - 1, 0],
-            [prevSegmentIndex - 1, 1],
+            [prevVerticalSegment, 1],
             [mesh.segments.length - 2, 0],
           ])
         }
       }
 
+      // Beam vertical segments
       mesh.segments.push(
         [beamVertices[0], beamVertices[3]]
       )
@@ -75,7 +79,7 @@ export function generateInternalMesh (geometry, shell, ribGen) {
       if (i === 0) {
         // Save vertices for beam extension
         rootBeamVertices = beamVertices
-        rootBeamSegment = mesh.segments.length - 1
+        rootBeamSegment = mesh.segments.length - 2
         rootGroupIndex = mesh.groups.length
 
         // Add root group
@@ -100,7 +104,7 @@ export function generateInternalMesh (geometry, shell, ribGen) {
         })
       }
 
-      prevSegmentIndex = mesh.segments.length
+      prevSegmentIndex = mesh.segments.length - numberOfBeams
       prevBeamVertices = beamVertices
     }
 
@@ -139,7 +143,7 @@ export function generateInternalMesh (geometry, shell, ribGen) {
         // Add beam extension GID faces
         const s = mesh.segments.length
         mesh.facesFromSegments.push([
-          [rootBeamSegment, 0],
+          [rootBeamSegment + i, 0],
           [s - 3, 0],
           [s - 2, 0],
           [s - 1, 0],
