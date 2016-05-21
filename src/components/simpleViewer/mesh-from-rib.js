@@ -5,6 +5,9 @@ import math from 'mathjs'
 import addFacesWithPressure from './addFaceWithPressure'
 import getPressureFromVertices from './getPressureFromVertices'
 
+// Configuration
+const numberOfBeams = 2
+
 export function generateInternalMesh (geometry, shell, ribGen) {
   const mesh = {
     vertices: [],
@@ -33,32 +36,40 @@ export function generateInternalMesh (geometry, shell, ribGen) {
       mesh.facesFromSegments = mesh.facesFromSegments.concat(rib.facesFromSegments)
 
       if (i !== 0 && beamVertices.length !== 0) {
-        mesh.faces.push(
-          new THREE.Face3(beamVertices[0], beamVertices[1], prevBeamVertices[0])
-        )
-        mesh.faces.push(
-          new THREE.Face3(beamVertices[1], prevBeamVertices[1], prevBeamVertices[0])
-        )
+        for (let j = 0; j < numberOfBeams; j++) {
+          const v1 = j
+          const v2 = numberOfBeams * 2 - 1 - j
 
-        // Add segments for GID
-        mesh.segments.push(
-          [prevBeamVertices[0], beamVertices[0]]
-        )
-        mesh.segments.push(
-          [beamVertices[1], prevBeamVertices[1]]
-        )
+          mesh.faces.push(
+            new THREE.Face3(beamVertices[v1], beamVertices[v2], prevBeamVertices[v1])
+          )
+          mesh.faces.push(
+            new THREE.Face3(beamVertices[v2], prevBeamVertices[v2], prevBeamVertices[v1])
+          )
 
-        // Add facesFromSegments (notice the last segment is still to be added)
-        mesh.facesFromSegments.push([
-          [mesh.segments.length, 0],
-          [mesh.segments.length - 1, 0],
-          [prevSegmentIndex - 1, 1],
-          [mesh.segments.length - 2, 0],
-        ])
+          // Add segments for GID
+          mesh.segments.push(
+            [prevBeamVertices[v1], beamVertices[v1]]
+          )
+          mesh.segments.push(
+            [beamVertices[v2], prevBeamVertices[v2]]
+          )
+
+          // Add facesFromSegments (notice the last segment is yet to be added)
+          mesh.facesFromSegments.push([
+            [mesh.segments.length, 0],
+            [mesh.segments.length - 1, 0],
+            [prevSegmentIndex - 1, 1],
+            [mesh.segments.length - 2, 0],
+          ])
+        }
       }
 
       mesh.segments.push(
-        [beamVertices[0], beamVertices[1]]
+        [beamVertices[0], beamVertices[3]]
+      )
+      mesh.segments.push(
+        [beamVertices[1], beamVertices[2]]
       )
 
       if (i === 0) {
@@ -95,48 +106,53 @@ export function generateInternalMesh (geometry, shell, ribGen) {
 
     // Add beam extension (at the end, otherwise we would mess with the exporter)
     if (geometry.structureParameters.beamExtension) {
-      const x = math.tan(geometry.wingParameters.sweep / 180 * math.pi) *
-        geometry.structureParameters.beamExtension
+      for (let i = 0; i < numberOfBeams; i++) {
+        const v1 = i
+        const v2 = numberOfBeams * 2 - 1 - i
 
-      // Add beam extension vertices
-      mesh.vertices.push(new THREE.Vector3(
-        mesh.vertices[rootBeamVertices[0]].x - x,
-        mesh.vertices[rootBeamVertices[0]].y,
-        mesh.vertices[rootBeamVertices[0]].z + geometry.structureParameters.beamExtension
-      ))
-      mesh.vertices.push(new THREE.Vector3(
-        mesh.vertices[rootBeamVertices[1]].x - x,
-        mesh.vertices[rootBeamVertices[1]].y,
-        mesh.vertices[rootBeamVertices[1]].z + geometry.structureParameters.beamExtension
-      ))
+        const x = math.tan(geometry.wingParameters.sweep / 180 * math.pi) *
+          geometry.structureParameters.beamExtension
 
-      // Add this to vertices to the intern route group
-      mesh.groups[rootGroupIndex].entities.push(
-        [mesh.vertices.length - 2, mesh.vertices.length - 1]
-      )
+        // Add beam extension vertices
+        mesh.vertices.push(new THREE.Vector3(
+          mesh.vertices[rootBeamVertices[v1]].x - x,
+          mesh.vertices[rootBeamVertices[v1]].y,
+          mesh.vertices[rootBeamVertices[v1]].z + geometry.structureParameters.beamExtension
+        ))
+        mesh.vertices.push(new THREE.Vector3(
+          mesh.vertices[rootBeamVertices[v2]].x - x,
+          mesh.vertices[rootBeamVertices[v2]].y,
+          mesh.vertices[rootBeamVertices[v2]].z + geometry.structureParameters.beamExtension
+        ))
 
-      // Add beam extension threes faces
-      const l = mesh.vertices.length
-      mesh.segments.push([rootBeamVertices[1], l - 1])
-      mesh.segments.push([l - 1, l - 2])
-      mesh.segments.push([l - 2, rootBeamVertices[0]])
+        // Add this to vertices to the intern route group
+        mesh.groups[rootGroupIndex].entities.push(
+          [mesh.vertices.length - 2, mesh.vertices.length - 1]
+        )
 
-      // Add beam extension GID faces
-      const s = mesh.segments.length
-      mesh.facesFromSegments.push([
-        [rootBeamSegment, 0],
-        [s - 3, 0],
-        [s - 2, 0],
-        [s - 1, 0],
-      ])
+        // Add beam extension threes faces
+        const l = mesh.vertices.length
+        mesh.segments.push([rootBeamVertices[v2], l - 1])
+        mesh.segments.push([l - 1, l - 2])
+        mesh.segments.push([l - 2, rootBeamVertices[v1]])
 
-      // Add beam extension threes faces
-      mesh.faces.push(
-        new THREE.Face3(rootBeamVertices[0], rootBeamVertices[1], l - 2)
-      )
-      mesh.faces.push(
-        new THREE.Face3(rootBeamVertices[1], l - 1, l - 2)
-      )
+        // Add beam extension GID faces
+        const s = mesh.segments.length
+        mesh.facesFromSegments.push([
+          [rootBeamSegment, 0],
+          [s - 3, 0],
+          [s - 2, 0],
+          [s - 1, 0],
+        ])
+
+        // Add beam extension threes faces
+        mesh.faces.push(
+          new THREE.Face3(rootBeamVertices[v1], rootBeamVertices[v2], l - 2)
+        )
+        mesh.faces.push(
+          new THREE.Face3(rootBeamVertices[v2], l - 1, l - 2)
+        )
+      }
     }
 
     return mesh

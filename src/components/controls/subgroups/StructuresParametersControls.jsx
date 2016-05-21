@@ -13,6 +13,7 @@ import { structureParametersShape } from '../../../shapes/geometry'
 const propTypes = {
   structureParameters: structureParametersShape,
   handleBeamCoordChange: React.PropTypes.func,
+  handleBeam2CoordChange: React.PropTypes.func,
   handleRibsChange: React.PropTypes.func,
   handleBeamExtensionChange: React.PropTypes.func,
 }
@@ -20,6 +21,7 @@ const propTypes = {
 function WingParametersControls ({
   structureParameters,
   handleBeamCoordChange,
+  handleBeam2CoordChange,
   handleRibsChange,
   handleBeamExtensionChange,
 }) {
@@ -34,6 +36,11 @@ function WingParametersControls ({
         value={structureParameters.beamCoord} onChange={handleBeamCoordChange}
         style={style.field} inputStyle={style.input}
         floatingLabelText="Beam postion (over 1)" type="number"
+      />
+      <TextField
+        value={structureParameters.beam2Coord} onChange={handleBeam2CoordChange}
+        style={style.field} inputStyle={style.input}
+        floatingLabelText="Beam 2 postion (over 1)" type="number"
       />
       <TextField
         value={structureParameters.beamExtension} onChange={handleBeamExtensionChange}

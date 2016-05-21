@@ -6,7 +6,7 @@ export default function (shell, i, chord, x, y, z, segmentOffset, find) {
 
   const found = shell.vertices.filter((vertex) => {
     for (let j = 0; j < find.length; j++) {
-      return find[j] === vertex.x
+      if (find[j] === vertex.x) return true
     }
     return false
   }).map((vertex) => shell.vertices.indexOf(vertex))

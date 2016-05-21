@@ -101,6 +101,7 @@ class Viewer extends React.Component {
 
     if (prevGeometry.airfoil.uid !== geometry.airfoil.uid ||
         prevGeometry.structureParameters.beamCoord !== geometry.structureParameters.beamCoord ||
+        prevGeometry.structureParameters.beam2Coord !== geometry.structureParameters.beam2Coord ||
         prevGeometry.airfoil.nPoints !== geometry.airfoil.nPoints ||
         prevGeometry.airfoil.distribution !== geometry.airfoil.distribution ||
         prevGeometry.airfoil.interpolation !== geometry.airfoil.interpolation) {
@@ -200,7 +201,10 @@ class Viewer extends React.Component {
   }
 
   getImposedPoints () {
-    return [this.props.geometry.structureParameters.beamCoord]
+    return [
+      this.props.geometry.structureParameters.beamCoord,
+      this.props.geometry.structureParameters.beam2Coord,
+    ]
   }
 
   generateAirfoilShell () { // eslint-disable-line
@@ -247,7 +251,6 @@ class Viewer extends React.Component {
   }
 
   generateRib (i, segmentOffset) {
-    const geometry = this.props.geometry
     const shell = this.props.airfoilShell
     const z = this.getZcoord(i)
     const x = this.getXcoord(i, z)
@@ -261,7 +264,7 @@ class Viewer extends React.Component {
       0,
       - z,
       segmentOffset,
-      [geometry.structureParameters.beamCoord],
+      this.getImposedPoints(),
     )
   }
 

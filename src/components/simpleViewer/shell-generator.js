@@ -7,18 +7,6 @@ export const distributionFunctions = {
   sin: (x) => (math.cos((x - 2) * math.pi / 2) + 1),
 }
 
-function imposePoints (points, imposed) {
-  for (let j = 0, o = imposed.length; j < o; j++) {
-    for (let i = 1; i < points.length; i++) {
-      if (points[i] > imposed[j] && points[i - 1] < imposed[j]) {
-        points.splice(i, 0, imposed[j])
-        break
-      }
-    }
-  }
-  return points
-}
-
 // Fixes the inpressions ints might have.
 // Me want real 0. and 1. not 0.999999 etc
 function fix (x) {
@@ -29,7 +17,7 @@ function fix (x) {
 function pointsGenerator (airfoilFunction, n, distribution, imposedPoints) {
   let lastX = 1
   let impoToBeFound = [...imposedPoints]
-  const x = (math.range(0, 1, 1 / (n / 2 - imposePoints.length + 2))).toArray()
+  const x = (math.range(0, 1, 1 / (n / 2 - imposedPoints.length + 2))).toArray()
   const data = []
 
   // Extrados

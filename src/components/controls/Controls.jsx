@@ -85,6 +85,7 @@ class Controls extends React.Component {
     this.handleTipChange = this.handleTipChange.bind(this)
     this.handleSweepChange = this.handleSweepChange.bind(this)
     this.handleBeamCoordChange = this.handleBeamCoordChange.bind(this)
+    this.handleBeam2CoordChange = this.handleBeam2CoordChange.bind(this)
     this.handleInternalTypeChange = this.handleInternalTypeChange.bind(this)
     this.handleInternalThicknessChange = this.handleInternalThicknessChange.bind(this)
     this.handleExternalTypeChange = this.handleExternalTypeChange.bind(this)
@@ -137,6 +138,10 @@ class Controls extends React.Component {
   }
   handleBeamCoordChange (e) {
     this.props.changeGeometryParameter('structureParameters.beamCoord',
+      proccessInputVal(e.target.value, 0, 1))
+  }
+  handleBeam2CoordChange (e) {
+    this.props.changeGeometryParameter('structureParameters.beam2Coord',
       proccessInputVal(e.target.value, 0, 1))
   }
   handleBeamExtensionChange (e) {
@@ -301,6 +306,7 @@ class Controls extends React.Component {
               structureParameters={structureParameters}
               handleRibsChange={this.handleRibsChange}
               handleBeamCoordChange={this.handleBeamCoordChange}
+              handleBeam2CoordChange={this.handleBeam2CoordChange}
               handleBeamExtensionChange={this.handleBeamExtensionChange}
             />
           </Foldable>
