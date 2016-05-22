@@ -71,7 +71,6 @@ export default class gidObject {
         face.map((seg) => {
           const m = move.find((mo) => (mo.fromS === seg[0]))
           if (m === undefined) {
-            console.log('move segment to', seg[0] - moveCount[seg[0]])
             return [seg[0] - moveCount[seg[0]], seg[1]]
           }
 
@@ -194,11 +193,6 @@ ${segment[0] + 1 + objPrevV} ${segment[1] + 1 + objPrevV}
       return [all[0] + p[0], all[1] + p[1], all[2] + p[2]]
     }, [0, 0, 0])
     .map((x) => (x / points.length))
-
-    console.log('face point', vector.join(' '))
-    if (vector[2] === 2.5) {
-      console.log(points)
-    }
 
     if (returnVector) {
       return vector
