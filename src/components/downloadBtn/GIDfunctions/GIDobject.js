@@ -16,6 +16,7 @@ export default class gidObject {
     this.problemType = problemType || 'NONE'
     this.files = files
 
+    this.deleteDuplicateSegments = this.deleteDuplicateSegments.bind(this)
     this.generateFile = this.generateFile.bind(this)
     this.generateVertices = this.generateVertices.bind(this)
     this.generateSegments = this.generateSegments.bind(this)
@@ -34,6 +35,52 @@ export default class gidObject {
     this.parseGroupEntities = this.parseGroupEntities.bind(this)
     this.fillXmlEntitiesGroup = this.fillXmlEntitiesGroup.bind(this)
     this.convertToKratosGroup = this.convertToKratosGroup.bind(this)
+
+    this.deleteDuplicateSegments()
+  }
+
+  deleteDuplicateSegments () {
+    this.objects = this.objects.map((obj, i) => {
+      if (i === 0) return obj // Skip the first one (no need to check if there is only 1)
+      if (typeof obj.useVerticesFrom === 'undefined') return obj
+
+      const totalSegments = obj.segments.length
+      const obj2 = this.objects[obj.useVerticesFrom]
+      const move = []
+      const moveCount = []
+
+      obj.segments = obj.segments.filter((seg, k) => ( // eslint-disable-line
+        // For each segment of this object, keep the non-repeated
+        obj2.segments.findIndex((seg2, l) => { // See if the segment is repeated
+          if (seg2[0] === seg[0] && seg[1] === seg2[1]) {
+            move.push({ fromS: k, toS: l })
+            moveCount[k] = true
+            return true
+          }
+          return false
+        }) === -1
+      ))
+
+      let tmpCount = 0
+      for (let j = 0; j < totalSegments; j++) {
+        if (moveCount[j]) tmpCount++
+        moveCount[j] = tmpCount
+      }
+
+      obj.faces = obj.faces.map((face) => ( // eslint-disable-line
+        face.map((seg) => {
+          const m = move.find((mo) => (mo.fromS === seg[0]))
+          if (m === undefined) {
+            console.log('move segment to', seg[0] - moveCount[seg[0]])
+            return [seg[0] - moveCount[seg[0]], seg[1]]
+          }
+
+          return [{ seg: m.toS }, seg[1]]
+        })
+      ))
+
+      return obj
+    })
   }
 
   vertexDependencyCounter (iObj, jVer) {
@@ -71,11 +118,24 @@ ${vertex[0].toFixed(6)} ${vertex[1].toFixed(6)} ${vertex[2].toFixed(6)}
   }
 
   segmentDependencyCounter (iObj, jSeg) {
-    return this.objects[iObj].faces.filter((face) => (
-      face.findIndex((segment) => (
-        segment[0] === jSeg
-      )) !== -1
-    )).length
+    const objs = [{ isThis: true, obj: this.objects[iObj] }]
+    .concat(this.objects.reduce((all, obj) => (
+      obj.useVerticesFrom === iObj ? [...all, { isThis: false, obj }] : all
+    ), []))
+
+    return objs.map((obj) => (
+      obj.isThis ?
+        obj.obj.faces.filter((face) => (
+          face.findIndex((segment) => (
+            segment[0] === jSeg
+          )) !== -1
+        )).length :
+        obj.obj.faces.filter((face) => (
+          face.findIndex((segment) => (
+            segment[0].seg === jSeg
+          )) !== -1
+        )).length
+    )).reduce((all, o) => (all + o))
   }
 
   generateSegments () {
@@ -116,47 +176,59 @@ ${segment[0] + 1 + objPrevV} ${segment[1] + 1 + objPrevV}
   faceCenterCalculator (iObj, face, returnVector) {
     const points = []
     face.forEach((segment) => {
-      const seg = this.objects[iObj].segments[segment[0]]
-      if (typeof points.find((x) => (x === seg[0])) === 'undefined') {
-        points.push(seg[0])
-      }
-      if (typeof points.find((x) => (x === seg[1])) === 'undefined') {
-        points.push(seg[1])
+      if (typeof segment[0] === 'object') {
+        const seg = this.objects[this.objects[iObj].useVerticesFrom].segments[segment[0].seg]
+
+        points.push({ obj: this.objects[iObj].useVerticesFrom, point: seg[0] })
+        points.push({ obj: this.objects[iObj].useVerticesFrom, point: seg[1] })
+      } else {
+        const seg = this.objects[iObj].segments[segment[0]]
+
+        points.push({ obj: iObj, point: seg[0] })
+        points.push({ obj: iObj, point: seg[1] })
       }
     })
 
     const vector = points.reduce((all, point) => {
-      const p = this.objects[iObj].vertices[point]
+      const p = this.objects[point.obj].vertices[point.point]
       return [all[0] + p[0], all[1] + p[1], all[2] + p[2]]
     }, [0, 0, 0])
     .map((x) => (x / points.length))
+
+    console.log('face point', vector.join(' '))
+    if (vector[2] === 2.5) {
+      console.log(points)
+    }
 
     if (returnVector) {
       return vector
     }
 
-    return vector.map((x) => (`${x} `)).join('').trim()
+    return vector.join(' ')
   }
 
   faceNormalCalculator (iObj, face) {
     const points = []
 
+    const seg1 = typeof face[0][0] === 'object' ?
+      this.objects[this.objects[iObj].useVerticesFrom].segments[face[0][0].seg] :
+      this.objects[iObj].segments[face[0][0]]
+    const seg2 = typeof face[1][0] === 'object' ?
+      this.objects[this.objects[iObj].useVerticesFrom].segments[face[1][0].seg] :
+      this.objects[iObj].segments[face[1][0]]
+
     if (face[0][1] === 0) {
-      const seg = this.objects[iObj].segments[face[0][0]]
-      points.push(this.objects[iObj].vertices[seg[0]])
-      points.push(this.objects[iObj].vertices[seg[1]])
+      points.push(this.objects[iObj].vertices[seg1[0]])
+      points.push(this.objects[iObj].vertices[seg1[1]])
     } else {
-      const seg = this.objects[iObj].segments[face[0][0]]
-      points.push(this.objects[iObj].vertices[seg[1]])
-      points.push(this.objects[iObj].vertices[seg[0]])
+      points.push(this.objects[iObj].vertices[seg1[1]])
+      points.push(this.objects[iObj].vertices[seg1[0]])
     }
 
     if (face[1][1] === 0) {
-      const seg = this.objects[iObj].segments[face[1][0]]
-      points.push(this.objects[iObj].vertices[seg[1]])
+      points.push(this.objects[iObj].vertices[seg2[1]])
     } else {
-      const seg = this.objects[iObj].segments[face[1][0]]
-      points.push(this.objects[iObj].vertices[seg[0]])
+      points.push(this.objects[iObj].vertices[seg2[0]])
     }
 
     const v1 = math.add(points[1], math.multiply(points[0], -1))
@@ -165,7 +237,7 @@ ${segment[0] + 1 + objPrevV} ${segment[1] + 1 + objPrevV}
     const normal = math.cross(v1, v2)
     const normalized = math.divide(normal, math.norm(normal))
 
-    return normalized.map((x) => `${x} `).join('').trim()
+    return normalized.join(' ')
   }
 
   generateFaces () {
@@ -187,8 +259,11 @@ ${segment[0] + 1 + objPrevV} ${segment[1] + 1 + objPrevV}
   generateFace (n, objPrevS, iObj, jFac, face) {
     return `5 ${n + 1} 0 0 ${this.faceDependencyCounter(iObj, jFac)} 0 0 ${iObj + 1} 0
 ${face.length}
-${face.map((f) => (`${f[0] + 1 + objPrevS} `)).join('').trim()}
-${face.map((f) => (`${f[1]} `)).join('').trim()}
+${face.map((f) => (
+  // FIX: We only can do this if useVerticesFrom = 0
+  typeof f[0] === 'object' ? f[0].seg + 1 : f[0] + 1 + objPrevS
+)).join(' ')}
+${face.map((f) => (f[1])).join(' ')}
 ${this.faceCenterCalculator(iObj, face)}
 ${this.faceNormalCalculator(iObj, face)}
 `
@@ -198,7 +273,7 @@ ${this.faceNormalCalculator(iObj, face)}
     return volume.map((face) => (
       this.faceCenterCalculator(iObj, this.objects[iObj].faces[face[0]], true)
     )).reduce((prev, current) => (math.add(prev, current)))
-    .map((coord) => (`${coord / volume.length} `)).join('').trim()
+    .map((coord) => (coord / volume.length)).join(' ')
   }
 
   generateVolumes () {
@@ -220,8 +295,8 @@ ${this.faceNormalCalculator(iObj, face)}
   generateVolume (n, objPrevF, iObj, jVol, volume) {
     return `9 ${n + 1} 0 0 0 0 0 ${iObj + 1} 0
 ${volume.length}
-${volume.map((f) => (`${f[0] + 1 + objPrevF} `)).join('').trim()}
-${volume.map((f) => (`${f[1]} `)).join('').trim()}
+${volume.map((f) => (f[0] + 1 + objPrevF)).join(' ')}
+${volume.map((f) => (f[1])).join(' ')}
 ${this.volumeCenterCalculator(iObj, volume)}
 `
   }
