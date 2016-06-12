@@ -94,6 +94,14 @@ describe('GIDobject', () => {
       })
     })
 
+    describe('and when we call generatePressuresFile', () => {
+      const text = GITobj.generatePressuresFile()
+    
+      it('should generate the file correctly', () => {
+        expect(text).to.equal(data.pressuresFile)
+      })
+    })
+
     describe('and when we call generateKratosPrjFile', () => {
       const text = GITobj.generateKratosPrjFile()
 

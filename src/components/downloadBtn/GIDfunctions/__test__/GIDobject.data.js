@@ -301,4 +301,6 @@ export const conditionsFileGroups = `<Group id="group1" color="{#000000}" state=
 <Group id="AllSurfaces" color="{#999999}" state="1" type="Generic"/>
 `
 
+export const pressuresFile = ''
+
 /* eslint-enable */

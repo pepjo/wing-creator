@@ -31,6 +31,7 @@ export default class gidObject {
     this.generateVolumes = this.generateVolumes.bind(this)
     this.generateVolume = this.generateVolume.bind(this)
     this.generareSpdFile = this.generareSpdFile.bind(this)
+    this.generatePressuresFile = this.generatePressuresFile.bind(this)
     this.generateKratosPrjFile = this.generateKratosPrjFile.bind(this)
     this.parseGroupEntities = this.parseGroupEntities.bind(this)
     this.fillXmlEntitiesGroup = this.fillXmlEntitiesGroup.bind(this)
@@ -232,6 +233,65 @@ ${segment[0] + 1 + objPrevV} ${segment[1] + 1 + objPrevV}
     const normalized = math.divide(normal, math.norm(normal))
 
     return normalized.join(' ')
+  }
+
+  faceAreaCalculator (iObj, face) {
+    const points = []
+    const triangles = []
+
+    if (face.length === 4) {
+      const seg1 = typeof face[0][0] === 'object' ?
+        this.objects[this.objects[iObj].useVerticesFrom].segments[face[0][0].seg] :
+        this.objects[iObj].segments[face[0][0]]
+      const seg2 = typeof face[2][0] === 'object' ?
+        this.objects[this.objects[iObj].useVerticesFrom].segments[face[2][0].seg] :
+        this.objects[iObj].segments[face[2][0]]
+
+      if (face[0][1] === 0) {
+        points.push(this.objects[iObj].vertices[seg1[0]])
+        points.push(this.objects[iObj].vertices[seg1[1]])
+      } else {
+        points.push(this.objects[iObj].vertices[seg1[1]])
+        points.push(this.objects[iObj].vertices[seg1[0]])
+      }
+
+      if (face[1][1] === 0) {
+        points.push(this.objects[iObj].vertices[seg2[0]])
+        points.push(this.objects[iObj].vertices[seg2[1]])
+      } else {
+        points.push(this.objects[iObj].vertices[seg2[1]])
+        points.push(this.objects[iObj].vertices[seg2[0]])
+      }
+
+      triangles.push([points[0], points[1], points[2]])
+      triangles.push([points[0], points[3], points[2]])
+    } else {
+      throw new Error(`Calculation of area of a ${face.length} sided face is not implemented`)
+    }
+
+    const sides = triangles.map((triangle) => (
+      [
+        math.add(triangle[0], math.multiply(triangle[1], -1)),
+        math.add(triangle[1], math.multiply(triangle[2], -1)),
+        math.add(triangle[2], math.multiply(triangle[0], -1)),
+      ]
+    ))
+
+    const sidesLen = sides.map((side) => (
+      [
+        math.norm(side[0], 3),
+        math.norm(side[1], 3),
+        math.norm(side[2], 3),
+      ]
+    ))
+
+    const halfP = sidesLen.map((side) => (
+      (side[0] + side[1] + side[2]) / 2
+    ))
+
+    return halfP.reduce((total, s, i) => (
+      total + (math.sqrt(s * (s - sidesLen[i][0]) * (s - sidesLen[i][1]) * (s - [sidesLen[i][2]])))
+    ), 0)
   }
 
   generateFaces () {
@@ -514,6 +574,71 @@ ${this.volumeCenterCalculator(iObj, volume)}
     return null
   }
 
+  generatePressuresFile () {
+    return this.generatePressuresData()
+    .reduce((total, press, i) => (
+      /* eslint-disable */
+      `${total}${i + 1}\t${press.value}\t${press.area}\t${press.normal.replace(' ', '\t').replace(' ', '\t')}\r\n`
+      /* eslint-enable */
+    ), '')
+  }
+
+  generatePressuresData () {
+    // This generates a pressures file, not for Kratos but for me
+    const pressures = []
+
+    for (const object of this.objects) {
+      if (object.loads instanceof Array) {
+        for (const load of object.loads) {
+          if (load.type === 'SurfacePressureLoad3D') {
+            const temp = {
+              group: load.goupName,
+              value: load.pressureValue,
+            }
+            pressures.push(temp)
+          } else {
+            throw new Error('Load type not yet implemented')
+          }
+        }
+      }
+    }
+
+    return pressures.map((press) => (
+      Object.assign({}, press, {
+        group: this.objects.reduce((obj, object, i) => {
+          if (typeof object.groups !== 'undefined') {
+            const g = object.groups.find((group) => {
+              if (group.name === press.group) {
+                return true
+              }
+              return obj
+            })
+            if (g) {
+              return Object.assign(g, {
+                iObj: i,
+              })
+            }
+            return obj
+          }
+          return obj
+        }, false),
+      })
+    ))
+    .map((press) => (
+      Object.assign({}, press, {
+        face: press.group.entities.map((entity) => (
+          this.objects[press.group.iObj].faces[entity]
+        ))[0],
+      })
+    ))
+    .map((press) => (
+      Object.assign({}, press, {
+        normal: this.faceNormalCalculator(press.group.iObj, press.face),
+        area: this.faceAreaCalculator(press.group.iObj, press.face),
+      })
+    ))
+  }
+
   // Returns a string with the xml spd file
   generareSpdFile () {
     let content = ''
@@ -655,6 +780,11 @@ ${this.volumeCenterCalculator(iObj, volume)}
       const prj = this.generateKratosPrjFile()
       if (prj) {
         gid.file(`${filename}.prj`, prj)
+      }
+
+      const pressuresF = this.generatePressuresFile()
+      if (pressuresF) {
+        gid.file(`${filename}.pressures.out.dat`, pressuresF)
       }
     }
 
